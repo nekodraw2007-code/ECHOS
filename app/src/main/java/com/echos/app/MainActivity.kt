@@ -763,7 +763,6 @@ class MainActivity : Activity(), SensorEventListener {
     }
 
     @Synchronized
-    @Synchronized
     private fun processMagneticSignature(x: Double, y: Double, z: Double, magnitude: Double) {
         if (!magnitude.isFinite() || magnitude <= 0.0) return
         val now = System.currentTimeMillis()
@@ -799,7 +798,6 @@ class MainActivity : Activity(), SensorEventListener {
     }
 
     @Synchronized
-    @Synchronized
     private fun processMotionSignature(x: Double, y: Double, z: Double, source: String) {
         val now = System.currentTimeMillis()
         val norm = sqrt(x * x + y * y + z * z)
@@ -824,7 +822,6 @@ class MainActivity : Activity(), SensorEventListener {
         emitWord(entry, "signature de mouvement · $source · %.3f".format(Locale.FRANCE, norm), signature)
     }
 
-    @Synchronized
     @Synchronized
     private fun processProximitySignature(distance: Double, maxRange: Double, isNear: Boolean) {
         val now = System.currentTimeMillis()
