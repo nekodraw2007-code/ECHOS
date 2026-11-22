@@ -630,7 +630,6 @@ class MainActivity : Activity(), SensorEventListener {
     }
 
     @Synchronized
-    @Synchronized
     private fun processMagneticSignature(x: Double, y: Double, z: Double, magnitude: Double) {
         val now = System.currentTimeMillis()
         if (!magnitude.isFinite() || magnitude <= 0.0) return
@@ -673,7 +672,6 @@ class MainActivity : Activity(), SensorEventListener {
         nextWordAt = now + (10 + ((1f - sensitivity) * 30f).toInt()) * 1_000L
     }
 
-    @Synchronized
     @Synchronized
     private fun processMotionSignature(x: Double, y: Double, z: Double, source: String) {
         val now = System.currentTimeMillis()
