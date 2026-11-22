@@ -428,6 +428,7 @@ class MainActivity : Activity(), SensorEventListener {
         if (now - nextWordAt < 1_000L) return
         val pool = activeWordPool()
         if (pool.isEmpty()) return
+        ensureSensorOrder(pool.size)
 
         // GhostTube calcule sqrt(x² + y² + z²), puis ignore les trois premières décimales.
         val norm = sqrt(x * x + y * y + z * z)
@@ -444,7 +445,7 @@ class MainActivity : Activity(), SensorEventListener {
 
         val index = (raw - remainder) / 10_000
         if (index in 1..pool.size) {
-            pool.getOrNull(index)?.let { entry ->
+            orderedEntry(pool, index)?.let { entry ->
                 emitWord(entry, "signature magnétique · " + "%.1f".format(Locale.FRANCE, magnitude) + " µT")
             }
             val upperExclusive = (70f + (1f - sensitivity) * 120f).toInt().coerceAtLeast(11)
@@ -457,6 +458,7 @@ class MainActivity : Activity(), SensorEventListener {
         if (now - nextWordAt < 1_000L) return
         val pool = activeWordPool()
         if (pool.isEmpty()) return
+        ensureSensorOrder(pool.size)
 
         // GhostTube garde 20 décimales et fait pivoter les trois premières à la fin.
         val norm = sqrt(x * x + y * y + z * z)
@@ -516,7 +518,6 @@ class MainActivity : Activity(), SensorEventListener {
     }
 
     private fun emitWord(entry: WordEntry, reason: String) {
-        if (entry.text == lastWord && activeWordPool().size > 1) return
         lastWord = entry.text
         lastWordAt = System.currentTimeMillis()
         runOnUiThread {
