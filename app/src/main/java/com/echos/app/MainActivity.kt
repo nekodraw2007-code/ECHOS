@@ -30,7 +30,9 @@ import androidx.credentials.CredentialManager
 import androidx.credentials.GetCredentialRequest
 import androidx.credentials.CustomCredential
 import androidx.credentials.exceptions.GetCredentialException
-import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.firebase.FirebaseApp
@@ -129,6 +131,7 @@ class MainActivity : Activity(), SensorEventListener {
     private var firestore: FirebaseFirestore? = null
     private var customSyncListener: ListenerRegistration? = null
     private var historySyncListener: ListenerRegistration? = null
+    private val syncScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
     private var applyingRemoteSync = false
     private var customInitialSyncDone = false
 
@@ -1182,7 +1185,7 @@ class MainActivity : Activity(), SensorEventListener {
             toast("ID client OAuth Web absent. Télécharge google-services.json après avoir activé Google dans Firebase.")
             return
         }
-        lifecycleScope.launch {
+        syncScope.launch {
             try {
                 val googleOption = GetGoogleIdOption.Builder()
                     .setServerClientId(getString(webClientIdRes))
