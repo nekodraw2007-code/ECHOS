@@ -553,6 +553,7 @@ class MainActivity : Activity(), SensorEventListener {
     private fun dp(value: Int) = (value * resources.displayMetrics.density).toInt()
 
     companion object {
+        private const val MODE_AUTO = 0
         private const val MODE_MOTION = 1
         private const val MODE_MAGNETIC = 2
     }
