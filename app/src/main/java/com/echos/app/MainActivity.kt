@@ -275,7 +275,7 @@ class MainActivity : Activity(), SensorEventListener {
         statusView.text = when {
             !hasMag && accelerometer == null && gyroscope == null -> "Aucun capteur compatible détecté"
             calibrated -> "Capteurs prêts · calibration enregistrée"
-            else -> "Calibration nécessaire · pose le téléphone sur une surface stable"
+            else -> "Capteurs prêts · calibration facultative"
         }
         statusView.setTextColor(if (hasMag || accelerometer != null || gyroscope != null) orange else red)
         fieldView.text = if (hasMag) "%.1f µT".format(Locale.FRANCE, magneticMagnitude) else "INDISPONIBLE"
