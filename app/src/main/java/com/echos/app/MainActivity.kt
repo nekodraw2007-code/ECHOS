@@ -45,7 +45,10 @@ class MainActivity : Activity(), SensorEventListener {
     private var magnetic: Sensor? = null
     private var magneticUncalibrated: Sensor? = null
     private var accelerometer: Sensor? = null
+    private var accelerometerUncalibrated: Sensor? = null
     private var gyroscope: Sensor? = null
+    private var gyroscopeUncalibrated: Sensor? = null
+    private var gameRotationVector: Sensor? = null
 
     private val baseEntries = mutableListOf<WordEntry>()
     private val customEntries = mutableListOf<WordEntry>()
@@ -88,7 +91,10 @@ class MainActivity : Activity(), SensorEventListener {
         magnetic = sensors.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD)
         magneticUncalibrated = sensors.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD_UNCALIBRATED)
         accelerometer = sensors.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
+        accelerometerUncalibrated = sensors.getDefaultSensor(35) // TYPE_ACCELEROMETER_UNCALIBRATED
         gyroscope = sensors.getDefaultSensor(Sensor.TYPE_GYROSCOPE)
+        gyroscopeUncalibrated = sensors.getDefaultSensor(16) // TYPE_GYROSCOPE_UNCALIBRATED
+        gameRotationVector = sensors.getDefaultSensor(15) // TYPE_GAME_ROTATION_VECTOR
         loadDictionary()
         loadPreferences()
         buildInterface()
@@ -269,8 +275,8 @@ class MainActivity : Activity(), SensorEventListener {
         if (!::sensorLabel.isInitialized) return
         val hasMag = magnetic != null || magneticUncalibrated != null
         sensorLabel.text = "Magnétomètre : " + if (hasMag) "disponible" else "absent"
-        sensorLabel.append("\nAccéléromètre : " + if (accelerometer != null) "disponible" else "absent")
-        sensorLabel.append("\nGyroscope : " + if (gyroscope != null) "disponible" else "absent")
+        sensorLabel.append("\nAccéléromètre : " + if (accelerometer != null || accelerometerUncalibrated != null) "disponible" else "absent")
+        sensorLabel.append("\nGyroscope / rotation : " + if (gyroscope != null || gyroscopeUncalibrated != null || gameRotationVector != null) "disponible" else "absent")
         currentMode = if (hasMag) "MAGNÉTIQUE" else "MOUVEMENT"
         statusView.text = when {
             !hasMag && accelerometer == null && gyroscope == null -> "Aucun capteur compatible détecté"
@@ -286,7 +292,10 @@ class MainActivity : Activity(), SensorEventListener {
         val magSensor = magnetic ?: magneticUncalibrated
         if (magSensor != null) sensors.registerListener(this, magSensor, SensorManager.SENSOR_DELAY_GAME)
         accelerometer?.let { sensors.registerListener(this, it, SensorManager.SENSOR_DELAY_GAME) }
+        accelerometerUncalibrated?.let { sensors.registerListener(this, it, SensorManager.SENSOR_DELAY_GAME) }
         gyroscope?.let { sensors.registerListener(this, it, SensorManager.SENSOR_DELAY_GAME) }
+        gyroscopeUncalibrated?.let { sensors.registerListener(this, it, SensorManager.SENSOR_DELAY_GAME) }
+        gameRotationVector?.let { sensors.registerListener(this, it, SensorManager.SENSOR_DELAY_GAME) }
     }
 
     override fun onPause() {
@@ -313,13 +322,13 @@ class MainActivity : Activity(), SensorEventListener {
                     deltaView.text = "Variation depuis calibration : %.2f µT".format(Locale.FRANCE, magneticDelta)
                 }
             }
-            Sensor.TYPE_ACCELEROMETER -> {
+            Sensor.TYPE_ACCELEROMETER, 35 -> {
                 val preciseAcceleration = sqrt(v[0].toDouble()*v[0] + v[1].toDouble()*v[1] + v[2].toDouble()*v[2])
                 accelerationMagnitude = preciseAcceleration.toFloat()
                 if (calibrating && magnetic == null && magneticUncalibrated == null) collectCalibration(accelerationMagnitude)
                 else if (sessionActive) processMotionSignature(v[0].toDouble(), v[1].toDouble(), v[2].toDouble(), preciseAcceleration, "accéléromètre")
             }
-            Sensor.TYPE_GYROSCOPE -> {
+            Sensor.TYPE_GYROSCOPE, 16, 15 -> {
                 val preciseRotation = sqrt(v[0].toDouble()*v[0] + v[1].toDouble()*v[1] + v[2].toDouble()*v[2])
                 rotationMagnitude = preciseRotation.toFloat()
                 if (calibrating && magnetic == null && magneticUncalibrated == null) collectCalibration(rotationMagnitude)
@@ -329,7 +338,9 @@ class MainActivity : Activity(), SensorEventListener {
     }
 
     private fun startCalibration() {
-        if (magnetic == null && magneticUncalibrated == null && accelerometer == null && gyroscope == null) {
+        if (magnetic == null && magneticUncalibrated == null && accelerometer == null &&
+            accelerometerUncalibrated == null && gyroscope == null &&
+            gyroscopeUncalibrated == null && gameRotationVector == null) {
             toast("Aucun capteur compatible sur cet appareil.")
             return
         }
@@ -374,7 +385,9 @@ class MainActivity : Activity(), SensorEventListener {
             addHistory("Session arrêtée")
             return
         }
-        val hasAnySensor = magnetic != null || magneticUncalibrated != null || accelerometer != null || gyroscope != null
+        val hasAnySensor = magnetic != null || magneticUncalibrated != null || accelerometer != null ||
+            accelerometerUncalibrated != null || gyroscope != null ||
+            gyroscopeUncalibrated != null || gameRotationVector != null
         if (!hasAnySensor) {
             toast("Aucun capteur de mouvement ou magnétique disponible sur cet appareil.")
             return
