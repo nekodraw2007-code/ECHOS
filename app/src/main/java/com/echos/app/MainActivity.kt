@@ -49,6 +49,9 @@ class MainActivity : Activity(), SensorEventListener {
     private var calibrationCount = 0
     private var calibrationTotal = 0.0
     private var magneticMagnitude = 0f
+    private var magneticX = 0f
+    private var magneticY = 0f
+    private var magneticZ = 0f
     private var accelerationMagnitude = 0f
     private var rotationMagnitude = 0f
     private var motionMagnitude = 0f
@@ -375,6 +378,9 @@ class MainActivity : Activity(), SensorEventListener {
         val v = event.values
         when (event.sensor.type) {
             Sensor.TYPE_MAGNETIC_FIELD -> {
+                magneticX = v[0]
+                magneticY = v[1]
+                magneticZ = v[2]
                 magneticMagnitude = sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2])
                 if (activeMode() == 2) processSample(abs(magneticMagnitude - magneticBaseline), magneticMagnitude)
             }
@@ -450,7 +456,8 @@ class MainActivity : Activity(), SensorEventListener {
         if (!::readingText.isInitialized) return
         if (activeMode() == 2) {
             readingText.text = if (magnetometer == null) "INDISPONIBLE" else "%.1f µT".format(Locale.FRANCE, magneticMagnitude)
-            readingDetail.text = if (calibrated) "Écart à la référence : %.2f µT".format(Locale.FRANCE, abs(magneticMagnitude - magneticBaseline)) else "Champ magnétique mesuré sur les trois axes"
+            readingDetail.text = "X %.1f · Y %.1f · Z %.1f µT".format(Locale.FRANCE, magneticX, magneticY, magneticZ) +
+                if (calibrated) "  |  Δ %.2f µT".format(Locale.FRANCE, abs(magneticMagnitude - magneticBaseline)) else "  |  non calibré"
         } else {
             readingText.text = "MOUVEMENT"
             readingDetail.text = "Accéléromètre : %.2f · Gyroscope : %.2f".format(Locale.FRANCE, accelerationMagnitude, rotationMagnitude)
