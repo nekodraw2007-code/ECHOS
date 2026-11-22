@@ -1215,21 +1215,21 @@ class MainActivity : Activity(), SensorEventListener {
             toast("Identifiant OAuth Web introuvable dans google-services.json.")
             return
         }
-
-        try {
-            googleSignInButton.isEnabled = false
-            googleSignInButton.text = "OUVERTURE DE GOOGLE…"
-            val options = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestEmail()
-                .requestIdToken(getString(webClientIdRes))
-                .build()
-            val client = GoogleSignIn.getClient(this, options)
-            @Suppress("DEPRECATION")
-            startActivityForResult(client.signInIntent, GOOGLE_SIGN_IN_REQUEST)
-        } catch (e: Exception) {
-            Log.e("ECHOS_SYNC", "Impossible d'ouvrir le sélecteur Google", e)
-            toast("Impossible d'ouvrir Google : ${e.localizedMessage ?: e.javaClass.simpleName}")
-            refreshAccountUi()
+        googleSignInButton.isEnabled = false
+        googleSignInButton.text = "OUVERTURE DE GOOGLE…"
+        val options = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+            .requestEmail().requestIdToken(getString(webClientIdRes)).build()
+        val client = GoogleSignIn.getClient(this, options)
+        // Clear stale cached sign-in state before opening the chooser.
+        client.signOut().addOnCompleteListener {
+            try {
+                @Suppress("DEPRECATION")
+                startActivityForResult(client.signInIntent, GOOGLE_SIGN_IN_REQUEST)
+            } catch (e: Exception) {
+                Log.e("ECHOS_SYNC", "Impossible d'ouvrir le sélecteur Google", e)
+                toast("Impossible d'ouvrir Google : ${e.localizedMessage ?: e.javaClass.simpleName}")
+                refreshAccountUi()
+            }
         }
     }
 
@@ -1237,25 +1237,23 @@ class MainActivity : Activity(), SensorEventListener {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: android.content.Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode != GOOGLE_SIGN_IN_REQUEST) return
-
-        if (resultCode != RESULT_OK || data == null) {
-            Log.w("ECHOS_SYNC", "Sélection du compte Google annulée (resultCode=$resultCode)")
-            toast("Connexion Google annulée.")
+        // Google Play Services may use RESULT_CANCELED for failures too.
+        // Always inspect the returned Intent to expose the real ApiException.
+        if (data == null) {
+            Log.w("ECHOS_SYNC", "Google returned no result Intent (resultCode=$resultCode)")
+            toast("Google n'a renvoyé aucun résultat. Vérifie Google Play Services et OAuth.")
             refreshAccountUi()
             return
         }
-
         try {
-            val task = GoogleSignIn.getSignedInAccountFromIntent(data)
-            val account = task.getResult(ApiException::class.java)
+            val account = GoogleSignIn.getSignedInAccountFromIntent(data).getResult(ApiException::class.java)
             val idToken = account.idToken
             if (idToken.isNullOrBlank()) {
-                Log.e("ECHOS_SYNC", "Google n'a pas retourné d'ID token.")
-                toast("Google n'a pas fourni de jeton. Vérifie l'identifiant OAuth Web.")
+                Log.e("ECHOS_SYNC", "Google n'a pas retourné d'ID token pour ${account.email}")
+                toast("Google n'a pas fourni de jeton. Vérifie le client OAuth Web.")
                 refreshAccountUi()
                 return
             }
-
             val credential = GoogleAuthProvider.getCredential(idToken, null)
             firebaseAuth?.signInWithCredential(credential)
                 ?.addOnSuccessListener {
@@ -1272,8 +1270,14 @@ class MainActivity : Activity(), SensorEventListener {
                     refreshAccountUi()
                 }
         } catch (e: ApiException) {
-            Log.e("ECHOS_SYNC", "Google Sign-In a échoué : statusCode=${e.statusCode}", e)
-            toast("Échec Google (${e.statusCode}) : ${e.localizedMessage ?: "réessaie"}")
+            Log.e("ECHOS_SYNC", "Google Sign-In statusCode=${e.statusCode}, resultCode=$resultCode", e)
+            val detail = when (e.statusCode) {
+                10 -> "Configuration OAuth incorrecte : package ou SHA-1 de cet APK."
+                16 -> "Réauthentification refusée par Google. Vérifie la signature SHA-1 de l'APK et Google Play Services."
+                12501 -> "Sélection Google annulée par l'utilisateur."
+                else -> e.localizedMessage ?: "Erreur Google"
+            }
+            toast("Échec Google [${e.statusCode}] : $detail")
             refreshAccountUi()
         } catch (e: Exception) {
             Log.e("ECHOS_SYNC", "Erreur inattendue pendant la connexion Google", e)
