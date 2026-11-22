@@ -1,6 +1,6 @@
 {
   "language": "fr",
-  "version": 2,
+  "version": 3,
   "entries": [
     {
       "category": "Réponses",
@@ -7325,6 +7325,556 @@
     {
       "category": "Prénoms",
       "text": "ZIAD",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "1 AN",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "2 ANS",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "3 ANS",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "4 ANS",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "5 ANS",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "6 ANS",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "7 ANS",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "8 ANS",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "9 ANS",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "10 ANS",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "11 ANS",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "12 ANS",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "13 ANS",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "14 ANS",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "15 ANS",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "16 ANS",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "17 ANS",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "18 ANS",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "19 ANS",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "20 ANS",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "21 ANS",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "22 ANS",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "23 ANS",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "24 ANS",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "25 ANS",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "26 ANS",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "27 ANS",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "28 ANS",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "29 ANS",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "30 ANS",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "31 ANS",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "32 ANS",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "33 ANS",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "34 ANS",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "35 ANS",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "36 ANS",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "37 ANS",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "38 ANS",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "39 ANS",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "40 ANS",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "41 ANS",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "42 ANS",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "43 ANS",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "44 ANS",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "45 ANS",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "46 ANS",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "47 ANS",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "48 ANS",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "49 ANS",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "50 ANS",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "51 ANS",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "52 ANS",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "53 ANS",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "54 ANS",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "55 ANS",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "56 ANS",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "57 ANS",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "58 ANS",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "59 ANS",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "60 ANS",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "61 ANS",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "62 ANS",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "63 ANS",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "64 ANS",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "65 ANS",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "66 ANS",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "67 ANS",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "68 ANS",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "69 ANS",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "70 ANS",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "71 ANS",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "72 ANS",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "73 ANS",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "74 ANS",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "75 ANS",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "76 ANS",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "77 ANS",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "78 ANS",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "79 ANS",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "80 ANS",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "81 ANS",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "82 ANS",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "83 ANS",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "84 ANS",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "85 ANS",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "86 ANS",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "87 ANS",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "88 ANS",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "89 ANS",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "90 ANS",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "91 ANS",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "92 ANS",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "93 ANS",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "94 ANS",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "95 ANS",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "96 ANS",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "97 ANS",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "98 ANS",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "99 ANS",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "100 ANS",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "NOUVEAU-NÉ",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "QUELQUES MOIS",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "MOINS D'UN AN",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "JEUNE",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "ADOLESCENT",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "JEUNE ADULTE",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "ADULTE",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "PERSONNE ÂGÉE",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "CENTENAIRE",
+      "weight": 1
+    },
+    {
+      "category": "Âges",
+      "text": "JE NE CONNAIS PAS MON ÂGE",
       "weight": 1
     }
   ]
