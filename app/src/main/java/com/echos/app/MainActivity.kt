@@ -766,35 +766,33 @@ class MainActivity : Activity(), SensorEventListener {
     private fun processMagneticSignature(x: Double, y: Double, z: Double, magnitude: Double) {
         if (!magnitude.isFinite() || magnitude <= 0.0) return
         val now = System.currentTimeMillis()
-        val currentVector = doubleArrayOf(x, y, z)
-        val reference = magneticReferenceVector
-        if (reference == null || !magneticReference.isFinite()) {
-            magneticReferenceVector = currentVector
+        if (!magneticReference.isFinite()) {
+            magneticReferenceVector = doubleArrayOf(x, y, z)
             magneticReference = magnitude
             return
         }
 
-        val dx = x - reference[0]
-        val dy = y - reference[1]
-        val dz = z - reference[2]
-        val vectorDelta = sqrt(dx * dx + dy * dy + dz * dz)
+        // La norme magnétique est indépendante de l'orientation du téléphone :
+        // tourner l'appareil ne doit donc pas suffire à déclencher un mot.
         val magnitudeDelta = abs(magnitude - magneticReference)
         val calibratedNoise = if (calibrated) noiseFloor.toDouble() * 3.0 else 0.0
         val threshold = maxOf(0.45, calibratedNoise, 1.45 - sensitivity.toDouble() * 1.0)
-        magneticDelta = maxOf(vectorDelta, magnitudeDelta).toFloat()
-        if (magneticDelta < threshold || now < nextWordAt) return
+        magneticDelta = magnitudeDelta.toFloat()
+        if (magnitudeDelta < threshold || now < nextWordAt) return
 
         val pool = activeWordPool()
         if (pool.isEmpty()) return
-        // Signature numérique déterministe construite à partir des axes et de la norme bruts.
-        val signature = signatureDigits(x, y, z, magnitude)
+        // GhostTube construit sa signature magnétique à partir de la norme du champ.
+        // On reprend ce principe : chiffres décimaux de |B|, étendus à 20 chiffres.
+        val signature = repeatDigitsTo20(sensorFraction(magnitude), inclusive = false)
+        if (signature.length < 20) return
         val entry = selectSignatureEntry(pool, signature) ?: return
 
-        magneticReferenceVector = currentVector
         magneticReference = magnitude
+        magneticReferenceVector = doubleArrayOf(x, y, z)
         lastMagneticSignature = signature
         nextWordAt = now + cooldownForSignature(signature)
-        emitWord(entry, "signature magnétique · Δ %.2f µT".format(Locale.FRANCE, magneticDelta), signature)
+        emitWord(entry, "signature magnétique · Δ %.2f µT".format(Locale.FRANCE, magnitudeDelta), signature)
     }
 
     @Synchronized
