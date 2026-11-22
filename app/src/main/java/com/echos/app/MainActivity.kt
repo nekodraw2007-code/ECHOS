@@ -26,11 +26,9 @@ import android.view.ViewGroup
 import android.widget.*
 import org.json.JSONArray
 import org.json.JSONObject
-import androidx.credentials.CredentialManager
-import androidx.credentials.CustomCredential
-import androidx.credentials.GetCredentialRequest
-import com.google.android.libraries.identity.googleid.GetSignInWithGoogleOption
-import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.ApiException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -53,6 +51,7 @@ import kotlin.random.Random
 private data class WordEntry(val category: String, val text: String, val weight: Int = 1, val custom: Boolean = false)
 
 class MainActivity : Activity(), SensorEventListener {
+    companion object { private const val GOOGLE_SIGN_IN_REQUEST = 7104 }
     private val bg = Color.rgb(5, 10, 22)
     private val panel = Color.rgb(13, 24, 43)
     private val panel2 = Color.rgb(20, 39, 67)
@@ -1204,8 +1203,8 @@ class MainActivity : Activity(), SensorEventListener {
         }
     }
 
-    // Connexion Google avec Credential Manager (flux Android recommandé).
-    // L'option Sign in with Google est conçue pour le bouton explicite de connexion.
+    // Connexion Google via le sélecteur natif Google Play Services.
+    // Ce flux ouvre explicitement l'écran de choix de compte, puis échange l'ID token avec Firebase.
     private fun startGoogleSignIn() {
         if (firebaseAuth == null) {
             toast("Firebase n'est pas initialisé. Vérifie google-services.json.")
@@ -1217,78 +1216,79 @@ class MainActivity : Activity(), SensorEventListener {
             return
         }
 
-        googleSignInButton.isEnabled = false
-        googleSignInButton.text = "OUVERTURE DE GOOGLE…"
+        try {
+            googleSignInButton.isEnabled = false
+            googleSignInButton.text = "OUVERTURE DE GOOGLE…"
+            val options = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .requestIdToken(getString(webClientIdRes))
+                .build()
+            val client = GoogleSignIn.getClient(this, options)
+            @Suppress("DEPRECATION")
+            startActivityForResult(client.signInIntent, GOOGLE_SIGN_IN_REQUEST)
+        } catch (e: Exception) {
+            Log.e("ECHOS_SYNC", "Impossible d'ouvrir le sélecteur Google", e)
+            toast("Impossible d'ouvrir Google : ${e.localizedMessage ?: e.javaClass.simpleName}")
+            refreshAccountUi()
+        }
+    }
 
-        syncScope.launch {
-            try {
-                val googleOption = GetSignInWithGoogleOption.Builder(
-                    serverClientId = getString(webClientIdRes)
-                ).build()
+    @Deprecated("Google Sign-In activity result")
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: android.content.Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode != GOOGLE_SIGN_IN_REQUEST) return
 
-                val request = GetCredentialRequest.Builder()
-                    .addCredentialOption(googleOption)
-                    .build()
+        if (resultCode != RESULT_OK || data == null) {
+            Log.w("ECHOS_SYNC", "Sélection du compte Google annulée (resultCode=$resultCode)")
+            toast("Connexion Google annulée.")
+            refreshAccountUi()
+            return
+        }
 
-                val result = CredentialManager.create(this@MainActivity).getCredential(
-                    context = this@MainActivity,
-                    request = request
-                )
-
-                val credential = result.credential
-                if (credential !is CustomCredential ||
-                    credential.type != GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL
-                ) {
-                    Log.e("ECHOS_SYNC", "Type de justificatif Google inattendu : ${credential::class.java.name}")
-                    toast("Google a renvoyé un type de compte non reconnu.")
-                    refreshAccountUi()
-                    return@launch
-                }
-
-                val googleToken = GoogleIdTokenCredential.createFrom(credential.data).idToken
-                if (googleToken.isBlank()) {
-                    toast("Google n'a pas fourni de jeton de connexion.")
-                    refreshAccountUi()
-                    return@launch
-                }
-
-                val firebaseCredential = GoogleAuthProvider.getCredential(googleToken, null)
-                firebaseAuth?.signInWithCredential(firebaseCredential)
-                    ?.addOnSuccessListener {
-                        Log.i("ECHOS_SYNC", "Connexion Google/Firebase réussie : ${it.user?.uid}")
-                        toast("Connexion Google réussie. Synchronisation activée.")
-                        refreshAccountUi()
-                    }
-                    ?.addOnFailureListener { error ->
-                        Log.e("ECHOS_SYNC", "Firebase a refusé le jeton Google", error)
-                        toast("Échec Firebase : ${error.localizedMessage ?: error.javaClass.simpleName}")
-                        refreshAccountUi()
-                    } ?: run {
-                        toast("Firebase n'est plus disponible.")
-                        refreshAccountUi()
-                    }
-            } catch (e: androidx.credentials.exceptions.GetCredentialException) {
-                Log.e("ECHOS_SYNC", "Credential Manager : ${e.javaClass.simpleName}: ${e.message}", e)
-                val detail = e.message?.takeIf { it.isNotBlank() } ?: e.javaClass.simpleName
-                toast("Connexion Google impossible : $detail")
+        try {
+            val task = GoogleSignIn.getSignedInAccountFromIntent(data)
+            val account = task.getResult(ApiException::class.java)
+            val idToken = account.idToken
+            if (idToken.isNullOrBlank()) {
+                Log.e("ECHOS_SYNC", "Google n'a pas retourné d'ID token.")
+                toast("Google n'a pas fourni de jeton. Vérifie l'identifiant OAuth Web.")
                 refreshAccountUi()
-            } catch (e: Exception) {
-                Log.e("ECHOS_SYNC", "Erreur inattendue pendant la connexion Google", e)
-                toast("Erreur Google : ${e.localizedMessage ?: e.javaClass.simpleName}")
-                refreshAccountUi()
+                return
             }
+
+            val credential = GoogleAuthProvider.getCredential(idToken, null)
+            firebaseAuth?.signInWithCredential(credential)
+                ?.addOnSuccessListener {
+                    Log.i("ECHOS_SYNC", "Connexion Google/Firebase réussie : ${it.user?.uid}")
+                    toast("Connexion Google réussie. Synchronisation activée.")
+                    refreshAccountUi()
+                }
+                ?.addOnFailureListener { error ->
+                    Log.e("ECHOS_SYNC", "Firebase a refusé le jeton Google", error)
+                    toast("Échec Firebase : ${error.localizedMessage ?: error.javaClass.simpleName}")
+                    refreshAccountUi()
+                } ?: run {
+                    toast("Firebase n'est plus disponible.")
+                    refreshAccountUi()
+                }
+        } catch (e: ApiException) {
+            Log.e("ECHOS_SYNC", "Google Sign-In a échoué : statusCode=${e.statusCode}", e)
+            toast("Échec Google (${e.statusCode}) : ${e.localizedMessage ?: "réessaie"}")
+            refreshAccountUi()
+        } catch (e: Exception) {
+            Log.e("ECHOS_SYNC", "Erreur inattendue pendant la connexion Google", e)
+            toast("Erreur Google : ${e.localizedMessage ?: e.javaClass.simpleName}")
+            refreshAccountUi()
         }
     }
 
     private fun signOutGoogle() {
         firebaseAuth?.signOut()
-        syncScope.launch {
-            runCatching { CredentialManager.create(this@MainActivity).clearCredentialState(
-                androidx.credentials.ClearCredentialStateRequest()
-            ) }
-            toast("Déconnecté. Les données locales sont conservées.")
-            refreshAccountUi()
-        }
+        GoogleSignIn.getClient(this, GoogleSignInOptions.DEFAULT_SIGN_IN).signOut()
+            .addOnCompleteListener {
+                toast("Déconnecté. Les données locales sont conservées.")
+                refreshAccountUi()
+            }
     }
 
     private fun cloudUserDocument(uid: String) =
