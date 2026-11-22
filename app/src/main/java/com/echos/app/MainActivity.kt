@@ -21,6 +21,7 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.view.Gravity
 import android.view.View
+import android.view.ViewGroup
 import android.widget.*
 import org.json.JSONArray
 import org.json.JSONObject
@@ -35,13 +36,13 @@ import kotlin.random.Random
 private data class WordEntry(val category: String, val text: String, val weight: Int = 1, val custom: Boolean = false)
 
 class MainActivity : Activity(), SensorEventListener {
-    private val bg = Color.rgb(7, 10, 16)
-    private val panel = Color.rgb(17, 24, 35)
-    private val panel2 = Color.rgb(25, 35, 49)
-    private val accent = Color.rgb(88, 211, 190)
-    private val white = Color.rgb(241, 246, 250)
-    private val muted = Color.rgb(143, 158, 177)
-    private val orange = Color.rgb(245, 174, 91)
+    private val bg = Color.rgb(8, 10, 8)
+    private val panel = Color.rgb(24, 28, 23)
+    private val panel2 = Color.rgb(34, 40, 31)
+    private val accent = Color.rgb(183, 232, 83)
+    private val white = Color.rgb(242, 244, 236)
+    private val muted = Color.rgb(151, 160, 143)
+    private val orange = Color.rgb(214, 190, 111)
     private val red = Color.rgb(240, 111, 111)
 
     private lateinit var sensors: SensorManager
@@ -194,121 +195,222 @@ class MainActivity : Activity(), SensorEventListener {
     }
 
     private fun buildInterface() {
-        val scroll = ScrollView(this).apply { setBackgroundColor(bg) }
-        val page = LinearLayout(this).apply {
+        val root = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
-            setPadding(dp(18), dp(22), dp(18), dp(28))
+            setBackgroundColor(bg)
+            fitsSystemWindows = true
         }
-        scroll.addView(page)
-        page.addView(text("E C H O S", 28, white, true))
-        page.addView(text("DICTIONNAIRE SENSORIEL", 11, accent, true))
-        page.addView(text("MESURES PHYSIQUES EN TEMPS RÉEL · HORS LIGNE", 9, muted))
-        page.addView(space(18))
 
-        val wordCard = card()
-        wordCard.addView(text("DERNIER MOT DÉTECTÉ", 10, accent, true))
-        wordView = text("—", 38, white, true).apply {
-            gravity = Gravity.CENTER
-            minHeight = dp(112)
-            setPadding(dp(6), dp(16), dp(6), dp(16))
+        val header = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(dp(20), dp(12), dp(20), dp(14))
+            setBackgroundColor(Color.rgb(5, 7, 5))
         }
-        wordCard.addView(wordView, match())
-        wordCard.addView(text("Les mots proviennent des signatures des capteurs. Leur origine n'est pas vérifiable.", 10, muted).apply { gravity = Gravity.CENTER })
-        page.addView(wordCard)
-        page.addView(space(10))
+        val brandRow = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL; gravity = Gravity.CENTER_VERTICAL }
+        val brand = text("ECHOS", 24, white, true)
+        brand.letterSpacing = 0.16f
+        brandRow.addView(brand, LinearLayout.LayoutParams(0, -2, 1f))
+        brandRow.addView(text("● LIVE SENSOR", 10, accent, true))
+        header.addView(brandRow)
+        header.addView(text("ENVIRONMENTAL WORD DETECTOR", 9, muted, true))
+        root.addView(header)
 
-        val meter = card()
-        meter.addView(text("CHAMP MAGNÉTIQUE", 10, accent, true))
-        fieldView = text("— µT", 30, white, true)
-        meter.addView(fieldView)
-        deltaView = text("Variation : —", 12, muted)
-        meter.addView(deltaView)
-        val meterBar = ProgressBar(this, null, android.R.attr.progressBarStyleHorizontal).apply {
-            max = 100
-            progress = 0
-            progressTintList = android.content.res.ColorStateList.valueOf(accent)
-            progressBackgroundTintList = android.content.res.ColorStateList.valueOf(panel2)
-        }
-        meter.addView(meterBar, LinearLayout.LayoutParams(-1, dp(7)).apply { topMargin = dp(10) })
-        page.addView(meter)
-        page.addView(space(10))
+        val content = FrameLayout(this)
+        root.addView(content, LinearLayout.LayoutParams(-1, 0, 1f))
 
-        statusView = text("Initialisation des capteurs…", 11, orange, true).apply {
-            gravity = Gravity.CENTER
-            background = rounded(panel2, 12)
-            setPadding(dp(12), dp(12), dp(12), dp(12))
-        }
-        page.addView(statusView, match())
-        page.addView(space(10))
-
-        val controls = card()
-        controls.addView(text("SESSION", 11, accent, true))
-        sessionButton = button("DÉMARRER LA SESSION") { toggleSession() }
-        controls.addView(sessionButton, match())
-        controls.addView(button("CALIBRER LES CAPTEURS") { startCalibration() }, match())
-        page.addView(controls)
-        page.addView(space(10))
-
-        val settings = card()
-        settings.addView(text("SENSIBILITÉ DU DICTIONNAIRE", 11, accent, true))
-        sensitivityLabel = text("", 12, white)
-        settings.addView(sensitivityLabel)
-        settings.addView(SeekBar(this).apply {
-            max = 100
-            progress = (sensitivity * 100).toInt()
-            progressTintList = android.content.res.ColorStateList.valueOf(accent)
-            thumbTintList = android.content.res.ColorStateList.valueOf(accent)
-            setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-                override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                    sensitivity = progress / 100f
-                    updateSensitivityLabel()
-                    savePreferences()
-                }
-                override fun onStartTrackingTouch(seekBar: SeekBar?) {}
-                override fun onStopTrackingTouch(seekBar: SeekBar?) {}
-            })
-        })
-        categoriesButton = button("CATÉGORIES ACTIVES") { chooseCategories() }
-        settings.addView(categoriesButton, match())
-        settings.addView(button("CONSULTER LE DICTIONNAIRE") { showDictionary() }, match())
-        settings.addView(button("MON DICTIONNAIRE PERSONNEL") { manageCustomDictionary() }, match())
-        settings.addView(Switch(this).apply {
-            text = "VOIX DYNAMIQUES (empreintes des capteurs)"
-            setTextColor(white)
-            textSize = 13f
-            isChecked = dynamicVoicesEnabled
-            setOnCheckedChangeListener { _, enabled ->
-                dynamicVoicesEnabled = enabled
-                getSharedPreferences("echos_preferences", MODE_PRIVATE).edit().putBoolean("dynamic_voices_enabled", enabled).apply()
-                if (!enabled) speechEngine?.stop()
-                toast(if (enabled) "Voix dynamiques activées" else "Voix désactivées")
+        fun makeScroll(builder: (LinearLayout) -> Unit): ScrollView {
+            val scroll = ScrollView(this).apply { setFillViewport(true); setBackgroundColor(bg) }
+            val column = LinearLayout(this).apply {
+                orientation = LinearLayout.VERTICAL
+                setPadding(dp(18), dp(18), dp(18), dp(24))
             }
-        }.apply { setPadding(0, dp(12), 0, dp(8)) }, match())
-        page.addView(settings)
-        page.addView(space(10))
+            scroll.addView(column)
+            builder(column)
+            return scroll
+        }
+        fun sectionTitle(title: String, subtitle: String): LinearLayout {
+            val block = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPadding(0, dp(4), 0, dp(14)) }
+            val titleView = text(title, 18, white, true)
+            titleView.letterSpacing = 0.06f
+            block.addView(titleView)
+            block.addView(text(subtitle, 10, muted))
+            return block
+        }
+        val pages = mutableListOf<View>()
 
-        val sensorsCard = card()
-        sensorsCard.addView(text("CAPTEURS DE L'APPAREIL", 11, accent, true))
-        sensorLabel = text("", 12, muted)
-        sensorsCard.addView(sensorLabel)
-        page.addView(sensorsCard)
-        page.addView(space(10))
+        val home = makeScroll { page ->
+            page.addView(sectionTitle("INVESTIGATION", "Mesures brutes des capteurs de ton appareil"))
+            val wordCard = card().apply {
+                background = rounded(Color.rgb(19, 24, 17), 18)
+                setPadding(dp(18), dp(18), dp(18), dp(18))
+            }
+            wordCard.addView(text("DERNIÈRE SIGNATURE DÉTECTÉE", 10, accent, true))
+            wordView = text("—", 42, white, true).apply {
+                gravity = Gravity.CENTER
+                minHeight = dp(128)
+                letterSpacing = 0.04f
+                setPadding(dp(4), dp(16), dp(4), dp(12))
+            }
+            wordCard.addView(wordView, match())
+            wordCard.addView(text("En attente d'une variation environnementale", 10, muted).apply { gravity = Gravity.CENTER })
+            page.addView(wordCard)
+            page.addView(space(14))
 
-        val historyCard = card()
-        historyCard.addView(text("HISTORIQUE DES MOTS", 11, accent, true))
-        historyView = text("Aucun mot détecté.", 12, muted)
-        historyCard.addView(historyView)
-        historyCard.addView(button("EFFACER L'HISTORIQUE") {
-            history.clear()
-            persistHistory()
-            refreshHistory()
-        }, match())
-        page.addView(historyCard)
-        page.addView(space(14))
-        page.addView(text("ECHOS est un outil expérimental. Les capteurs mesurent des phénomènes physiques ordinaires ; les mots affichés ne démontrent pas une communication avec l'invisible.", 10, muted))
-        setContentView(scroll)
+            sessionButton = button("▶   DÉMARRER L'ÉCOUTE") { toggleSession() }.apply {
+                textSize = 14f
+                typeface = Typeface.DEFAULT_BOLD
+                background = rounded(accent, 14)
+                setTextColor(Color.rgb(12, 16, 9))
+                layoutParams = LinearLayout.LayoutParams(-1, dp(58))
+            }
+            page.addView(sessionButton)
+            page.addView(space(14))
+
+            val magneticCard = card()
+            val top = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL; gravity = Gravity.CENTER_VERTICAL }
+            top.addView(text("CHAMP MAGNÉTIQUE", 10, accent, true), LinearLayout.LayoutParams(0, -2, 1f))
+            top.addView(text("µT", 10, muted, true))
+            magneticCard.addView(top)
+            fieldView = text("—", 34, white, true)
+            magneticCard.addView(fieldView)
+            deltaView = text("Variation : en attente", 11, muted)
+            magneticCard.addView(deltaView)
+            val meter = ProgressBar(this, null, android.R.attr.progressBarStyleHorizontal).apply {
+                max = 100
+                progressTintList = android.content.res.ColorStateList.valueOf(accent)
+                progressBackgroundTintList = android.content.res.ColorStateList.valueOf(panel2)
+            }
+            magneticCard.addView(meter, LinearLayout.LayoutParams(-1, dp(5)).apply { topMargin = dp(12) })
+            page.addView(magneticCard)
+            page.addView(space(10))
+
+            statusView = text("INITIALISATION DES CAPTEURS…", 10, orange, true).apply {
+                gravity = Gravity.CENTER
+                background = rounded(panel2, 12)
+                setPadding(dp(12), dp(14), dp(12), dp(14))
+            }
+            page.addView(statusView, match())
+            page.addView(space(10))
+            val sensorsCard = card()
+            sensorsCard.addView(text("ÉTAT DES CAPTEURS", 10, accent, true))
+            sensorLabel = text("", 11, muted)
+            sensorLabel.setLineSpacing(dp(3).toFloat(), 1f)
+            sensorsCard.addView(sensorLabel)
+            page.addView(sensorsCard)
+        }
+        pages.add(home)
+
+        val historyPage = makeScroll { page ->
+            page.addView(sectionTitle("HISTORIQUE", "Événements et mots détectés pendant les sessions"))
+            val box = card()
+            historyView = text("Aucun événement enregistré.", 12, white)
+            historyView.setLineSpacing(dp(5).toFloat(), 1f)
+            box.addView(historyView)
+            box.addView(button("EFFACER L'HISTORIQUE") {
+                history.clear()
+                persistHistory()
+                refreshHistory()
+            }, match())
+            page.addView(box)
+        }
+        pages.add(historyPage)
+
+        val dictionaryPage = makeScroll { page ->
+            page.addView(sectionTitle("DICTIONNAIRE", "Entrées associées aux signatures des capteurs"))
+            val countCard = card()
+            countCard.addView(text("BIBLIOTHÈQUE DE MOTS", 10, accent, true))
+            countCard.addView(text("${baseEntries.size + customEntries.size} entrées disponibles", 23, white, true))
+            countCard.addView(text("Les entrées personnalisées restent enregistrées sur cet appareil.", 10, muted))
+            page.addView(countCard)
+            page.addView(space(12))
+            categoriesButton = button("CATÉGORIES ACTIVES · ${activeCategories.size}") { chooseCategories() }
+            page.addView(categoriesButton, match())
+            page.addView(button("PARCOURIR LE DICTIONNAIRE") { showDictionary() }, match())
+            page.addView(button("MON DICTIONNAIRE PERSONNEL") { manageCustomDictionary() }, match())
+        }
+        pages.add(dictionaryPage)
+
+        val settingsPage = makeScroll { page ->
+            page.addView(sectionTitle("RÉGLAGES", "Personnalise le comportement de la session"))
+            val sensitivityCard = card()
+            sensitivityCard.addView(text("SENSIBILITÉ", 10, accent, true))
+            sensitivityLabel = text("", 15, white, true)
+            sensitivityCard.addView(sensitivityLabel)
+            sensitivityCard.addView(SeekBar(this).apply {
+                max = 100
+                progress = (sensitivity * 100).toInt()
+                progressTintList = android.content.res.ColorStateList.valueOf(accent)
+                thumbTintList = android.content.res.ColorStateList.valueOf(accent)
+                setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+                    override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                        sensitivity = progress / 100f
+                        updateSensitivityLabel()
+                        savePreferences()
+                    }
+                    override fun onStartTrackingTouch(seekBar: SeekBar?) {}
+                    override fun onStopTrackingTouch(seekBar: SeekBar?) {}
+                })
+            })
+            sensitivityCard.addView(text("Une sensibilité élevée abaisse les seuils de variation ; elle ne doit pas créer de mots sans signal.", 10, muted))
+            page.addView(sensitivityCard)
+            page.addView(space(10))
+            val toolsCard = card()
+            toolsCard.addView(text("OUTILS DE MESURE", 10, accent, true))
+            toolsCard.addView(button("CALIBRER LE CAPTEUR MAGNÉTIQUE") { startCalibration() }, match())
+            toolsCard.addView(button("CATÉGORIES DU DICTIONNAIRE") { chooseCategories() }, match())
+            toolsCard.addView(button("CONSULTER LE DICTIONNAIRE") { showDictionary() }, match())
+            toolsCard.addView(button("GÉRER MES MOTS PERSONNELS") { manageCustomDictionary() }, match())
+            toolsCard.addView(Switch(this).apply {
+                text = "VOIX DYNAMIQUES"
+                setTextColor(white)
+                textSize = 13f
+                isChecked = dynamicVoicesEnabled
+                setOnCheckedChangeListener { _, enabled ->
+                    dynamicVoicesEnabled = enabled
+                    getSharedPreferences("echos_preferences", MODE_PRIVATE).edit().putBoolean("dynamic_voices_enabled", enabled).apply()
+                    if (!enabled) speechEngine?.stop()
+                    toast(if (enabled) "Voix dynamiques activées" else "Voix désactivées")
+                }
+            }.apply { setPadding(0, dp(14), 0, dp(4)) }, match())
+            page.addView(toolsCard)
+            page.addView(space(10))
+            val info = card()
+            info.addView(text("À PROPOS DES MESURES", 10, accent, true))
+            info.addView(text("ECHOS réagit aux lectures physiques du téléphone. Les variations peuvent provenir d'objets métalliques, d'appareils électroniques, de mouvements ou du champ magnétique terrestre. Aucun résultat ne prouve une communication paranormale.", 11, muted))
+            page.addView(info)
+        }
+        pages.add(settingsPage)
+
+        pages.forEachIndexed { index, view ->
+            content.addView(view, FrameLayout.LayoutParams(-1, -1))
+            view.visibility = if (index == 0) View.VISIBLE else View.GONE
+        }
+        val nav = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            setPadding(dp(6), dp(7), dp(6), dp(8))
+            setBackgroundColor(Color.rgb(5, 7, 5))
+        }
+        val labels = listOf("⌖\nENQUÊTE", "↻\nHISTORIQUE", "▤\nDICTIONNAIRE", "⚙\nRÉGLAGES")
+        labels.forEachIndexed { index, label ->
+            val item = TextView(this).apply {
+                text = label
+                gravity = Gravity.CENTER
+                textSize = 10f
+                setLineSpacing(dp(2).toFloat(), 1f)
+                setTextColor(if (index == 0) accent else muted)
+                setPadding(0, dp(7), 0, dp(7))
+                setOnClickListener {
+                    pages.forEachIndexed { i, p -> p.visibility = if (i == index) View.VISIBLE else View.GONE }
+                    for (child in 0 until nav.childCount) (nav.getChildAt(child) as? TextView)?.setTextColor(if (child == index) accent else muted)
+                }
+            }
+            nav.addView(item, LinearLayout.LayoutParams(0, dp(54), 1f))
+        }
+        root.addView(nav)
+        setContentView(root)
         updateSensitivityLabel()
         refreshHistory()
+        refreshSensorStatus()
     }
 
     private fun updateSensitivityLabel() {
@@ -629,101 +731,110 @@ class MainActivity : Activity(), SensorEventListener {
         return digits.take(20)
     }
 
+    private fun signatureDigits(vararg values: Double): String {
+        val raw = values.joinToString("") { value ->
+            if (!value.isFinite()) "" else {
+                val decimal = BigDecimal(abs(value)).stripTrailingZeros().toPlainString()
+                decimal.substringAfter(".", "").ifEmpty { "0" }
+            }
+        }.filter { it.isDigit() }
+        return repeatDigitsTo20(raw, inclusive = true)
+    }
+
+    // Associe directement l'empreinte numérique à une entrée stable du dictionnaire.
+    // L'entrelacement des catégories évite qu'une catégorie volumineuse monopolise les sorties.
+    private fun selectSignatureEntry(pool: List<WordEntry>, signature: String): WordEntry? {
+        if (pool.isEmpty() || signature.isEmpty()) return null
+        val groups = pool.groupBy { it.category }.toSortedMap()
+        val ordered = mutableListOf<WordEntry>()
+        val maxSize = groups.values.maxOfOrNull { it.size } ?: 0
+        for (row in 0 until maxSize) {
+            groups.values.forEach { group -> group.getOrNull(row)?.let { ordered.add(it) } }
+        }
+        if (ordered.isEmpty()) return null
+        val numeric = runCatching { java.math.BigInteger(signature) }.getOrDefault(java.math.BigInteger.ZERO)
+        val index = numeric.mod(java.math.BigInteger.valueOf(ordered.size.toLong())).toInt()
+        return ordered[index]
+    }
+
+    private fun cooldownForSignature(signature: String): Long {
+        val tail = signature.takeLast(2).toIntOrNull() ?: 0
+        return (12L + tail % 24L) * 1_000L
+    }
+
+    @Synchronized
     @Synchronized
     private fun processMagneticSignature(x: Double, y: Double, z: Double, magnitude: Double) {
-        val now = System.currentTimeMillis()
         if (!magnitude.isFinite() || magnitude <= 0.0) return
-
+        val now = System.currentTimeMillis()
         val currentVector = doubleArrayOf(x, y, z)
-        val referenceVector = magneticReferenceVector
-        if (referenceVector == null || !magneticReference.isFinite()) {
+        val reference = magneticReferenceVector
+        if (reference == null || !magneticReference.isFinite()) {
             magneticReferenceVector = currentVector
             magneticReference = magnitude
             return
         }
 
-        // Une valeur stable n'est jamais une raison de produire un mot.
-        // On attend une variation réelle du champ par rapport à la dernière
-        // empreinte acceptée, en tenant compte du bruit mesuré à la calibration.
-        val vectorDelta = sqrt(
-            (x - referenceVector[0]) * (x - referenceVector[0]) +
-            (y - referenceVector[1]) * (y - referenceVector[1]) +
-            (z - referenceVector[2]) * (z - referenceVector[2])
-        )
+        val dx = x - reference[0]
+        val dy = y - reference[1]
+        val dz = z - reference[2]
+        val vectorDelta = sqrt(dx * dx + dy * dy + dz * dz)
         val magnitudeDelta = abs(magnitude - magneticReference)
-        val noiseThreshold = if (calibrated) noiseFloor.toDouble() * 4.0 else 0.0
-        val sensitivityThreshold = 0.35 + (1.0 - sensitivity.toDouble()) * 1.20
-        val threshold = maxOf(0.35, noiseThreshold, sensitivityThreshold)
-        if (maxOf(vectorDelta, magnitudeDelta) < threshold) return
-        if (now < nextWordAt) return
+        val calibratedNoise = if (calibrated) noiseFloor.toDouble() * 3.0 else 0.0
+        val threshold = maxOf(0.45, calibratedNoise, 1.45 - sensitivity.toDouble() * 1.0)
+        magneticDelta = maxOf(vectorDelta, magnitudeDelta).toFloat()
+        if (magneticDelta < threshold || now < nextWordAt) return
 
         val pool = activeWordPool()
         if (pool.isEmpty()) return
-        val fingerprint = listOf(x, y, z, magnitude).joinToString("|") {
-            BigDecimal(it).stripTrailingZeros().toPlainString()
-        }.filter { it.isDigit() }.take(20).padEnd(20, '0')
-        val seed = fingerprint.hashCode()
-        val entry = selectBalancedEntry(pool, seed) ?: return
+        // Signature numérique déterministe construite à partir des axes et de la norme bruts.
+        val signature = signatureDigits(x, y, z, magnitude)
+        val entry = selectSignatureEntry(pool, signature) ?: return
 
         magneticReferenceVector = currentVector
         magneticReference = magnitude
-        lastMagneticSignature = fingerprint
-        emitWord(entry, "variation magnétique · Δ %.2f µT".format(Locale.FRANCE, maxOf(vectorDelta, magnitudeDelta)), fingerprint)
-        nextWordAt = now + (10 + ((1f - sensitivity) * 30f).toInt()) * 1_000L
+        lastMagneticSignature = signature
+        nextWordAt = now + cooldownForSignature(signature)
+        emitWord(entry, "signature magnétique · Δ %.2f µT".format(Locale.FRANCE, magneticDelta), signature)
     }
 
+    @Synchronized
     @Synchronized
     private fun processMotionSignature(x: Double, y: Double, z: Double, source: String) {
         val now = System.currentTimeMillis()
         val norm = sqrt(x * x + y * y + z * z)
         if (!norm.isFinite()) return
-
-        // L'accéléromètre brut est déjà filtré pour retirer la gravité avant
-        // d'arriver ici. Les seuils ci-dessous empêchent le bruit de fond et
-        // les micro-mouvements de devenir des déclencheurs.
-        val baseThreshold = when {
-            source == "gyroscope" -> 0.10
-            source == "accéléromètre linéaire" -> 0.30
-            else -> 0.30
+        val threshold = when (source) {
+            "gyroscope" -> 0.12 + (1.0 - sensitivity.toDouble()) * 0.18
+            "accéléromètre linéaire" -> 0.35 + (1.0 - sensitivity.toDouble()) * 0.45
+            else -> 0.35 + (1.0 - sensitivity.toDouble()) * 0.45
         }
-        val threshold = baseThreshold + (1.0 - sensitivity.toDouble()) * baseThreshold * 2.0
-        val resetThreshold = threshold * 0.45
-        val active = motionTriggerActive[source] == true
-
-        if (norm <= resetThreshold) {
+        val wasActive = motionTriggerActive[source] == true
+        if (norm < threshold * 0.40) {
             motionTriggerActive[source] = false
             return
         }
-        if (active || norm < threshold || now < nextWordAt) return
-
+        if (wasActive || norm < threshold || now < nextWordAt) return
         val pool = activeWordPool()
         if (pool.isEmpty()) return
-        val fraction = sensorFraction(norm)
-        if (fraction.isEmpty()) return
-        val digits = repeatDigitsTo20(fraction, inclusive = false)
-        if (digits.length < 20) return
-        val signature = digits.substring(3, 20) + digits.substring(0, 3)
-        val fingerprint = (listOf(x, y, z, norm, signature).joinToString("|"))
-            .filter { it.isDigit() }.take(20).padEnd(20, '0')
-        val entry = selectBalancedEntry(pool, fingerprint.hashCode()) ?: return
-
+        val signature = signatureDigits(x, y, z, norm)
+        val entry = selectSignatureEntry(pool, signature) ?: return
         motionTriggerActive[source] = true
-        emitWord(entry, "variation de mouvement · $source · %.4f".format(Locale.FRANCE, norm), fingerprint)
-        nextWordAt = now + (10 + ((1f - sensitivity) * 30f).toInt()) * 1_000L
+        nextWordAt = now + cooldownForSignature(signature)
+        emitWord(entry, "signature de mouvement · $source · %.3f".format(Locale.FRANCE, norm), signature)
     }
 
+    @Synchronized
     @Synchronized
     private fun processProximitySignature(distance: Double, maxRange: Double, isNear: Boolean) {
         val now = System.currentTimeMillis()
         if (now < nextWordAt || maxRange <= 0.0) return
         val pool = activeWordPool()
         if (pool.isEmpty()) return
-        val fingerprint = (distance.toString() + "|" + maxRange.toString() + "|" + if (isNear) "1" else "0")
-            .filter { it.isDigit() }.take(20).padEnd(20, '0')
-        val seed = (fingerprint + now / 10_000L).hashCode()
-        val entry = selectBalancedEntry(pool, seed) ?: return
-        emitWord(entry, if (isNear) "proximité · objet proche" else "proximité · objet éloigné", fingerprint)
-        nextWordAt = now + (8 + ((1f - sensitivity) * 32f).toInt()) * 1_000L
+        val signature = signatureDigits(distance, maxRange, if (isNear) 1.0 else 0.0)
+        val entry = selectSignatureEntry(pool, signature) ?: return
+        nextWordAt = now + cooldownForSignature(signature)
+        emitWord(entry, if (isNear) "signature de proximité · proche" else "signature de proximité · éloigné", signature)
     }
 
     private fun isMotionStable(source: String, magnitude: Double, now: Long): Boolean {
@@ -742,9 +853,7 @@ class MainActivity : Activity(), SensorEventListener {
         return shuffledWordIndexes.getOrNull(index)?.let { pool.getOrNull(it) }
     }
 
-    // Équilibre le tirage par catégorie : une catégorie très volumineuse
-    // (ex. les 465 prénoms) ne doit pas écraser les autres catégories.
-    // La catégorie ET le mot restent déterminés par l'empreinte du capteur.
+    // Ancienne sélection conservée pour compatibilité avec les appels historiques.
     private fun selectBalancedEntry(pool: List<WordEntry>, sensorSeed: Int): WordEntry? {
         if (pool.isEmpty()) return null
         val groups = pool.groupBy { it.category }.toSortedMap().values.toList()
