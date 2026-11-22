@@ -358,12 +358,14 @@ class MainActivity : Activity(), SensorEventListener {
         sensorLabel.append("\nAccéléromètre linéaire : " + if (linearAccelerometer != null) "disponible" else "absent")
         sensorLabel.append("\nProximité : " + if (proximity != null) "disponible" else "absent")
         currentMode = if (hasMag) "MULTICAPTEURS" else "MOUVEMENT / PROXIMITÉ"
+        val hasMotionOrProximity = accelerometer != null || accelerometerUncalibrated != null ||
+            linearAccelerometer != null || gyroscope != null || gyroscopeUncalibrated != null || proximity != null
         statusView.text = when {
-            !hasMag && accelerometer == null && accelerometerUncalibrated == null && gyroscope == null && gyroscopeUncalibrated == null -> "Aucun capteur compatible détecté"
+            !hasMag && !hasMotionOrProximity -> "Aucun capteur compatible détecté"
             calibrated -> "Capteurs prêts · calibration enregistrée"
             else -> "Capteurs prêts · calibration facultative"
         }
-        statusView.setTextColor(if (hasMag || accelerometer != null || accelerometerUncalibrated != null || gyroscope != null || gyroscopeUncalibrated != null) orange else red)
+        statusView.setTextColor(if (hasMag || hasMotionOrProximity) orange else red)
         fieldView.text = if (hasMag) "%.1f µT".format(Locale.FRANCE, magneticMagnitude) else "INDISPONIBLE"
     }
 
@@ -510,8 +512,8 @@ class MainActivity : Activity(), SensorEventListener {
     private fun startCalibration() {
         if (magnetic == null && magneticUncalibrated == null && accelerometer == null &&
             accelerometerUncalibrated == null && linearAccelerometer == null && gyroscope == null &&
-            gyroscopeUncalibrated == null && proximity == null) {
-            toast("Aucun capteur compatible sur cet appareil.")
+            gyroscopeUncalibrated == null) {
+            toast("Aucun capteur ne permet une calibration sur cet appareil.")
             return
         }
         calibrationValues.clear()
