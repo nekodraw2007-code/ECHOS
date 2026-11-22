@@ -475,7 +475,7 @@ class MainActivity : Activity(), SensorEventListener {
             if (end > 5) {
                 val index = signature.substring(5, end).toIntOrNull()
                 if (index != null) {
-                    pool.getOrNull(index)?.let { entry ->
+                    orderedEntry(pool, index)?.let { entry ->
                         emitWord(entry, "signature " + source + " · " + "%.4f".format(Locale.FRANCE, norm))
                         val upperExclusive = ((1f - sensitivity) * 45f).toInt() + 11
                         nextWordAt = now + Random.nextInt(10, upperExclusive.coerceAtLeast(11)) * 1_000L
