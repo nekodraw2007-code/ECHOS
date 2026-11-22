@@ -564,16 +564,18 @@ class MainActivity : Activity(), SensorEventListener {
     @Synchronized
     private fun processMagneticSignature(x: Double, y: Double, z: Double, magnitude: Double) {
         val now = System.currentTimeMillis()
-        if (!calibrated) return
+        // La calibration est facultative : GhostTube peut exploiter les signatures
+        // brutes dès le démarrage. Exiger calibrated ici bloquait TOUS les mots
+        // lorsqu'aucune calibration valide n'avait été enregistrée.
         if (now < nextWordAt) return
         val pool = activeWordPool()
         if (pool.isEmpty()) return
         ensureSensorOrder(pool.size)
 
-        // Le champ doit s'écarter nettement du niveau mesuré pendant la calibration.
-        // Cela filtre le bruit de fond et empêche une valeur stable de produire des mots.
-        val minimumChange = (noiseFloor * (4.0 - sensitivity.toDouble() * 2.0)).coerceAtLeast(0.12)
-        if (abs(magnitude - baseline.toDouble()) < minimumChange) return
+        // Ne pas imposer de seuil de variation par rapport à la baseline :
+        // ce filtre cumulait un second verrou avec la tolérance de signature et
+        // rendait les déclenchements quasiment impossibles sur certains téléphones.
+        // Le magnétomètre seul reste la source des mots (pas le mouvement brut).
 
         // GhostTube calcule sqrt(x² + y² + z²), puis ignore les trois premières décimales.
         val norm = sqrt(x * x + y * y + z * z)
@@ -593,8 +595,9 @@ class MainActivity : Activity(), SensorEventListener {
             val entry = orderedEntry(pool, index) ?: return
             lastMagneticSignature = digits
             emitWord(entry, "signature magnétique · variation %.2f µT".format(Locale.FRANCE, abs(magnitude - baseline)), digits)
-            // Un délai plus long laisse le champ se stabiliser et évite les rafales de mots.
-            nextWordAt = now + Random.nextInt(30, 91) * 1_000L
+            // Délai progressif : réduit à sensibilité élevée, sans rafale.
+            val cooldownSeconds = 10 + ((1f - sensitivity) * 35f).toInt()
+            nextWordAt = now + cooldownSeconds * 1_000L
         }
     }
 
