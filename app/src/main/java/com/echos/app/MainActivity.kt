@@ -279,11 +279,11 @@ class MainActivity : Activity(), SensorEventListener {
         sensorLabel.append("\nGyroscope / rotation : " + if (gyroscope != null || gyroscopeUncalibrated != null || gameRotationVector != null) "disponible" else "absent")
         currentMode = if (hasMag) "MAGNÉTIQUE" else "MOUVEMENT"
         statusView.text = when {
-            !hasMag && accelerometer == null && gyroscope == null -> "Aucun capteur compatible détecté"
+            !hasMag && accelerometer == null && accelerometerUncalibrated == null && gyroscope == null && gyroscopeUncalibrated == null && gameRotationVector == null -> "Aucun capteur compatible détecté"
             calibrated -> "Capteurs prêts · calibration enregistrée"
             else -> "Capteurs prêts · calibration facultative"
         }
-        statusView.setTextColor(if (hasMag || accelerometer != null || gyroscope != null) orange else red)
+        statusView.setTextColor(if (hasMag || accelerometer != null || accelerometerUncalibrated != null || gyroscope != null || gyroscopeUncalibrated != null || gameRotationVector != null) orange else red)
         fieldView.text = if (hasMag) "%.1f µT".format(Locale.FRANCE, magneticMagnitude) else "INDISPONIBLE"
     }
 
