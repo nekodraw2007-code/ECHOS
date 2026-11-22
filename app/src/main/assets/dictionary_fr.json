@@ -1,6 +1,6 @@
 {
   "language": "fr",
-  "version": 3,
+  "version": 4,
   "entries": [
     {
       "category": "Réponses",
@@ -7875,6 +7875,1276 @@
     {
       "category": "Âges",
       "text": "JE NE CONNAIS PAS MON ÂGE",
+      "weight": 1
+    },
+    {
+      "category": "Questions et identité",
+      "text": "QUEL EST TON NOM ?",
+      "weight": 1
+    },
+    {
+      "category": "Questions et identité",
+      "text": "COMMENT T'APPELLES-TU ?",
+      "weight": 1
+    },
+    {
+      "category": "Questions et identité",
+      "text": "PEUX-TU ME DIRE TON PRÉNOM ?",
+      "weight": 1
+    },
+    {
+      "category": "Questions et identité",
+      "text": "QUEL ÂGE AS-TU ?",
+      "weight": 1
+    },
+    {
+      "category": "Questions et identité",
+      "text": "D'OÙ VIENS-TU ?",
+      "weight": 1
+    },
+    {
+      "category": "Questions et identité",
+      "text": "QUI CHERCHES-TU ?",
+      "weight": 1
+    },
+    {
+      "category": "Questions et identité",
+      "text": "ES-TU SEUL ?",
+      "weight": 1
+    },
+    {
+      "category": "Questions et identité",
+      "text": "ES-TU AVEC NOUS ?",
+      "weight": 1
+    },
+    {
+      "category": "Questions et identité",
+      "text": "VEUX-TU PARLER ?",
+      "weight": 1
+    },
+    {
+      "category": "Questions et identité",
+      "text": "POURQUOI ES-TU ICI ?",
+      "weight": 1
+    },
+    {
+      "category": "Questions et identité",
+      "text": "QUE VEUX-TU ?",
+      "weight": 1
+    },
+    {
+      "category": "Questions et identité",
+      "text": "AS-TU QUELQUE CHOSE À DIRE ?",
+      "weight": 1
+    },
+    {
+      "category": "Questions et identité",
+      "text": "CONNAIS-TU MON NOM ?",
+      "weight": 1
+    },
+    {
+      "category": "Questions et identité",
+      "text": "M'ENTENDS-TU ?",
+      "weight": 1
+    },
+    {
+      "category": "Questions et identité",
+      "text": "PEUX-TU RÉPONDRE ?",
+      "weight": 1
+    },
+    {
+      "category": "Questions et identité",
+      "text": "COMMENT VAS-TU ?",
+      "weight": 1
+    },
+    {
+      "category": "Questions et identité",
+      "text": "QUE S'EST-IL PASSÉ ?",
+      "weight": 1
+    },
+    {
+      "category": "Questions et identité",
+      "text": "QUAND ES-TU ARRIVÉ ?",
+      "weight": 1
+    },
+    {
+      "category": "Questions et identité",
+      "text": "OÙ HABITAIS-TU ?",
+      "weight": 1
+    },
+    {
+      "category": "Questions et identité",
+      "text": "ES-TU EN DANGER ?",
+      "weight": 1
+    },
+    {
+      "category": "Questions et identité",
+      "text": "AS-TU BESOIN D'AIDE ?",
+      "weight": 1
+    },
+    {
+      "category": "Questions et identité",
+      "text": "VEUX-TU QUE JE PARTE ?",
+      "weight": 1
+    },
+    {
+      "category": "Questions et identité",
+      "text": "PUIS-JE T'AIDER ?",
+      "weight": 1
+    },
+    {
+      "category": "Questions et identité",
+      "text": "QUI EST AVEC TOI ?",
+      "weight": 1
+    },
+    {
+      "category": "Questions et identité",
+      "text": "COMBIEN ÊTES-VOUS ?",
+      "weight": 1
+    },
+    {
+      "category": "Questions et identité",
+      "text": "ES-TU UN HOMME ?",
+      "weight": 1
+    },
+    {
+      "category": "Questions et identité",
+      "text": "ES-TU UNE FEMME ?",
+      "weight": 1
+    },
+    {
+      "category": "Questions et identité",
+      "text": "ES-TU UN ENFANT ?",
+      "weight": 1
+    },
+    {
+      "category": "Questions et identité",
+      "text": "AS-TU UNE FAMILLE ?",
+      "weight": 1
+    },
+    {
+      "category": "Questions et identité",
+      "text": "AS-TU UN MESSAGE ?",
+      "weight": 1
+    },
+    {
+      "category": "Questions et identité",
+      "text": "À QUI VEUX-TU PARLER ?",
+      "weight": 1
+    },
+    {
+      "category": "Questions et identité",
+      "text": "QUEL EST TON SOUVENIR ?",
+      "weight": 1
+    },
+    {
+      "category": "Questions et identité",
+      "text": "QUEL EST TON PLUS GRAND REGRET ?",
+      "weight": 1
+    },
+    {
+      "category": "Questions et identité",
+      "text": "VEUX-TU RESTER ?",
+      "weight": 1
+    },
+    {
+      "category": "Questions et identité",
+      "text": "VEUX-TU PARTIR ?",
+      "weight": 1
+    },
+    {
+      "category": "Questions et identité",
+      "text": "AS-TU PEUR ?",
+      "weight": 1
+    },
+    {
+      "category": "Questions et identité",
+      "text": "ES-TU HEUREUX ?",
+      "weight": 1
+    },
+    {
+      "category": "Questions et identité",
+      "text": "ES-TU TRISTE ?",
+      "weight": 1
+    },
+    {
+      "category": "Questions et identité",
+      "text": "ES-TU EN COLÈRE ?",
+      "weight": 1
+    },
+    {
+      "category": "Questions et identité",
+      "text": "PEUX-TU DIRE OUI ?",
+      "weight": 1
+    },
+    {
+      "category": "Questions et identité",
+      "text": "PEUX-TU DIRE NON ?",
+      "weight": 1
+    },
+    {
+      "category": "Couleurs",
+      "text": "ROUGE",
+      "weight": 1
+    },
+    {
+      "category": "Couleurs",
+      "text": "BLEU",
+      "weight": 1
+    },
+    {
+      "category": "Couleurs",
+      "text": "BLEU CLAIR",
+      "weight": 1
+    },
+    {
+      "category": "Couleurs",
+      "text": "BLEU FONCÉ",
+      "weight": 1
+    },
+    {
+      "category": "Couleurs",
+      "text": "VERT",
+      "weight": 1
+    },
+    {
+      "category": "Couleurs",
+      "text": "VERT CLAIR",
+      "weight": 1
+    },
+    {
+      "category": "Couleurs",
+      "text": "JAUNE",
+      "weight": 1
+    },
+    {
+      "category": "Couleurs",
+      "text": "ORANGE",
+      "weight": 1
+    },
+    {
+      "category": "Couleurs",
+      "text": "ROSE",
+      "weight": 1
+    },
+    {
+      "category": "Couleurs",
+      "text": "VIOLET",
+      "weight": 1
+    },
+    {
+      "category": "Couleurs",
+      "text": "MAUVE",
+      "weight": 1
+    },
+    {
+      "category": "Couleurs",
+      "text": "NOIR",
+      "weight": 1
+    },
+    {
+      "category": "Couleurs",
+      "text": "BLANC",
+      "weight": 1
+    },
+    {
+      "category": "Couleurs",
+      "text": "GRIS",
+      "weight": 1
+    },
+    {
+      "category": "Couleurs",
+      "text": "MARRON",
+      "weight": 1
+    },
+    {
+      "category": "Couleurs",
+      "text": "BEIGE",
+      "weight": 1
+    },
+    {
+      "category": "Couleurs",
+      "text": "TURQUOISE",
+      "weight": 1
+    },
+    {
+      "category": "Couleurs",
+      "text": "CYAN",
+      "weight": 1
+    },
+    {
+      "category": "Couleurs",
+      "text": "DORÉ",
+      "weight": 1
+    },
+    {
+      "category": "Couleurs",
+      "text": "ARGENTÉ",
+      "weight": 1
+    },
+    {
+      "category": "Couleurs",
+      "text": "BORDEAUX",
+      "weight": 1
+    },
+    {
+      "category": "Couleurs",
+      "text": "ÉCARLATE",
+      "weight": 1
+    },
+    {
+      "category": "Couleurs",
+      "text": "INDIGO",
+      "weight": 1
+    },
+    {
+      "category": "Couleurs",
+      "text": "LILAS",
+      "weight": 1
+    },
+    {
+      "category": "Couleurs",
+      "text": "CRÈME",
+      "weight": 1
+    },
+    {
+      "category": "Couleurs",
+      "text": "CUIVRE",
+      "weight": 1
+    },
+    {
+      "category": "Moyens de transport",
+      "text": "VOITURE",
+      "weight": 1
+    },
+    {
+      "category": "Moyens de transport",
+      "text": "CAMION",
+      "weight": 1
+    },
+    {
+      "category": "Moyens de transport",
+      "text": "CAMIONNETTE",
+      "weight": 1
+    },
+    {
+      "category": "Moyens de transport",
+      "text": "BUS",
+      "weight": 1
+    },
+    {
+      "category": "Moyens de transport",
+      "text": "AUTOCAR",
+      "weight": 1
+    },
+    {
+      "category": "Moyens de transport",
+      "text": "TAXI",
+      "weight": 1
+    },
+    {
+      "category": "Moyens de transport",
+      "text": "MOTO",
+      "weight": 1
+    },
+    {
+      "category": "Moyens de transport",
+      "text": "SCOOTER",
+      "weight": 1
+    },
+    {
+      "category": "Moyens de transport",
+      "text": "VÉLO",
+      "weight": 1
+    },
+    {
+      "category": "Moyens de transport",
+      "text": "TROTTINETTE",
+      "weight": 1
+    },
+    {
+      "category": "Moyens de transport",
+      "text": "TRAIN",
+      "weight": 1
+    },
+    {
+      "category": "Moyens de transport",
+      "text": "MÉTRO",
+      "weight": 1
+    },
+    {
+      "category": "Moyens de transport",
+      "text": "TRAMWAY",
+      "weight": 1
+    },
+    {
+      "category": "Moyens de transport",
+      "text": "RER",
+      "weight": 1
+    },
+    {
+      "category": "Moyens de transport",
+      "text": "TGV",
+      "weight": 1
+    },
+    {
+      "category": "Moyens de transport",
+      "text": "AVION",
+      "weight": 1
+    },
+    {
+      "category": "Moyens de transport",
+      "text": "HÉLICOPTÈRE",
+      "weight": 1
+    },
+    {
+      "category": "Moyens de transport",
+      "text": "BATEAU",
+      "weight": 1
+    },
+    {
+      "category": "Moyens de transport",
+      "text": "VOILIER",
+      "weight": 1
+    },
+    {
+      "category": "Moyens de transport",
+      "text": "CANOT",
+      "weight": 1
+    },
+    {
+      "category": "Moyens de transport",
+      "text": "SOUS-MARIN",
+      "weight": 1
+    },
+    {
+      "category": "Moyens de transport",
+      "text": "FERRY",
+      "weight": 1
+    },
+    {
+      "category": "Moyens de transport",
+      "text": "PÉNICHE",
+      "weight": 1
+    },
+    {
+      "category": "Moyens de transport",
+      "text": "CHARRETTE",
+      "weight": 1
+    },
+    {
+      "category": "Moyens de transport",
+      "text": "CALÈCHE",
+      "weight": 1
+    },
+    {
+      "category": "Moyens de transport",
+      "text": "AMBULANCE",
+      "weight": 1
+    },
+    {
+      "category": "Moyens de transport",
+      "text": "CAMION DE POMPIERS",
+      "weight": 1
+    },
+    {
+      "category": "Moyens de transport",
+      "text": "TRACTEUR",
+      "weight": 1
+    },
+    {
+      "category": "Moyens de transport",
+      "text": "CARAVANE",
+      "weight": 1
+    },
+    {
+      "category": "Moyens de transport",
+      "text": "MONTGOLFIÈRE",
+      "weight": 1
+    },
+    {
+      "category": "Moyens de transport",
+      "text": "FUSÉE",
+      "weight": 1
+    },
+    {
+      "category": "Moyens de transport",
+      "text": "TÉLÉPHÉRIQUE",
+      "weight": 1
+    },
+    {
+      "category": "Moyens de transport",
+      "text": "TÉLÉCABINE",
+      "weight": 1
+    },
+    {
+      "category": "Pays",
+      "text": "FRANCE",
+      "weight": 1
+    },
+    {
+      "category": "Pays",
+      "text": "BELGIQUE",
+      "weight": 1
+    },
+    {
+      "category": "Pays",
+      "text": "SUISSE",
+      "weight": 1
+    },
+    {
+      "category": "Pays",
+      "text": "CANADA",
+      "weight": 1
+    },
+    {
+      "category": "Pays",
+      "text": "ÉTATS-UNIS",
+      "weight": 1
+    },
+    {
+      "category": "Pays",
+      "text": "ROYAUME-UNI",
+      "weight": 1
+    },
+    {
+      "category": "Pays",
+      "text": "IRLANDE",
+      "weight": 1
+    },
+    {
+      "category": "Pays",
+      "text": "ESPAGNE",
+      "weight": 1
+    },
+    {
+      "category": "Pays",
+      "text": "PORTUGAL",
+      "weight": 1
+    },
+    {
+      "category": "Pays",
+      "text": "ITALIE",
+      "weight": 1
+    },
+    {
+      "category": "Pays",
+      "text": "ALLEMAGNE",
+      "weight": 1
+    },
+    {
+      "category": "Pays",
+      "text": "PAYS-BAS",
+      "weight": 1
+    },
+    {
+      "category": "Pays",
+      "text": "LUXEMBOURG",
+      "weight": 1
+    },
+    {
+      "category": "Pays",
+      "text": "SUÈDE",
+      "weight": 1
+    },
+    {
+      "category": "Pays",
+      "text": "NORVÈGE",
+      "weight": 1
+    },
+    {
+      "category": "Pays",
+      "text": "DANEMARK",
+      "weight": 1
+    },
+    {
+      "category": "Pays",
+      "text": "FINLANDE",
+      "weight": 1
+    },
+    {
+      "category": "Pays",
+      "text": "POLOGNE",
+      "weight": 1
+    },
+    {
+      "category": "Pays",
+      "text": "UKRAINE",
+      "weight": 1
+    },
+    {
+      "category": "Pays",
+      "text": "RUSSIE",
+      "weight": 1
+    },
+    {
+      "category": "Pays",
+      "text": "GRÈCE",
+      "weight": 1
+    },
+    {
+      "category": "Pays",
+      "text": "TURQUIE",
+      "weight": 1
+    },
+    {
+      "category": "Pays",
+      "text": "MAROC",
+      "weight": 1
+    },
+    {
+      "category": "Pays",
+      "text": "ALGÉRIE",
+      "weight": 1
+    },
+    {
+      "category": "Pays",
+      "text": "TUNISIE",
+      "weight": 1
+    },
+    {
+      "category": "Pays",
+      "text": "SÉNÉGAL",
+      "weight": 1
+    },
+    {
+      "category": "Pays",
+      "text": "CÔTE D'IVOIRE",
+      "weight": 1
+    },
+    {
+      "category": "Pays",
+      "text": "CAMEROUN",
+      "weight": 1
+    },
+    {
+      "category": "Pays",
+      "text": "RÉPUBLIQUE DÉMOCRATIQUE DU CONGO",
+      "weight": 1
+    },
+    {
+      "category": "Pays",
+      "text": "AFRIQUE DU SUD",
+      "weight": 1
+    },
+    {
+      "category": "Pays",
+      "text": "ÉGYPTE",
+      "weight": 1
+    },
+    {
+      "category": "Pays",
+      "text": "ISRAËL",
+      "weight": 1
+    },
+    {
+      "category": "Pays",
+      "text": "PALESTINE",
+      "weight": 1
+    },
+    {
+      "category": "Pays",
+      "text": "JAPON",
+      "weight": 1
+    },
+    {
+      "category": "Pays",
+      "text": "CHINE",
+      "weight": 1
+    },
+    {
+      "category": "Pays",
+      "text": "CORÉE DU SUD",
+      "weight": 1
+    },
+    {
+      "category": "Pays",
+      "text": "INDE",
+      "weight": 1
+    },
+    {
+      "category": "Pays",
+      "text": "PAKISTAN",
+      "weight": 1
+    },
+    {
+      "category": "Pays",
+      "text": "AUSTRALIE",
+      "weight": 1
+    },
+    {
+      "category": "Pays",
+      "text": "NOUVELLE-ZÉLANDE",
+      "weight": 1
+    },
+    {
+      "category": "Pays",
+      "text": "BRÉSIL",
+      "weight": 1
+    },
+    {
+      "category": "Pays",
+      "text": "ARGENTINE",
+      "weight": 1
+    },
+    {
+      "category": "Pays",
+      "text": "MEXIQUE",
+      "weight": 1
+    },
+    {
+      "category": "Pays",
+      "text": "CHILI",
+      "weight": 1
+    },
+    {
+      "category": "Pays",
+      "text": "COLOMBIE",
+      "weight": 1
+    },
+    {
+      "category": "Pays",
+      "text": "PÉROU",
+      "weight": 1
+    },
+    {
+      "category": "Pays",
+      "text": "THAÏLANDE",
+      "weight": 1
+    },
+    {
+      "category": "Pays",
+      "text": "VIETNAM",
+      "weight": 1
+    },
+    {
+      "category": "Pays",
+      "text": "INDONÉSIE",
+      "weight": 1
+    },
+    {
+      "category": "Pays",
+      "text": "PHILIPPINES",
+      "weight": 1
+    },
+    {
+      "category": "Pays",
+      "text": "MADAGASCAR",
+      "weight": 1
+    },
+    {
+      "category": "Pays",
+      "text": "ISLANDE",
+      "weight": 1
+    },
+    {
+      "category": "Pays",
+      "text": "AUTRICHE",
+      "weight": 1
+    },
+    {
+      "category": "Pays",
+      "text": "ROUMANIE",
+      "weight": 1
+    },
+    {
+      "category": "Pays",
+      "text": "CROATIE",
+      "weight": 1
+    },
+    {
+      "category": "Pays",
+      "text": "SERBIE",
+      "weight": 1
+    },
+    {
+      "category": "Pays",
+      "text": "ÉCOSSE",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "CLÉ",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "TÉLÉPHONE",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "MONTRE",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "LUNETTES",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "MIROIR",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "LAMPE",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "BOUGIE",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "CHAISE",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "TABLE",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "LIT",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "OREILLER",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "COUVERTURE",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "LIVRE",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "CAHIER",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "STYLO",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "CRAYON",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "SAC",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "VALISE",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "PORTEFEUILLE",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "MONNAIE",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "PIÈCE",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "BOUTON",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "BAGUE",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "COLLIER",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "BRACELET",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "PHOTO",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "CADRE",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "HORLOGE",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "RADIO",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "TÉLÉVISION",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "ORDINATEUR",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "CLAVIER",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "SOURIS",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "ÉCOUTEURS",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "CASQUE",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "PARAPLUIE",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "COUTEAU",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "FOURCHETTE",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "CUILLÈRE",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "ASSIETTE",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "VERRE",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "TASSE",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "BOUTEILLE",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "BOÎTE",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "CARTON",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "PAPIER",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "ENVELOPPE",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "LETTRE",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "JOUET",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "POUPÉE",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "BALLON",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "CHAUSSURE",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "MANTEAU",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "CHAPEAU",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "ÉCHARPE",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "GANT",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "PEIGNE",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "BROSSE",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "SAVON",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "SERVIETTE",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "SEAU",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "MARTEAU",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "TOURNEVIS",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "CISEAUX",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "AIGUILLE",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "FIL",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "CORDE",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "CHAÎNE",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "CLOCHE",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "CROIX",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "MÉDAILLE",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "BOUSSOLE",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "CARTE",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "TICKET",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "BILLET",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "DOCUMENT",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "PASSEPORT",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "CARNET",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "BOÎTE À MUSIQUE",
+      "weight": 1
+    },
+    {
+      "category": "Émotions",
+      "text": "APPRÉHENSION",
+      "weight": 1
+    },
+    {
+      "category": "Émotions",
+      "text": "ANXIÉTÉ",
+      "weight": 1
+    },
+    {
+      "category": "Émotions",
+      "text": "ÉMERVEILLEMENT",
+      "weight": 1
+    },
+    {
+      "category": "Émotions",
+      "text": "COMPASSION",
+      "weight": 1
+    },
+    {
+      "category": "Émotions",
+      "text": "PARDON",
+      "weight": 1
+    },
+    {
+      "category": "Émotions",
+      "text": "DÉGOÛT",
+      "weight": 1
+    },
+    {
+      "category": "Émotions",
+      "text": "IRRITATION",
+      "weight": 1
+    },
+    {
+      "category": "Émotions",
+      "text": "RÉCONFORT",
+      "weight": 1
+    },
+    {
+      "category": "Émotions",
+      "text": "VULNÉRABILITÉ",
+      "weight": 1
+    },
+    {
+      "category": "Émotions",
+      "text": "DÉTRESSE",
+      "weight": 1
+    },
+    {
+      "category": "Émotions",
+      "text": "ENTHOUSIASME",
+      "weight": 1
+    },
+    {
+      "category": "Émotions",
+      "text": "MOTIVATION",
+      "weight": 1
+    },
+    {
+      "category": "Émotions",
+      "text": "AFFLICTION",
+      "weight": 1
+    },
+    {
+      "category": "Émotions",
+      "text": "APPRÉCIATION",
+      "weight": 1
+    },
+    {
+      "category": "Émotions",
+      "text": "SENTIMENT",
+      "weight": 1
+    },
+    {
+      "category": "Émotions",
+      "text": "FRAYEUR",
+      "weight": 1
+    },
+    {
+      "category": "Émotions",
+      "text": "ÉMOTION",
+      "weight": 1
+    },
+    {
+      "category": "Émotions",
+      "text": "INDIFFÉRENCE",
       "weight": 1
     }
   ]
