@@ -437,14 +437,19 @@ class MainActivity : Activity(), SensorEventListener {
                 val preciseAcceleration = sqrt(v[0].toDouble()*v[0] + v[1].toDouble()*v[1] + v[2].toDouble()*v[2])
                 accelerationMagnitude = preciseAcceleration.toFloat()
                 if (calibrating && magnetic == null && magneticUncalibrated == null) collectCalibration(accelerationMagnitude)
-                // L'accéléromètre est conservé pour le diagnostic, mais un mouvement seul
-                // ne peut jamais déclencher un mot. Les mots viennent du magnétomètre.
+                else if (sessionActive && magnetic == null && magneticUncalibrated == null) {
+                    // Voie de secours inspirée de GhostTube : la signature n'est évaluée
+                    // qu'après stabilisation des mesures, jamais sur le simple mouvement.
+                    processMotionSignature(v[0].toDouble(), v[1].toDouble(), v[2].toDouble(), "accéléromètre")
+                }
             }
             Sensor.TYPE_GYROSCOPE, 15, 16 -> {
                 val preciseRotation = sqrt(v[0].toDouble()*v[0] + v[1].toDouble()*v[1] + v[2].toDouble()*v[2])
                 rotationMagnitude = preciseRotation.toFloat()
                 if (calibrating && magnetic == null && magneticUncalibrated == null) collectCalibration(rotationMagnitude)
-                // Le gyroscope ne déclenche pas de mot : il reste disponible pour les mesures.
+                else if (sessionActive && magnetic == null && magneticUncalibrated == null) {
+                    processMotionSignature(v[0].toDouble(), v[1].toDouble(), v[2].toDouble(), "gyroscope")
+                }
             }
         }
     }
@@ -658,10 +663,12 @@ class MainActivity : Activity(), SensorEventListener {
     }
 
     private fun activeWordPool(): List<WordEntry> {
-        // Une entrée = un index, sans répétition pondérée artificielle.
+        // Une préférence de catégorie devenue obsolète ne doit jamais vider le dictionnaire.
         val base = baseEntries.filter { it.category in activeCategories && it.text.isNotBlank() }
         val custom = customEntries.filter { it.category in activeCategories && it.text.isNotBlank() }
-        return base + custom
+        val selected = base + custom
+        return if (selected.isNotEmpty()) selected
+        else (baseEntries + customEntries).filter { it.text.isNotBlank() }
     }
 
     private fun emitWord(entry: WordEntry, reason: String, fingerprint: String) {
