@@ -2,21 +2,32 @@
 
 ECHOS est une application Android autonome, développée dans ce dépôt indépendant.
 
-## Première version
-- Lecture du magnétomètre (µT) lorsqu'il est présent.
+## Version 1.0.1
+- Lecture du magnétomètre en µT et affichage des axes X, Y et Z.
 - Mode alternatif avec accéléromètre et gyroscope.
-- Sélection automatique du capteur disponible ou choix manuel du mode.
-- Calibration des mesures.
-- Dictionnaire français organisé en neuf catégories.
-- Activation/désactivation des catégories et ajout de mots personnalisés.
-- Réglage de la sensibilité et du délai anti-répétition.
+- Mode automatique, mode mouvement et mode magnétomètre.
+- Calibration des mesures avant chaque session.
+- Dictionnaire français réparti en neuf catégories thématiques.
+- Activation/désactivation des catégories, mémorisée entre les lancements.
+- Ajout de mots personnalisés, conservés localement.
+- Réglage de la sensibilité et du délai anti-répétition, conservés localement.
 - Historique local des événements.
-- Fonctionnement hors connexion.
+- Interface sombre et icône dédiée.
+- Fonctionnement hors connexion ; aucune permission Internet n'est demandée.
 
 ## Compiler l'APK
 Chaque push sur `main` lance GitHub Actions. Le workflow **Build ECHOS APK** compile `app-debug.apk` et le publie dans l'artefact `ECHOS-APK` pendant 14 jours. Le workflow peut aussi être lancé manuellement depuis l'onglet Actions.
 
-Télécharge l'artefact ZIP, décompresse-le, puis ouvre `app-debug.apk` sur Android.
+Télécharger l'artefact ZIP, le décompresser, puis ouvrir `app-debug.apk` sur Android. Cette version est signée avec la clé de débogage Android : elle convient à l'installation et aux tests, pas à une publication Play Store.
+
+## Première utilisation
+1. Ouvrir ECHOS et choisir le mode automatique ou un mode manuel.
+2. Poser le téléphone sur une surface stable.
+3. Lancer **Calibrer les capteurs** et attendre la fin de la calibration.
+4. Démarrer la session.
+5. Ajuster le seuil, le délai anti-répétition et les catégories dans les réglages.
+
+Les objets métalliques, aimants, haut-parleurs, câbles et appareils électriques peuvent influencer les mesures du magnétomètre.
 
 ## Transparence
 Les capteurs mesurent des phénomènes physiques ordinaires. Les mots sont choisis par un algorithme local à partir de variations mesurées ; ils ne constituent pas une preuve de communication avec une entité ou un défunt.
