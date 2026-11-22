@@ -26,18 +26,15 @@ import android.view.ViewGroup
 import android.widget.*
 import org.json.JSONArray
 import org.json.JSONObject
-import androidx.credentials.CredentialManager
-import androidx.credentials.GetCredentialRequest
-import androidx.credentials.CustomCredential
-import androidx.credentials.exceptions.GetCredentialException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
-import com.google.android.libraries.identity.googleid.GetGoogleIdOption
-import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.ApiException
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.SetOptions
@@ -1205,58 +1202,64 @@ class MainActivity : Activity(), SensorEventListener {
         }
     }
 
+    private val googleSignInRequestCode = 7401
+
+    // Ouvre explicitement le sélecteur de compte Google (popup système).
     private fun startGoogleSignIn() {
-        val auth = firebaseAuth
-        if (auth == null) {
+        if (firebaseAuth == null) {
             toast("Configuration Firebase manquante : google-services.json")
             return
         }
         val webClientIdRes = resources.getIdentifier("default_web_client_id", "string", packageName)
         if (webClientIdRes == 0) {
-            toast("ID client OAuth Web absent. Télécharge google-services.json après avoir activé Google dans Firebase.")
+            toast("ID client OAuth Web absent. Vérifie la configuration Google dans Firebase.")
             return
         }
-        syncScope.launch {
-            try {
-                val googleOption = GetGoogleIdOption.Builder()
-                    .setServerClientId(getString(webClientIdRes))
-                    .setFilterByAuthorizedAccounts(false)
-                    .setAutoSelectEnabled(false)
-                    .build()
-                val request = GetCredentialRequest.Builder()
-                    .addCredentialOption(googleOption)
-                    .build()
-                val manager = CredentialManager.create(this@MainActivity)
-                val result = manager.getCredential(this@MainActivity, request)
-                val credential = result.credential
-                if (credential is CustomCredential &&
-                    credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
-                    val googleToken = GoogleIdTokenCredential.createFrom(credential.data)
-                    val firebaseCredential = GoogleAuthProvider.getCredential(googleToken.idToken, null)
-                    auth.signInWithCredential(firebaseCredential)
-                        .addOnSuccessListener {
-                            toast("Connexion Google réussie. Synchronisation en cours…")
-                            refreshAccountUi()
-                        }
-                        .addOnFailureListener { error ->
-                            Log.e("ECHOS_SYNC", "Échec Firebase Auth", error)
-                            toast("Connexion impossible : ${error.localizedMessage ?: "erreur Firebase"}")
-                        }
-                } else {
-                    toast("Identifiant Google non reconnu.")
-                }
-            } catch (e: GetCredentialException) {
-                Log.e("ECHOS_SYNC", "Google Credential Manager: ${e::class.java.name}: ${e.message}", e)
-                val detail = when (e) {
-                    is androidx.credentials.exceptions.GetCredentialCancellationException -> "Connexion annulée."
-                    is androidx.credentials.exceptions.NoCredentialException -> "Aucun compte Google disponible. Vérifie qu'un compte Google est ajouté sur le téléphone."
-                    else -> "Échec Google : ${e.message ?: e::class.java.simpleName}"
-                }
-                runOnUiThread { toast(detail) }
-            } catch (e: Exception) {
-                Log.e("ECHOS_SYNC", "Erreur connexion Google", e)
-                toast("Erreur de connexion : ${e.localizedMessage ?: "inconnue"}")
+        try {
+            val options = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(webClientIdRes))
+                .requestEmail()
+                .build()
+            val client = GoogleSignIn.getClient(this, options)
+            startActivityForResult(client.signInIntent, googleSignInRequestCode)
+        } catch (e: Exception) {
+            Log.e("ECHOS_SYNC", "Impossible d'ouvrir la fenêtre Google", e)
+            toast("Impossible d'ouvrir la connexion Google : ${e.localizedMessage ?: "erreur inconnue"}")
+        }
+    }
+
+    @Deprecated("Google Sign-In renvoie le compte choisi via le résultat de l'activité")
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: android.content.Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode != googleSignInRequestCode) return
+        if (resultCode != RESULT_OK || data == null) {
+            toast("Connexion Google annulée.")
+            return
+        }
+        try {
+            val task = GoogleSignIn.getSignedInAccountFromIntent(data)
+            val account = task.getResult(ApiException::class.java)
+            val token = account.idToken
+            if (token.isNullOrBlank()) {
+                toast("Google n'a pas fourni de jeton. Vérifie le client OAuth Web Firebase.")
+                return
             }
+            val credential = GoogleAuthProvider.getCredential(token, null)
+            firebaseAuth?.signInWithCredential(credential)
+                ?.addOnSuccessListener {
+                    toast("Connexion Google réussie. Synchronisation en cours…")
+                    refreshAccountUi()
+                }
+                ?.addOnFailureListener { error ->
+                    Log.e("ECHOS_SYNC", "Échec Firebase Auth", error)
+                    toast("Connexion impossible : ${error.localizedMessage ?: "erreur Firebase"}")
+                }
+        } catch (e: ApiException) {
+            Log.e("ECHOS_SYNC", "Sélection du compte Google échouée: ${e.statusCode}", e)
+            toast("Échec de la fenêtre Google (code ${e.statusCode}). Réessaie.")
+        } catch (e: Exception) {
+            Log.e("ECHOS_SYNC", "Erreur de connexion Google", e)
+            toast("Erreur de connexion : ${e.localizedMessage ?: "inconnue"}")
         }
     }
 
