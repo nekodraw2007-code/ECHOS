@@ -156,6 +156,11 @@ class MainActivity : Activity(), SensorEventListener {
             activeCategories.addAll(baseEntries.map { it.category }.distinct())
             p.edit().putBoolean("dictionary_v2_initialized", true).apply()
         }
+        // Active une seule fois la nouvelle catégorie de prénoms pour les installations existantes.
+        if (!p.getBoolean("first_names_v1_initialized", false)) {
+            if (baseEntries.any { it.category == "Prénoms" }) activeCategories.add("Prénoms")
+            p.edit().putBoolean("first_names_v1_initialized", true).apply()
+        }
         history.addAll(p.getString("history", "")!!.split("\n").filter { it.isNotBlank() }.take(60))
     }
 
@@ -462,7 +467,7 @@ class MainActivity : Activity(), SensorEventListener {
         return digits.take(20)
     }
 
-    private fun processMagneticSignature(x: Double, y: Double, z: Double, magnitude: Double) {
+    @Synchronized\n    private fun processMagneticSignature(x: Double, y: Double, z: Double, magnitude: Double) {
         val now = System.currentTimeMillis()
         if (now - nextWordAt < 1_000L) return
         val pool = activeWordPool()
@@ -492,7 +497,7 @@ class MainActivity : Activity(), SensorEventListener {
         }
     }
 
-    private fun processMotionSignature(x: Double, y: Double, z: Double, source: String) {
+    @Synchronized\n    private fun processMotionSignature(x: Double, y: Double, z: Double, source: String) {
         val now = System.currentTimeMillis()
         if (now - nextWordAt < 1_000L) return
         val pool = activeWordPool()
