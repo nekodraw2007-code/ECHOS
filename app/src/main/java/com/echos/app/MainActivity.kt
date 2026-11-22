@@ -470,7 +470,7 @@ class MainActivity : Activity(), SensorEventListener {
                 val norm = sqrt(v[0].toDouble()*v[0] + v[1].toDouble()*v[1] + v[2].toDouble()*v[2])
                 accelerationMagnitude = norm.toFloat()
                 if (calibrating && magnetic == null && magneticUncalibrated == null) collectCalibration(accelerationMagnitude)
-                else if (sessionActive) processMotionSignature(v[0].toDouble(), v[1].toDouble(), v[2].toDouble(), "accéléromètre linéaire")
+                else if (sessionActive && norm >= 0.025) processMotionSignature(v[0].toDouble(), v[1].toDouble(), v[2].toDouble(), "accéléromètre linéaire")
             }
             Sensor.TYPE_ACCELEROMETER, 35 -> {
                 val preciseAcceleration = sqrt(v[0].toDouble()*v[0] + v[1].toDouble()*v[1] + v[2].toDouble()*v[2])
@@ -486,11 +486,9 @@ class MainActivity : Activity(), SensorEventListener {
                     gravityVector[i] += alpha * (v[i] - gravityVector[i])
                     (v[i] - gravityVector[i]).toDouble()
                 }
-                if (linearAccelerometer == null) {
-                    val linearNorm = sqrt(linear[0]*linear[0] + linear[1]*linear[1] + linear[2]*linear[2])
-                    if (calibrating && magnetic == null && magneticUncalibrated == null) collectCalibration(linearNorm.toFloat())
-                    else if (sessionActive) processMotionSignature(linear[0], linear[1], linear[2], "accéléromètre")
-                }
+                val linearNorm = sqrt(linear[0]*linear[0] + linear[1]*linear[1] + linear[2]*linear[2])
+                if (calibrating && magnetic == null && magneticUncalibrated == null) collectCalibration(linearNorm.toFloat())
+                else if (sessionActive) processMotionSignature(linear[0], linear[1], linear[2], "accéléromètre")
             }
             Sensor.TYPE_GYROSCOPE, 15, 16 -> {
                 val preciseRotation = sqrt(v[0].toDouble()*v[0] + v[1].toDouble()*v[1] + v[2].toDouble()*v[2])
@@ -631,47 +629,25 @@ class MainActivity : Activity(), SensorEventListener {
     private fun processMagneticSignature(x: Double, y: Double, z: Double, magnitude: Double) {
         val now = System.currentTimeMillis()
         if (!magnitude.isFinite() || magnitude <= 0.0 || now < nextWordAt) return
-
-        // Référence initiale : le premier relevé ne déclenche jamais de mot.
-        // Une variation réelle du champ est nécessaire, contrairement à l'ancienne
-        // version qui émettait un mot à chaque fin de délai même avec un champ immobile.
-        if (!magneticReference.isFinite()) {
-            magneticReference = magnitude
-            return
-        }
-        val deviation = abs(magnitude - magneticReference)
-        val calibratedNoise = if (calibrated) noiseFloor.toDouble() else 0.0
-        val threshold = maxOf(
-            0.30,
-            calibratedNoise * (3.5 - sensitivity * 2.7),
-            0.35 + (1f - sensitivity) * 1.45f
-        )
-        if (deviation < threshold) {
-            // Adaptation lente du niveau de référence pour suivre les dérives ambiantes.
-            magneticReference = magneticReference * 0.998 + magnitude * 0.002
-            return
-        }
-
         val pool = activeWordPool()
         if (pool.isEmpty()) return
         ensureSensorOrder(pool.size)
-        val rawFingerprint = listOf(x, y, z, magnitude, deviation).joinToString("|") {
+
+        // Le magnétomètre fournit une signature à chaque fenêtre d'analyse.
+        // Ne pas exiger une variation minimale : un champ stable reste une mesure
+        // exploitable, comme sur les appareils où le signal ambiant est peu variable.
+        val raw = listOf(x, y, z, magnitude).joinToString("|") {
             BigDecimal(it).stripTrailingZeros().toPlainString()
         }
-        val fingerprint = rawFingerprint.filter { it.isDigit() }.take(20).padEnd(20, '0')
-        if (fingerprint == lastMagneticSignature) {
-            magneticReference = magnitude
-            return
-        }
-
-        val cooldownSeconds = 8 + ((1f - sensitivity) * 32f).toInt()
+        val fingerprint = raw.filter { it.isDigit() }.take(20).padEnd(20, '0')
+        val cooldownSeconds = 9 + ((1f - sensitivity) * 26f).toInt()
         val timeSlot = now / (cooldownSeconds * 1_000L)
-        val seed = (fingerprint + timeSlot.toString()).hashCode()
+        val seed = (fingerprint + "|" + timeSlot).hashCode()
         val entry = selectBalancedEntry(pool, seed) ?: return
 
-        lastMagneticSignature = fingerprint
         magneticReference = magnitude
-        emitWord(entry, "variation magnétique · Δ %.2f µT".format(Locale.FRANCE, deviation), fingerprint)
+        lastMagneticSignature = fingerprint
+        emitWord(entry, "signature magnétique · champ %.2f µT".format(Locale.FRANCE, magnitude), fingerprint)
         nextWordAt = now + cooldownSeconds * 1_000L
     }
 
@@ -680,39 +656,37 @@ class MainActivity : Activity(), SensorEventListener {
         val now = System.currentTimeMillis()
         if (now < nextWordAt) return
         val norm = sqrt(x * x + y * y + z * z)
-        // Un gyroscope immobile et un accéléromètre dont la gravité a été retirée
-        // ne doivent pas produire de signature artificielle composée de zéros.
-        val minimumSignal = if (source == "gyroscope") 0.018 else 0.045
-        if (!norm.isFinite() || norm < minimumSignal) {
+        if (!norm.isFinite()) return
+
+        // Les mesures brutes de l'accéléromètre conservent la gravité : elles donnent
+        // une signature même sur un appareil dépourvu de magnétomètre et posé immobile.
+        // Les voies linéaire et gyroscope ne sont exploitées que si leur signal est réel.
+        val minimumSignal = when {
+            source == "gyroscope" -> 0.018
+            source == "accéléromètre linéaire" -> 0.025
+            else -> 1.0
+        }
+        if (norm < minimumSignal) {
             motionStableSince[source] = 0L
             return
         }
         if (!isMotionStable(source, norm, now)) return
+
         val pool = activeWordPool()
         if (pool.isEmpty()) return
         ensureSensorOrder(pool.size)
-
-        // Signature numérique de la mesure stabilisée. La voie mouvement reste active
-        // même lorsqu'un magnétomètre est présent : chaque capteur a son propre canal.
         val fraction = sensorFraction(norm)
         if (fraction.isEmpty()) return
-        val first20 = repeatDigitsTo20(fraction, inclusive = false)
-        if (first20.length < 20) return
-        val signature = first20.substring(3, 20) + first20.substring(0, 3)
-        val gate = signature.substring(0, 4).toIntOrNull() ?: return
-        val tolerance = (sensitivity * 250f).toInt() + 1
+        val digits = repeatDigitsTo20(fraction, inclusive = false)
+        if (digits.length < 20) return
+        val signature = digits.substring(3, 20) + digits.substring(0, 3)
+        val combined = listOf(x, y, z, norm, signature).joinToString("|")
+        val fingerprint = combined.filter { it.isDigit() }.take(20).padEnd(20, '0')
+        val seed = (fingerprint + "|" + source).hashCode()
+        val entry = selectBalancedEntry(pool, seed) ?: return
 
-        if (gate <= tolerance || gate >= 10_000 - tolerance) {
-            val end = (kotlin.math.log10(pool.size.toDouble()).toInt() + 5).coerceAtMost(signature.length)
-            if (end <= 5) return
-            val index = signature.substring(5, end).toIntOrNull() ?: return
-            val entry = selectBalancedEntry(pool, signature.hashCode() xor index) ?: return
-            emitWord(entry, "signature $source · %.4f".format(Locale.FRANCE, norm), signature)
-            val cooldownSeconds = 8 + ((1f - sensitivity) * 32f).toInt()
-            nextWordAt = now + cooldownSeconds * 1_000L
-            ensureSensorOrder(pool.size)
-            shuffledWordIndexes.shuffle()
-        }
+        emitWord(entry, "signature $source · %.4f".format(Locale.FRANCE, norm), fingerprint)
+        nextWordAt = now + (9 + ((1f - sensitivity) * 26f).toInt()) * 1_000L
     }
 
     @Synchronized
@@ -735,7 +709,11 @@ class MainActivity : Activity(), SensorEventListener {
         if (samples.size > 12) samples.removeAt(0)
         if (samples.size < 12) return false
         val spread = (samples.maxOrNull() ?: magnitude) - (samples.minOrNull() ?: magnitude)
-        val threshold = if (source.contains("accéléromètre")) 0.035 else 0.006
+        val threshold = when {
+            source == "gyroscope" -> 0.012
+            source == "accéléromètre linéaire" -> 0.08
+            else -> 0.12
+        }
         if (spread > threshold) { motionStableSince[source] = 0L; return false }
         val since = motionStableSince[source] ?: 0L
         if (since == 0L) { motionStableSince[source] = now; return false }
