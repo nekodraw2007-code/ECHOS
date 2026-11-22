@@ -222,6 +222,14 @@ class MainActivity : Activity(), SensorEventListener {
             if (baseEntries.any { it.category == "Âges" }) activeCategories.add("Âges")
             p.edit().putBoolean("ages_category_v1_initialized", true).apply()
         }
+        // Active une seule fois les nouvelles catégories du dictionnaire 1.2.0
+        // sur les installations existantes, sans réactiver les catégories
+        // que l'utilisateur avait volontairement désactivées par la suite.
+        if (!p.getBoolean("dictionary_v4_categories_initialized", false)) {
+            val newCategories = setOf("Questions et identité", "Couleurs", "Moyens de transport", "Pays", "Objets du quotidien")
+            activeCategories.addAll(baseEntries.map { it.category }.filter { it in newCategories })
+            p.edit().putBoolean("dictionary_v4_categories_initialized", true).apply()
+        }
         history.addAll(p.getString("history", "")!!.split("\n").filter { it.isNotBlank() })
     }
 
