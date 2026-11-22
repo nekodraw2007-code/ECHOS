@@ -254,242 +254,42 @@
     },
     {
       "category": "Réponses",
-      "text": "Je réponds oui",
+      "text": "JE RÉPONDS OUI",
       "weight": 1
     },
     {
       "category": "Réponses",
-      "text": "Je réponds non",
+      "text": "JE RÉPONDS NON",
       "weight": 1
     },
     {
       "category": "Réponses",
-      "text": "Je veux répondre",
+      "text": "JE VEUX RÉPONDRE",
       "weight": 1
     },
     {
       "category": "Réponses",
-      "text": "Je ne peux pas répondre",
+      "text": "JE NE PEUX PAS RÉPONDRE",
       "weight": 1
     },
     {
       "category": "Réponses",
-      "text": "Je suis d'accord",
+      "text": "JE SUIS D'ACCORD",
       "weight": 1
     },
     {
       "category": "Réponses",
-      "text": "Je ne suis pas d'accord",
+      "text": "JE NE SUIS PAS D'ACCORD",
       "weight": 1
     },
     {
       "category": "Réponses",
-      "text": "Je demande de l'aide",
+      "text": "JE DEMANDE DE L'AIDE",
       "weight": 1
     },
     {
       "category": "Réponses",
-      "text": "Je veux continuer",
-      "weight": 1
-    },
-    {
-      "category": "Réponses",
-      "text": "Je pense à oui",
-      "weight": 1
-    },
-    {
-      "category": "Réponses",
-      "text": "Je pense à non",
-      "weight": 1
-    },
-    {
-      "category": "Réponses",
-      "text": "Je pense à peut-être",
-      "weight": 1
-    },
-    {
-      "category": "Réponses",
-      "text": "Je pense à je ne sais pas",
-      "weight": 1
-    },
-    {
-      "category": "Réponses",
-      "text": "Je pense à pourquoi",
-      "weight": 1
-    },
-    {
-      "category": "Réponses",
-      "text": "Je pense à comment",
-      "weight": 1
-    },
-    {
-      "category": "Réponses",
-      "text": "Je pense à qui",
-      "weight": 1
-    },
-    {
-      "category": "Réponses",
-      "text": "Je pense à quand",
-      "weight": 1
-    },
-    {
-      "category": "Réponses",
-      "text": "Je pense à où",
-      "weight": 1
-    },
-    {
-      "category": "Réponses",
-      "text": "Je pense à merci",
-      "weight": 1
-    },
-    {
-      "category": "Réponses",
-      "text": "Je pense à pardon",
-      "weight": 1
-    },
-    {
-      "category": "Réponses",
-      "text": "Je pense à écoute",
-      "weight": 1
-    },
-    {
-      "category": "Réponses",
-      "text": "Je pense à parle",
-      "weight": 1
-    },
-    {
-      "category": "Réponses",
-      "text": "Je pense à répète",
-      "weight": 1
-    },
-    {
-      "category": "Réponses",
-      "text": "Je pense à attends",
-      "weight": 1
-    },
-    {
-      "category": "Réponses",
-      "text": "Je pense à stop",
-      "weight": 1
-    },
-    {
-      "category": "Réponses",
-      "text": "Je pense à je suis là",
-      "weight": 1
-    },
-    {
-      "category": "Réponses",
-      "text": "Je pense à je t'entends",
-      "weight": 1
-    },
-    {
-      "category": "Réponses",
-      "text": "Je pense à je me souviens",
-      "weight": 1
-    },
-    {
-      "category": "Réponses",
-      "text": "Je pense à je veux parler",
-      "weight": 1
-    },
-    {
-      "category": "Réponses",
-      "text": "Je pense à pas maintenant",
-      "weight": 1
-    },
-    {
-      "category": "Réponses",
-      "text": "Je pense à plus tard",
-      "weight": 1
-    },
-    {
-      "category": "Réponses",
-      "text": "Je pense à c'est bien",
-      "weight": 1
-    },
-    {
-      "category": "Réponses",
-      "text": "Je pense à c'est faux",
-      "weight": 1
-    },
-    {
-      "category": "Réponses",
-      "text": "Je pense à aide-moi",
-      "weight": 1
-    },
-    {
-      "category": "Réponses",
-      "text": "Je pense à où es-tu",
-      "weight": 1
-    },
-    {
-      "category": "Réponses",
-      "text": "Je pense à es-tu seul",
-      "weight": 1
-    },
-    {
-      "category": "Réponses",
-      "text": "Je pense à je comprends",
-      "weight": 1
-    },
-    {
-      "category": "Réponses",
-      "text": "Je pense à je ne comprends pas",
-      "weight": 1
-    },
-    {
-      "category": "Réponses",
-      "text": "Je pense à continue",
-      "weight": 1
-    },
-    {
-      "category": "Réponses",
-      "text": "Je pense à silence",
-      "weight": 1
-    },
-    {
-      "category": "Réponses",
-      "text": "Je pense à je pars",
-      "weight": 1
-    },
-    {
-      "category": "Réponses",
-      "text": "Je pense à je reste",
-      "weight": 1
-    },
-    {
-      "category": "Réponses",
-      "text": "Je pense à recommence",
-      "weight": 1
-    },
-    {
-      "category": "Réponses",
-      "text": "Je pense à c'est fini",
-      "weight": 1
-    },
-    {
-      "category": "Réponses",
-      "text": "Je pense à c'est important",
-      "weight": 1
-    },
-    {
-      "category": "Réponses",
-      "text": "Je pense à peux-tu m'entendre",
-      "weight": 1
-    },
-    {
-      "category": "Réponses",
-      "text": "Je pense à je refuse",
-      "weight": 1
-    },
-    {
-      "category": "Réponses",
-      "text": "Je pense à j'accepte",
-      "weight": 1
-    },
-    {
-      "category": "Réponses",
-      "text": "Je pense à peut-on parler",
+      "text": "JE VEUX CONTINUER",
       "weight": 1
     },
     {
@@ -744,252 +544,52 @@
     },
     {
       "category": "Personnes et identité",
-      "text": "Je suis une femme",
+      "text": "JE SUIS UNE FEMME",
       "weight": 1
     },
     {
       "category": "Personnes et identité",
-      "text": "Je suis un homme",
+      "text": "JE SUIS UN HOMME",
       "weight": 1
     },
     {
       "category": "Personnes et identité",
-      "text": "Je suis un enfant",
+      "text": "JE SUIS UN ENFANT",
       "weight": 1
     },
     {
       "category": "Personnes et identité",
-      "text": "Je suis de ta famille",
+      "text": "JE SUIS DE TA FAMILLE",
       "weight": 1
     },
     {
       "category": "Personnes et identité",
-      "text": "Je suis un ami",
+      "text": "JE SUIS UN AMI",
       "weight": 1
     },
     {
       "category": "Personnes et identité",
-      "text": "Je suis un inconnu",
+      "text": "JE SUIS UN INCONNU",
       "weight": 1
     },
     {
       "category": "Personnes et identité",
-      "text": "Je connais ton nom",
+      "text": "JE CONNAIS TON NOM",
       "weight": 1
     },
     {
       "category": "Personnes et identité",
-      "text": "Je cherche quelqu'un",
+      "text": "JE CHERCHE QUELQU'UN",
       "weight": 1
     },
     {
       "category": "Personnes et identité",
-      "text": "Je suis venu seul",
+      "text": "JE SUIS VENU SEUL",
       "weight": 1
     },
     {
       "category": "Personnes et identité",
-      "text": "Je suis accompagné",
-      "weight": 1
-    },
-    {
-      "category": "Personnes et identité",
-      "text": "Je pense à mère",
-      "weight": 1
-    },
-    {
-      "category": "Personnes et identité",
-      "text": "Je pense à père",
-      "weight": 1
-    },
-    {
-      "category": "Personnes et identité",
-      "text": "Je pense à enfant",
-      "weight": 1
-    },
-    {
-      "category": "Personnes et identité",
-      "text": "Je pense à famille",
-      "weight": 1
-    },
-    {
-      "category": "Personnes et identité",
-      "text": "Je pense à ami",
-      "weight": 1
-    },
-    {
-      "category": "Personnes et identité",
-      "text": "Je pense à sœur",
-      "weight": 1
-    },
-    {
-      "category": "Personnes et identité",
-      "text": "Je pense à frère",
-      "weight": 1
-    },
-    {
-      "category": "Personnes et identité",
-      "text": "Je pense à femme",
-      "weight": 1
-    },
-    {
-      "category": "Personnes et identité",
-      "text": "Je pense à homme",
-      "weight": 1
-    },
-    {
-      "category": "Personnes et identité",
-      "text": "Je pense à grand-mère",
-      "weight": 1
-    },
-    {
-      "category": "Personnes et identité",
-      "text": "Je pense à grand-père",
-      "weight": 1
-    },
-    {
-      "category": "Personnes et identité",
-      "text": "Je pense à inconnu",
-      "weight": 1
-    },
-    {
-      "category": "Personnes et identité",
-      "text": "Je pense à visiteur",
-      "weight": 1
-    },
-    {
-      "category": "Personnes et identité",
-      "text": "Je pense à prénom",
-      "weight": 1
-    },
-    {
-      "category": "Personnes et identité",
-      "text": "Je pense à nom",
-      "weight": 1
-    },
-    {
-      "category": "Personnes et identité",
-      "text": "Je pense à voisin",
-      "weight": 1
-    },
-    {
-      "category": "Personnes et identité",
-      "text": "Je pense à proche",
-      "weight": 1
-    },
-    {
-      "category": "Personnes et identité",
-      "text": "Je pense à oncle",
-      "weight": 1
-    },
-    {
-      "category": "Personnes et identité",
-      "text": "Je pense à tante",
-      "weight": 1
-    },
-    {
-      "category": "Personnes et identité",
-      "text": "Je pense à cousin",
-      "weight": 1
-    },
-    {
-      "category": "Personnes et identité",
-      "text": "Je pense à cousine",
-      "weight": 1
-    },
-    {
-      "category": "Personnes et identité",
-      "text": "Je pense à petit-fils",
-      "weight": 1
-    },
-    {
-      "category": "Personnes et identité",
-      "text": "Je pense à petite-fille",
-      "weight": 1
-    },
-    {
-      "category": "Personnes et identité",
-      "text": "Je pense à bébé",
-      "weight": 1
-    },
-    {
-      "category": "Personnes et identité",
-      "text": "Je pense à adolescent",
-      "weight": 1
-    },
-    {
-      "category": "Personnes et identité",
-      "text": "Je pense à parent",
-      "weight": 1
-    },
-    {
-      "category": "Personnes et identité",
-      "text": "Je pense à époux",
-      "weight": 1
-    },
-    {
-      "category": "Personnes et identité",
-      "text": "Je pense à épouse",
-      "weight": 1
-    },
-    {
-      "category": "Personnes et identité",
-      "text": "Je pense à partenaire",
-      "weight": 1
-    },
-    {
-      "category": "Personnes et identité",
-      "text": "Je pense à collègue",
-      "weight": 1
-    },
-    {
-      "category": "Personnes et identité",
-      "text": "Je pense à passant",
-      "weight": 1
-    },
-    {
-      "category": "Personnes et identité",
-      "text": "Je pense à groupe",
-      "weight": 1
-    },
-    {
-      "category": "Personnes et identité",
-      "text": "Je pense à fils",
-      "weight": 1
-    },
-    {
-      "category": "Personnes et identité",
-      "text": "Je pense à fille",
-      "weight": 1
-    },
-    {
-      "category": "Personnes et identité",
-      "text": "Je pense à jumeau",
-      "weight": 1
-    },
-    {
-      "category": "Personnes et identité",
-      "text": "Je pense à ancien ami",
-      "weight": 1
-    },
-    {
-      "category": "Personnes et identité",
-      "text": "Je pense à enfant perdu",
-      "weight": 1
-    },
-    {
-      "category": "Personnes et identité",
-      "text": "Je pense à étranger",
-      "weight": 1
-    },
-    {
-      "category": "Personnes et identité",
-      "text": "Je pense à invité",
-      "weight": 1
-    },
-    {
-      "category": "Personnes et identité",
-      "text": "Je pense à protecteur",
+      "text": "JE SUIS ACCOMPAGNÉ",
       "weight": 1
     },
     {
@@ -1239,247 +839,52 @@
     },
     {
       "category": "Émotions",
-      "text": "Je ressens de la peur",
+      "text": "JE RESSENS DE LA PEUR",
       "weight": 1
     },
     {
       "category": "Émotions",
-      "text": "Je ressens de la joie",
+      "text": "JE RESSENS DE LA JOIE",
       "weight": 1
     },
     {
       "category": "Émotions",
-      "text": "Je suis triste",
+      "text": "JE SUIS TRISTE",
       "weight": 1
     },
     {
       "category": "Émotions",
-      "text": "Je suis en colère",
+      "text": "JE SUIS EN COLÈRE",
       "weight": 1
     },
     {
       "category": "Émotions",
-      "text": "Je suis apaisé",
+      "text": "JE SUIS APAISÉ",
       "weight": 1
     },
     {
       "category": "Émotions",
-      "text": "Je suis inquiet",
+      "text": "JE SUIS INQUIET",
       "weight": 1
     },
     {
       "category": "Émotions",
-      "text": "Je suis heureux",
+      "text": "JE SUIS HEUREUX",
       "weight": 1
     },
     {
       "category": "Émotions",
-      "text": "Je suis seul",
+      "text": "JE SUIS SEUL",
       "weight": 1
     },
     {
       "category": "Émotions",
-      "text": "Je regrette",
+      "text": "JE REGRETTE",
       "weight": 1
     },
     {
       "category": "Émotions",
-      "text": "Je veux être pardonné",
-      "weight": 1
-    },
-    {
-      "category": "Émotions",
-      "text": "Je pense à amour",
-      "weight": 1
-    },
-    {
-      "category": "Émotions",
-      "text": "Je pense à peur",
-      "weight": 1
-    },
-    {
-      "category": "Émotions",
-      "text": "Je pense à joie",
-      "weight": 1
-    },
-    {
-      "category": "Émotions",
-      "text": "Je pense à tristesse",
-      "weight": 1
-    },
-    {
-      "category": "Émotions",
-      "text": "Je pense à colère",
-      "weight": 1
-    },
-    {
-      "category": "Émotions",
-      "text": "Je pense à calme",
-      "weight": 1
-    },
-    {
-      "category": "Émotions",
-      "text": "Je pense à solitude",
-      "weight": 1
-    },
-    {
-      "category": "Émotions",
-      "text": "Je pense à regret",
-      "weight": 1
-    },
-    {
-      "category": "Émotions",
-      "text": "Je pense à bonheur",
-      "weight": 1
-    },
-    {
-      "category": "Émotions",
-      "text": "Je pense à inquiétude",
-      "weight": 1
-    },
-    {
-      "category": "Émotions",
-      "text": "Je pense à confiance",
-      "weight": 1
-    },
-    {
-      "category": "Émotions",
-      "text": "Je pense à douleur",
-      "weight": 1
-    },
-    {
-      "category": "Émotions",
-      "text": "Je pense à paix",
-      "weight": 1
-    },
-    {
-      "category": "Émotions",
-      "text": "Je pense à manque",
-      "weight": 1
-    },
-    {
-      "category": "Émotions",
-      "text": "Je pense à espoir",
-      "weight": 1
-    },
-    {
-      "category": "Émotions",
-      "text": "Je pense à trahison",
-      "weight": 1
-    },
-    {
-      "category": "Émotions",
-      "text": "Je pense à nostalgie",
-      "weight": 1
-    },
-    {
-      "category": "Émotions",
-      "text": "Je pense à culpabilité",
-      "weight": 1
-    },
-    {
-      "category": "Émotions",
-      "text": "Je pense à honte",
-      "weight": 1
-    },
-    {
-      "category": "Émotions",
-      "text": "Je pense à surprise",
-      "weight": 1
-    },
-    {
-      "category": "Émotions",
-      "text": "Je pense à curiosité",
-      "weight": 1
-    },
-    {
-      "category": "Émotions",
-      "text": "Je pense à déception",
-      "weight": 1
-    },
-    {
-      "category": "Émotions",
-      "text": "Je pense à soulagement",
-      "weight": 1
-    },
-    {
-      "category": "Émotions",
-      "text": "Je pense à jalousie",
-      "weight": 1
-    },
-    {
-      "category": "Émotions",
-      "text": "Je pense à courage",
-      "weight": 1
-    },
-    {
-      "category": "Émotions",
-      "text": "Je pense à tendresse",
-      "weight": 1
-    },
-    {
-      "category": "Émotions",
-      "text": "Je pense à frustration",
-      "weight": 1
-    },
-    {
-      "category": "Émotions",
-      "text": "Je pense à fatigue",
-      "weight": 1
-    },
-    {
-      "category": "Émotions",
-      "text": "Je pense à désir",
-      "weight": 1
-    },
-    {
-      "category": "Émotions",
-      "text": "Je pense à doute",
-      "weight": 1
-    },
-    {
-      "category": "Émotions",
-      "text": "Je pense à sérénité",
-      "weight": 1
-    },
-    {
-      "category": "Émotions",
-      "text": "Je pense à panique",
-      "weight": 1
-    },
-    {
-      "category": "Émotions",
-      "text": "Je pense à mélancolie",
-      "weight": 1
-    },
-    {
-      "category": "Émotions",
-      "text": "Je pense à gratitude",
-      "weight": 1
-    },
-    {
-      "category": "Émotions",
-      "text": "Je pense à affection",
-      "weight": 1
-    },
-    {
-      "category": "Émotions",
-      "text": "Je pense à rancune",
-      "weight": 1
-    },
-    {
-      "category": "Émotions",
-      "text": "Je pense à admiration",
-      "weight": 1
-    },
-    {
-      "category": "Émotions",
-      "text": "Je pense à méfiance",
-      "weight": 1
-    },
-    {
-      "category": "Émotions",
-      "text": "Je pense à envie",
+      "text": "JE VEUX ÊTRE PARDONNÉ",
       "weight": 1
     },
     {
@@ -1724,262 +1129,52 @@
     },
     {
       "category": "Lieux",
-      "text": "Je suis dans la maison",
+      "text": "JE SUIS DANS LA MAISON",
       "weight": 1
     },
     {
       "category": "Lieux",
-      "text": "Je suis dans la chambre",
+      "text": "JE SUIS DANS LA CHAMBRE",
       "weight": 1
     },
     {
       "category": "Lieux",
-      "text": "Je suis dehors",
+      "text": "JE SUIS DEHORS",
       "weight": 1
     },
     {
       "category": "Lieux",
-      "text": "Je suis à l'intérieur",
+      "text": "JE SUIS À L'INTÉRIEUR",
       "weight": 1
     },
     {
       "category": "Lieux",
-      "text": "Je suis près de la porte",
+      "text": "JE SUIS PRÈS DE LA PORTE",
       "weight": 1
     },
     {
       "category": "Lieux",
-      "text": "Je suis loin d'ici",
+      "text": "JE SUIS LOIN D'ICI",
       "weight": 1
     },
     {
       "category": "Lieux",
-      "text": "Je suis sous terre",
+      "text": "JE SUIS SOUS TERRE",
       "weight": 1
     },
     {
       "category": "Lieux",
-      "text": "Je suis à l'étage",
+      "text": "JE SUIS À L'ÉTAGE",
       "weight": 1
     },
     {
       "category": "Lieux",
-      "text": "Je suis dans le jardin",
+      "text": "JE SUIS DANS LE JARDIN",
       "weight": 1
     },
     {
       "category": "Lieux",
-      "text": "Je connais cet endroit",
-      "weight": 1
-    },
-    {
-      "category": "Lieux",
-      "text": "Je pense à maison",
-      "weight": 1
-    },
-    {
-      "category": "Lieux",
-      "text": "Je pense à chambre",
-      "weight": 1
-    },
-    {
-      "category": "Lieux",
-      "text": "Je pense à cuisine",
-      "weight": 1
-    },
-    {
-      "category": "Lieux",
-      "text": "Je pense à jardin",
-      "weight": 1
-    },
-    {
-      "category": "Lieux",
-      "text": "Je pense à porte",
-      "weight": 1
-    },
-    {
-      "category": "Lieux",
-      "text": "Je pense à fenêtre",
-      "weight": 1
-    },
-    {
-      "category": "Lieux",
-      "text": "Je pense à grenier",
-      "weight": 1
-    },
-    {
-      "category": "Lieux",
-      "text": "Je pense à cave",
-      "weight": 1
-    },
-    {
-      "category": "Lieux",
-      "text": "Je pense à dehors",
-      "weight": 1
-    },
-    {
-      "category": "Lieux",
-      "text": "Je pense à dedans",
-      "weight": 1
-    },
-    {
-      "category": "Lieux",
-      "text": "Je pense à ici",
-      "weight": 1
-    },
-    {
-      "category": "Lieux",
-      "text": "Je pense à là-bas",
-      "weight": 1
-    },
-    {
-      "category": "Lieux",
-      "text": "Je pense à près",
-      "weight": 1
-    },
-    {
-      "category": "Lieux",
-      "text": "Je pense à loin",
-      "weight": 1
-    },
-    {
-      "category": "Lieux",
-      "text": "Je pense à école",
-      "weight": 1
-    },
-    {
-      "category": "Lieux",
-      "text": "Je pense à église",
-      "weight": 1
-    },
-    {
-      "category": "Lieux",
-      "text": "Je pense à forêt",
-      "weight": 1
-    },
-    {
-      "category": "Lieux",
-      "text": "Je pense à eau",
-      "weight": 1
-    },
-    {
-      "category": "Lieux",
-      "text": "Je pense à hôpital",
-      "weight": 1
-    },
-    {
-      "category": "Lieux",
-      "text": "Je pense à cimetière",
-      "weight": 1
-    },
-    {
-      "category": "Lieux",
-      "text": "Je pense à gare",
-      "weight": 1
-    },
-    {
-      "category": "Lieux",
-      "text": "Je pense à route",
-      "weight": 1
-    },
-    {
-      "category": "Lieux",
-      "text": "Je pense à pont",
-      "weight": 1
-    },
-    {
-      "category": "Lieux",
-      "text": "Je pense à rivière",
-      "weight": 1
-    },
-    {
-      "category": "Lieux",
-      "text": "Je pense à lac",
-      "weight": 1
-    },
-    {
-      "category": "Lieux",
-      "text": "Je pense à mer",
-      "weight": 1
-    },
-    {
-      "category": "Lieux",
-      "text": "Je pense à montagne",
-      "weight": 1
-    },
-    {
-      "category": "Lieux",
-      "text": "Je pense à village",
-      "weight": 1
-    },
-    {
-      "category": "Lieux",
-      "text": "Je pense à ville",
-      "weight": 1
-    },
-    {
-      "category": "Lieux",
-      "text": "Je pense à appartement",
-      "weight": 1
-    },
-    {
-      "category": "Lieux",
-      "text": "Je pense à couloir",
-      "weight": 1
-    },
-    {
-      "category": "Lieux",
-      "text": "Je pense à escalier",
-      "weight": 1
-    },
-    {
-      "category": "Lieux",
-      "text": "Je pense à balcon",
-      "weight": 1
-    },
-    {
-      "category": "Lieux",
-      "text": "Je pense à sous-sol",
-      "weight": 1
-    },
-    {
-      "category": "Lieux",
-      "text": "Je pense à garage",
-      "weight": 1
-    },
-    {
-      "category": "Lieux",
-      "text": "Je pense à bord de mer",
-      "weight": 1
-    },
-    {
-      "category": "Lieux",
-      "text": "Je pense à campagne",
-      "weight": 1
-    },
-    {
-      "category": "Lieux",
-      "text": "Je pense à château",
-      "weight": 1
-    },
-    {
-      "category": "Lieux",
-      "text": "Je pense à ruines",
-      "weight": 1
-    },
-    {
-      "category": "Lieux",
-      "text": "Je pense à usine",
-      "weight": 1
-    },
-    {
-      "category": "Lieux",
-      "text": "Je pense à grange",
-      "weight": 1
-    },
-    {
-      "category": "Lieux",
-      "text": "Je pense à caveau",
+      "text": "JE CONNAIS CET ENDROIT",
       "weight": 1
     },
     {
@@ -2234,252 +1429,52 @@
     },
     {
       "category": "Temps et souvenirs",
-      "text": "Je me souviens d'avant",
+      "text": "JE ME SOUVIENS D'AVANT",
       "weight": 1
     },
     {
       "category": "Temps et souvenirs",
-      "text": "C'était hier",
+      "text": "C'ÉTAIT HIER",
       "weight": 1
     },
     {
       "category": "Temps et souvenirs",
-      "text": "C'était autrefois",
+      "text": "C'ÉTAIT AUTREFOIS",
       "weight": 1
     },
     {
       "category": "Temps et souvenirs",
-      "text": "Je reviendrai demain",
+      "text": "JE REVIENDRAI DEMAIN",
       "weight": 1
     },
     {
       "category": "Temps et souvenirs",
-      "text": "Je suis arrivé tôt",
+      "text": "JE SUIS ARRIVÉ TÔT",
       "weight": 1
     },
     {
       "category": "Temps et souvenirs",
-      "text": "Je suis parti tard",
+      "text": "JE SUIS PARTI TARD",
       "weight": 1
     },
     {
       "category": "Temps et souvenirs",
-      "text": "Le temps est passé",
+      "text": "LE TEMPS EST PASSÉ",
       "weight": 1
     },
     {
       "category": "Temps et souvenirs",
-      "text": "Je suis encore là",
+      "text": "JE SUIS ENCORE LÀ",
       "weight": 1
     },
     {
       "category": "Temps et souvenirs",
-      "text": "Je me rappelle ce jour",
+      "text": "JE ME RAPPELLE CE JOUR",
       "weight": 1
     },
     {
       "category": "Temps et souvenirs",
-      "text": "Attends encore un peu",
-      "weight": 1
-    },
-    {
-      "category": "Temps et souvenirs",
-      "text": "Je pense à hier",
-      "weight": 1
-    },
-    {
-      "category": "Temps et souvenirs",
-      "text": "Je pense à aujourd'hui",
-      "weight": 1
-    },
-    {
-      "category": "Temps et souvenirs",
-      "text": "Je pense à demain",
-      "weight": 1
-    },
-    {
-      "category": "Temps et souvenirs",
-      "text": "Je pense à avant",
-      "weight": 1
-    },
-    {
-      "category": "Temps et souvenirs",
-      "text": "Je pense à après",
-      "weight": 1
-    },
-    {
-      "category": "Temps et souvenirs",
-      "text": "Je pense à maintenant",
-      "weight": 1
-    },
-    {
-      "category": "Temps et souvenirs",
-      "text": "Je pense à bientôt",
-      "weight": 1
-    },
-    {
-      "category": "Temps et souvenirs",
-      "text": "Je pense à longtemps",
-      "weight": 1
-    },
-    {
-      "category": "Temps et souvenirs",
-      "text": "Je pense à enfance",
-      "weight": 1
-    },
-    {
-      "category": "Temps et souvenirs",
-      "text": "Je pense à souvenir",
-      "weight": 1
-    },
-    {
-      "category": "Temps et souvenirs",
-      "text": "Je pense à date",
-      "weight": 1
-    },
-    {
-      "category": "Temps et souvenirs",
-      "text": "Je pense à année",
-      "weight": 1
-    },
-    {
-      "category": "Temps et souvenirs",
-      "text": "Je pense à matin",
-      "weight": 1
-    },
-    {
-      "category": "Temps et souvenirs",
-      "text": "Je pense à soir",
-      "weight": 1
-    },
-    {
-      "category": "Temps et souvenirs",
-      "text": "Je pense à nuit",
-      "weight": 1
-    },
-    {
-      "category": "Temps et souvenirs",
-      "text": "Je pense à jour",
-      "weight": 1
-    },
-    {
-      "category": "Temps et souvenirs",
-      "text": "Je pense à été",
-      "weight": 1
-    },
-    {
-      "category": "Temps et souvenirs",
-      "text": "Je pense à hiver",
-      "weight": 1
-    },
-    {
-      "category": "Temps et souvenirs",
-      "text": "Je pense à printemps",
-      "weight": 1
-    },
-    {
-      "category": "Temps et souvenirs",
-      "text": "Je pense à automne",
-      "weight": 1
-    },
-    {
-      "category": "Temps et souvenirs",
-      "text": "Je pense à minuit",
-      "weight": 1
-    },
-    {
-      "category": "Temps et souvenirs",
-      "text": "Je pense à midi",
-      "weight": 1
-    },
-    {
-      "category": "Temps et souvenirs",
-      "text": "Je pense à aube",
-      "weight": 1
-    },
-    {
-      "category": "Temps et souvenirs",
-      "text": "Je pense à crépuscule",
-      "weight": 1
-    },
-    {
-      "category": "Temps et souvenirs",
-      "text": "Je pense à semaine",
-      "weight": 1
-    },
-    {
-      "category": "Temps et souvenirs",
-      "text": "Je pense à mois",
-      "weight": 1
-    },
-    {
-      "category": "Temps et souvenirs",
-      "text": "Je pense à lundi",
-      "weight": 1
-    },
-    {
-      "category": "Temps et souvenirs",
-      "text": "Je pense à mardi",
-      "weight": 1
-    },
-    {
-      "category": "Temps et souvenirs",
-      "text": "Je pense à mercredi",
-      "weight": 1
-    },
-    {
-      "category": "Temps et souvenirs",
-      "text": "Je pense à jeudi",
-      "weight": 1
-    },
-    {
-      "category": "Temps et souvenirs",
-      "text": "Je pense à vendredi",
-      "weight": 1
-    },
-    {
-      "category": "Temps et souvenirs",
-      "text": "Je pense à samedi",
-      "weight": 1
-    },
-    {
-      "category": "Temps et souvenirs",
-      "text": "Je pense à dimanche",
-      "weight": 1
-    },
-    {
-      "category": "Temps et souvenirs",
-      "text": "Je pense à passé",
-      "weight": 1
-    },
-    {
-      "category": "Temps et souvenirs",
-      "text": "Je pense à futur",
-      "weight": 1
-    },
-    {
-      "category": "Temps et souvenirs",
-      "text": "Je pense à en ce moment",
-      "weight": 1
-    },
-    {
-      "category": "Temps et souvenirs",
-      "text": "Je pense à il y a longtemps",
-      "weight": 1
-    },
-    {
-      "category": "Temps et souvenirs",
-      "text": "Je pense à dernière fois",
-      "weight": 1
-    },
-    {
-      "category": "Temps et souvenirs",
-      "text": "Je pense à première fois",
-      "weight": 1
-    },
-    {
-      "category": "Temps et souvenirs",
-      "text": "Je pense à anniversaire",
+      "text": "ATTENDS ENCORE UN PEU",
       "weight": 1
     },
     {
@@ -2729,252 +1724,52 @@
     },
     {
       "category": "Objets",
-      "text": "Regarde la photo",
+      "text": "REGARDE LA PHOTO",
       "weight": 1
     },
     {
       "category": "Objets",
-      "text": "Ouvre le livre",
+      "text": "OUVRE LE LIVRE",
       "weight": 1
     },
     {
       "category": "Objets",
-      "text": "Prends la clé",
+      "text": "PRENDS LA CLÉ",
       "weight": 1
     },
     {
       "category": "Objets",
-      "text": "Cherche la lettre",
+      "text": "CHERCHE LA LETTRE",
       "weight": 1
     },
     {
       "category": "Objets",
-      "text": "La montre est arrêtée",
+      "text": "LA MONTRE EST ARRÊTÉE",
       "weight": 1
     },
     {
       "category": "Objets",
-      "text": "Je veux une bougie",
+      "text": "JE VEUX UNE BOUGIE",
       "weight": 1
     },
     {
       "category": "Objets",
-      "text": "L'objet est ancien",
+      "text": "L'OBJET EST ANCIEN",
       "weight": 1
     },
     {
       "category": "Objets",
-      "text": "C'est un souvenir",
+      "text": "C'EST UN SOUVENIR",
       "weight": 1
     },
     {
       "category": "Objets",
-      "text": "Le tiroir est fermé",
+      "text": "LE TIROIR EST FERMÉ",
       "weight": 1
     },
     {
       "category": "Objets",
-      "text": "Ne touche pas l'objet",
-      "weight": 1
-    },
-    {
-      "category": "Objets",
-      "text": "Je pense à photo",
-      "weight": 1
-    },
-    {
-      "category": "Objets",
-      "text": "Je pense à livre",
-      "weight": 1
-    },
-    {
-      "category": "Objets",
-      "text": "Je pense à table",
-      "weight": 1
-    },
-    {
-      "category": "Objets",
-      "text": "Je pense à chaise",
-      "weight": 1
-    },
-    {
-      "category": "Objets",
-      "text": "Je pense à lit",
-      "weight": 1
-    },
-    {
-      "category": "Objets",
-      "text": "Je pense à montre",
-      "weight": 1
-    },
-    {
-      "category": "Objets",
-      "text": "Je pense à bijou",
-      "weight": 1
-    },
-    {
-      "category": "Objets",
-      "text": "Je pense à clé",
-      "weight": 1
-    },
-    {
-      "category": "Objets",
-      "text": "Je pense à téléphone",
-      "weight": 1
-    },
-    {
-      "category": "Objets",
-      "text": "Je pense à miroir",
-      "weight": 1
-    },
-    {
-      "category": "Objets",
-      "text": "Je pense à lampe",
-      "weight": 1
-    },
-    {
-      "category": "Objets",
-      "text": "Je pense à boîte",
-      "weight": 1
-    },
-    {
-      "category": "Objets",
-      "text": "Je pense à lettre",
-      "weight": 1
-    },
-    {
-      "category": "Objets",
-      "text": "Je pense à vêtement",
-      "weight": 1
-    },
-    {
-      "category": "Objets",
-      "text": "Je pense à jouet",
-      "weight": 1
-    },
-    {
-      "category": "Objets",
-      "text": "Je pense à musique",
-      "weight": 1
-    },
-    {
-      "category": "Objets",
-      "text": "Je pense à sac",
-      "weight": 1
-    },
-    {
-      "category": "Objets",
-      "text": "Je pense à portefeuille",
-      "weight": 1
-    },
-    {
-      "category": "Objets",
-      "text": "Je pense à bague",
-      "weight": 1
-    },
-    {
-      "category": "Objets",
-      "text": "Je pense à collier",
-      "weight": 1
-    },
-    {
-      "category": "Objets",
-      "text": "Je pense à bracelet",
-      "weight": 1
-    },
-    {
-      "category": "Objets",
-      "text": "Je pense à boucle",
-      "weight": 1
-    },
-    {
-      "category": "Objets",
-      "text": "Je pense à chaussure",
-      "weight": 1
-    },
-    {
-      "category": "Objets",
-      "text": "Je pense à manteau",
-      "weight": 1
-    },
-    {
-      "category": "Objets",
-      "text": "Je pense à chapeau",
-      "weight": 1
-    },
-    {
-      "category": "Objets",
-      "text": "Je pense à valise",
-      "weight": 1
-    },
-    {
-      "category": "Objets",
-      "text": "Je pense à pendule",
-      "weight": 1
-    },
-    {
-      "category": "Objets",
-      "text": "Je pense à horloge",
-      "weight": 1
-    },
-    {
-      "category": "Objets",
-      "text": "Je pense à radio",
-      "weight": 1
-    },
-    {
-      "category": "Objets",
-      "text": "Je pense à télévision",
-      "weight": 1
-    },
-    {
-      "category": "Objets",
-      "text": "Je pense à ordinateur",
-      "weight": 1
-    },
-    {
-      "category": "Objets",
-      "text": "Je pense à clavier",
-      "weight": 1
-    },
-    {
-      "category": "Objets",
-      "text": "Je pense à stylo",
-      "weight": 1
-    },
-    {
-      "category": "Objets",
-      "text": "Je pense à papier",
-      "weight": 1
-    },
-    {
-      "category": "Objets",
-      "text": "Je pense à enveloppe",
-      "weight": 1
-    },
-    {
-      "category": "Objets",
-      "text": "Je pense à tasse",
-      "weight": 1
-    },
-    {
-      "category": "Objets",
-      "text": "Je pense à verre",
-      "weight": 1
-    },
-    {
-      "category": "Objets",
-      "text": "Je pense à assiette",
-      "weight": 1
-    },
-    {
-      "category": "Objets",
-      "text": "Je pense à fourchette",
-      "weight": 1
-    },
-    {
-      "category": "Objets",
-      "text": "Je pense à couteau",
+      "text": "NE TOUCHE PAS L'OBJET",
       "weight": 1
     },
     {
@@ -3219,242 +2014,52 @@
     },
     {
       "category": "Sensations et corps",
-      "text": "Je ressens un frisson",
+      "text": "JE RESSENS UN FRISSON",
       "weight": 1
     },
     {
       "category": "Sensations et corps",
-      "text": "J'ai froid",
+      "text": "J'AI FROID",
       "weight": 1
     },
     {
       "category": "Sensations et corps",
-      "text": "J'ai chaud",
+      "text": "J'AI CHAUD",
       "weight": 1
     },
     {
       "category": "Sensations et corps",
-      "text": "Je sens une présence proche",
+      "text": "JE SENS UNE PRÉSENCE PROCHE",
       "weight": 1
     },
     {
       "category": "Sensations et corps",
-      "text": "J'entends un bruit",
+      "text": "J'ENTENDS UN BRUIT",
       "weight": 1
     },
     {
       "category": "Sensations et corps",
-      "text": "Je ressens une pression",
+      "text": "JE RESSENS UNE PRESSION",
       "weight": 1
     },
     {
       "category": "Sensations et corps",
-      "text": "Quelqu'un me touche",
+      "text": "QUELQU'UN ME TOUCHE",
       "weight": 1
     },
     {
       "category": "Sensations et corps",
-      "text": "Je suis derrière toi",
+      "text": "JE SUIS DERRIÈRE TOI",
       "weight": 1
     },
     {
       "category": "Sensations et corps",
-      "text": "Je suis devant toi",
+      "text": "JE SUIS DEVANT TOI",
       "weight": 1
     },
     {
       "category": "Sensations et corps",
-      "text": "Écoute le silence",
-      "weight": 1
-    },
-    {
-      "category": "Sensations et corps",
-      "text": "Je pense à froid",
-      "weight": 1
-    },
-    {
-      "category": "Sensations et corps",
-      "text": "Je pense à chaud",
-      "weight": 1
-    },
-    {
-      "category": "Sensations et corps",
-      "text": "Je pense à lumière",
-      "weight": 1
-    },
-    {
-      "category": "Sensations et corps",
-      "text": "Je pense à ombre",
-      "weight": 1
-    },
-    {
-      "category": "Sensations et corps",
-      "text": "Je pense à bruit",
-      "weight": 1
-    },
-    {
-      "category": "Sensations et corps",
-      "text": "Je pense à odeur",
-      "weight": 1
-    },
-    {
-      "category": "Sensations et corps",
-      "text": "Je pense à vent",
-      "weight": 1
-    },
-    {
-      "category": "Sensations et corps",
-      "text": "Je pense à pression",
-      "weight": 1
-    },
-    {
-      "category": "Sensations et corps",
-      "text": "Je pense à mouvement",
-      "weight": 1
-    },
-    {
-      "category": "Sensations et corps",
-      "text": "Je pense à vibration",
-      "weight": 1
-    },
-    {
-      "category": "Sensations et corps",
-      "text": "Je pense à derrière",
-      "weight": 1
-    },
-    {
-      "category": "Sensations et corps",
-      "text": "Je pense à devant",
-      "weight": 1
-    },
-    {
-      "category": "Sensations et corps",
-      "text": "Je pense à touche",
-      "weight": 1
-    },
-    {
-      "category": "Sensations et corps",
-      "text": "Je pense à souffle",
-      "weight": 1
-    },
-    {
-      "category": "Sensations et corps",
-      "text": "Je pense à frisson",
-      "weight": 1
-    },
-    {
-      "category": "Sensations et corps",
-      "text": "Je pense à picotement",
-      "weight": 1
-    },
-    {
-      "category": "Sensations et corps",
-      "text": "Je pense à chaleur",
-      "weight": 1
-    },
-    {
-      "category": "Sensations et corps",
-      "text": "Je pense à fraîcheur",
-      "weight": 1
-    },
-    {
-      "category": "Sensations et corps",
-      "text": "Je pense à pesanteur",
-      "weight": 1
-    },
-    {
-      "category": "Sensations et corps",
-      "text": "Je pense à légèreté",
-      "weight": 1
-    },
-    {
-      "category": "Sensations et corps",
-      "text": "Je pense à vertige",
-      "weight": 1
-    },
-    {
-      "category": "Sensations et corps",
-      "text": "Je pense à étourdissement",
-      "weight": 1
-    },
-    {
-      "category": "Sensations et corps",
-      "text": "Je pense à écho",
-      "weight": 1
-    },
-    {
-      "category": "Sensations et corps",
-      "text": "Je pense à résonance",
-      "weight": 1
-    },
-    {
-      "category": "Sensations et corps",
-      "text": "Je pense à claquement",
-      "weight": 1
-    },
-    {
-      "category": "Sensations et corps",
-      "text": "Je pense à pas",
-      "weight": 1
-    },
-    {
-      "category": "Sensations et corps",
-      "text": "Je pense à grincement",
-      "weight": 1
-    },
-    {
-      "category": "Sensations et corps",
-      "text": "Je pense à parfum",
-      "weight": 1
-    },
-    {
-      "category": "Sensations et corps",
-      "text": "Je pense à fumée",
-      "weight": 1
-    },
-    {
-      "category": "Sensations et corps",
-      "text": "Je pense à obscurité",
-      "weight": 1
-    },
-    {
-      "category": "Sensations et corps",
-      "text": "Je pense à clarté",
-      "weight": 1
-    },
-    {
-      "category": "Sensations et corps",
-      "text": "Je pense à éblouissement",
-      "weight": 1
-    },
-    {
-      "category": "Sensations et corps",
-      "text": "Je pense à fourmillement",
-      "weight": 1
-    },
-    {
-      "category": "Sensations et corps",
-      "text": "Je pense à contact",
-      "weight": 1
-    },
-    {
-      "category": "Sensations et corps",
-      "text": "Je pense à main",
-      "weight": 1
-    },
-    {
-      "category": "Sensations et corps",
-      "text": "Je pense à tête",
-      "weight": 1
-    },
-    {
-      "category": "Sensations et corps",
-      "text": "Je pense à cœur",
-      "weight": 1
-    },
-    {
-      "category": "Sensations et corps",
-      "text": "Je pense à dos",
+      "text": "ÉCOUTE LE SILENCE",
       "weight": 1
     },
     {
@@ -3704,252 +2309,52 @@
     },
     {
       "category": "Actions",
-      "text": "Viens ici",
+      "text": "VIENS ICI",
       "weight": 1
     },
     {
       "category": "Actions",
-      "text": "Reste avec moi",
+      "text": "RESTE AVEC MOI",
       "weight": 1
     },
     {
       "category": "Actions",
-      "text": "Pars maintenant",
+      "text": "PARS MAINTENANT",
       "weight": 1
     },
     {
       "category": "Actions",
-      "text": "Reviens bientôt",
+      "text": "REVIENS BIENTÔT",
       "weight": 1
     },
     {
       "category": "Actions",
-      "text": "Aide-moi à sortir",
+      "text": "AIDE-MOI À SORTIR",
       "weight": 1
     },
     {
       "category": "Actions",
-      "text": "Ouvre la porte",
+      "text": "OUVRE LA PORTE",
       "weight": 1
     },
     {
       "category": "Actions",
-      "text": "Ferme la fenêtre",
+      "text": "FERME LA FENÊTRE",
       "weight": 1
     },
     {
       "category": "Actions",
-      "text": "Regarde derrière toi",
+      "text": "REGARDE DERRIÈRE TOI",
       "weight": 1
     },
     {
       "category": "Actions",
-      "text": "Écoute attentivement",
+      "text": "ÉCOUTE ATTENTIVEMENT",
       "weight": 1
     },
     {
       "category": "Actions",
-      "text": "Ne bouge pas",
-      "weight": 1
-    },
-    {
-      "category": "Actions",
-      "text": "Je pense à viens",
-      "weight": 1
-    },
-    {
-      "category": "Actions",
-      "text": "Je pense à reste",
-      "weight": 1
-    },
-    {
-      "category": "Actions",
-      "text": "Je pense à partir",
-      "weight": 1
-    },
-    {
-      "category": "Actions",
-      "text": "Je pense à reviens",
-      "weight": 1
-    },
-    {
-      "category": "Actions",
-      "text": "Je pense à aide",
-      "weight": 1
-    },
-    {
-      "category": "Actions",
-      "text": "Je pense à suivre",
-      "weight": 1
-    },
-    {
-      "category": "Actions",
-      "text": "Je pense à ouvrir",
-      "weight": 1
-    },
-    {
-      "category": "Actions",
-      "text": "Je pense à fermer",
-      "weight": 1
-    },
-    {
-      "category": "Actions",
-      "text": "Je pense à montrer",
-      "weight": 1
-    },
-    {
-      "category": "Actions",
-      "text": "Je pense à attendre",
-      "weight": 1
-    },
-    {
-      "category": "Actions",
-      "text": "Je pense à avancer",
-      "weight": 1
-    },
-    {
-      "category": "Actions",
-      "text": "Je pense à reculer",
-      "weight": 1
-    },
-    {
-      "category": "Actions",
-      "text": "Je pense à regarder",
-      "weight": 1
-    },
-    {
-      "category": "Actions",
-      "text": "Je pense à entendre",
-      "weight": 1
-    },
-    {
-      "category": "Actions",
-      "text": "Je pense à dormir",
-      "weight": 1
-    },
-    {
-      "category": "Actions",
-      "text": "Je pense à réveiller",
-      "weight": 1
-    },
-    {
-      "category": "Actions",
-      "text": "Je pense à chercher",
-      "weight": 1
-    },
-    {
-      "category": "Actions",
-      "text": "Je pense à trouver",
-      "weight": 1
-    },
-    {
-      "category": "Actions",
-      "text": "Je pense à cacher",
-      "weight": 1
-    },
-    {
-      "category": "Actions",
-      "text": "Je pense à se cacher",
-      "weight": 1
-    },
-    {
-      "category": "Actions",
-      "text": "Je pense à se rappeler",
-      "weight": 1
-    },
-    {
-      "category": "Actions",
-      "text": "Je pense à oublier",
-      "weight": 1
-    },
-    {
-      "category": "Actions",
-      "text": "Je pense à protéger",
-      "weight": 1
-    },
-    {
-      "category": "Actions",
-      "text": "Je pense à prévenir",
-      "weight": 1
-    },
-    {
-      "category": "Actions",
-      "text": "Je pense à appeler",
-      "weight": 1
-    },
-    {
-      "category": "Actions",
-      "text": "Je pense à répondre",
-      "weight": 1
-    },
-    {
-      "category": "Actions",
-      "text": "Je pense à toucher",
-      "weight": 1
-    },
-    {
-      "category": "Actions",
-      "text": "Je pense à sentir",
-      "weight": 1
-    },
-    {
-      "category": "Actions",
-      "text": "Je pense à sourire",
-      "weight": 1
-    },
-    {
-      "category": "Actions",
-      "text": "Je pense à pleurer",
-      "weight": 1
-    },
-    {
-      "category": "Actions",
-      "text": "Je pense à rire",
-      "weight": 1
-    },
-    {
-      "category": "Actions",
-      "text": "Je pense à chanter",
-      "weight": 1
-    },
-    {
-      "category": "Actions",
-      "text": "Je pense à écrire",
-      "weight": 1
-    },
-    {
-      "category": "Actions",
-      "text": "Je pense à lire",
-      "weight": 1
-    },
-    {
-      "category": "Actions",
-      "text": "Je pense à venir",
-      "weight": 1
-    },
-    {
-      "category": "Actions",
-      "text": "Je pense à s'éloigner",
-      "weight": 1
-    },
-    {
-      "category": "Actions",
-      "text": "Je pense à s'approcher",
-      "weight": 1
-    },
-    {
-      "category": "Actions",
-      "text": "Je pense à monter",
-      "weight": 1
-    },
-    {
-      "category": "Actions",
-      "text": "Je pense à descendre",
-      "weight": 1
-    },
-    {
-      "category": "Actions",
-      "text": "Je pense à attendre ici",
+      "text": "NE BOUGE PAS",
       "weight": 1
     },
     {
@@ -4169,222 +2574,52 @@
     },
     {
       "category": "Nature et environnement",
-      "text": "Il pleut dehors",
+      "text": "IL PLEUT DEHORS",
       "weight": 1
     },
     {
       "category": "Nature et environnement",
-      "text": "Le vent se lève",
+      "text": "LE VENT SE LÈVE",
       "weight": 1
     },
     {
       "category": "Nature et environnement",
-      "text": "J'entends le tonnerre",
+      "text": "J'ENTENDS LE TONNERRE",
       "weight": 1
     },
     {
       "category": "Nature et environnement",
-      "text": "La forêt est calme",
+      "text": "LA FORÊT EST CALME",
       "weight": 1
     },
     {
       "category": "Nature et environnement",
-      "text": "L'eau est froide",
+      "text": "L'EAU EST FROIDE",
       "weight": 1
     },
     {
       "category": "Nature et environnement",
-      "text": "Le feu brûle",
+      "text": "LE FEU BRÛLE",
       "weight": 1
     },
     {
       "category": "Nature et environnement",
-      "text": "La lune est visible",
+      "text": "LA LUNE EST VISIBLE",
       "weight": 1
     },
     {
       "category": "Nature et environnement",
-      "text": "Un animal approche",
+      "text": "UN ANIMAL APPROCHE",
       "weight": 1
     },
     {
       "category": "Nature et environnement",
-      "text": "Il fait nuit",
+      "text": "IL FAIT NUIT",
       "weight": 1
     },
     {
       "category": "Nature et environnement",
-      "text": "La tempête arrive",
-      "weight": 1
-    },
-    {
-      "category": "Nature et environnement",
-      "text": "Je pense à feu",
-      "weight": 1
-    },
-    {
-      "category": "Nature et environnement",
-      "text": "Je pense à terre",
-      "weight": 1
-    },
-    {
-      "category": "Nature et environnement",
-      "text": "Je pense à air",
-      "weight": 1
-    },
-    {
-      "category": "Nature et environnement",
-      "text": "Je pense à pluie",
-      "weight": 1
-    },
-    {
-      "category": "Nature et environnement",
-      "text": "Je pense à orage",
-      "weight": 1
-    },
-    {
-      "category": "Nature et environnement",
-      "text": "Je pense à tonnerre",
-      "weight": 1
-    },
-    {
-      "category": "Nature et environnement",
-      "text": "Je pense à éclair",
-      "weight": 1
-    },
-    {
-      "category": "Nature et environnement",
-      "text": "Je pense à neige",
-      "weight": 1
-    },
-    {
-      "category": "Nature et environnement",
-      "text": "Je pense à glace",
-      "weight": 1
-    },
-    {
-      "category": "Nature et environnement",
-      "text": "Je pense à soleil",
-      "weight": 1
-    },
-    {
-      "category": "Nature et environnement",
-      "text": "Je pense à lune",
-      "weight": 1
-    },
-    {
-      "category": "Nature et environnement",
-      "text": "Je pense à étoile",
-      "weight": 1
-    },
-    {
-      "category": "Nature et environnement",
-      "text": "Je pense à nuage",
-      "weight": 1
-    },
-    {
-      "category": "Nature et environnement",
-      "text": "Je pense à brouillard",
-      "weight": 1
-    },
-    {
-      "category": "Nature et environnement",
-      "text": "Je pense à arbre",
-      "weight": 1
-    },
-    {
-      "category": "Nature et environnement",
-      "text": "Je pense à fleur",
-      "weight": 1
-    },
-    {
-      "category": "Nature et environnement",
-      "text": "Je pense à herbe",
-      "weight": 1
-    },
-    {
-      "category": "Nature et environnement",
-      "text": "Je pense à feuille",
-      "weight": 1
-    },
-    {
-      "category": "Nature et environnement",
-      "text": "Je pense à racine",
-      "weight": 1
-    },
-    {
-      "category": "Nature et environnement",
-      "text": "Je pense à océan",
-      "weight": 1
-    },
-    {
-      "category": "Nature et environnement",
-      "text": "Je pense à rocher",
-      "weight": 1
-    },
-    {
-      "category": "Nature et environnement",
-      "text": "Je pense à pierre",
-      "weight": 1
-    },
-    {
-      "category": "Nature et environnement",
-      "text": "Je pense à sable",
-      "weight": 1
-    },
-    {
-      "category": "Nature et environnement",
-      "text": "Je pense à poussière",
-      "weight": 1
-    },
-    {
-      "category": "Nature et environnement",
-      "text": "Je pense à cendre",
-      "weight": 1
-    },
-    {
-      "category": "Nature et environnement",
-      "text": "Je pense à animal",
-      "weight": 1
-    },
-    {
-      "category": "Nature et environnement",
-      "text": "Je pense à oiseau",
-      "weight": 1
-    },
-    {
-      "category": "Nature et environnement",
-      "text": "Je pense à chat",
-      "weight": 1
-    },
-    {
-      "category": "Nature et environnement",
-      "text": "Je pense à chien",
-      "weight": 1
-    },
-    {
-      "category": "Nature et environnement",
-      "text": "Je pense à cheval",
-      "weight": 1
-    },
-    {
-      "category": "Nature et environnement",
-      "text": "Je pense à loup",
-      "weight": 1
-    },
-    {
-      "category": "Nature et environnement",
-      "text": "Je pense à corbeau",
-      "weight": 1
-    },
-    {
-      "category": "Nature et environnement",
-      "text": "Je pense à insecte",
-      "weight": 1
-    },
-    {
-      "category": "Nature et environnement",
-      "text": "Je pense à papillon",
+      "text": "LA TEMPÊTE ARRIVE",
       "weight": 1
     },
     {
@@ -4589,232 +2824,52 @@
     },
     {
       "category": "Symboles et mystère",
-      "text": "Je suis une présence",
+      "text": "JE SUIS UNE PRÉSENCE",
       "weight": 1
     },
     {
       "category": "Symboles et mystère",
-      "text": "Je veux laisser un signe",
+      "text": "JE VEUX LAISSER UN SIGNE",
       "weight": 1
     },
     {
       "category": "Symboles et mystère",
-      "text": "Je connais ce lieu",
+      "text": "JE CONNAIS CE LIEU",
       "weight": 1
     },
     {
       "category": "Symboles et mystère",
-      "text": "Ne franchis pas le seuil",
+      "text": "NE FRANCHIS PAS LE SEUIL",
       "weight": 1
     },
     {
       "category": "Symboles et mystère",
-      "text": "Je cherche la lumière",
+      "text": "JE CHERCHE LA LUMIÈRE",
       "weight": 1
     },
     {
       "category": "Symboles et mystère",
-      "text": "Je veux être entendu",
+      "text": "JE VEUX ÊTRE ENTENDU",
       "weight": 1
     },
     {
       "category": "Symboles et mystère",
-      "text": "Un souvenir demeure",
+      "text": "UN SOUVENIR DEMEURE",
       "weight": 1
     },
     {
       "category": "Symboles et mystère",
-      "text": "Je ne suis pas seul",
+      "text": "JE NE SUIS PAS SEUL",
       "weight": 1
     },
     {
       "category": "Symboles et mystère",
-      "text": "Il y a un passage",
+      "text": "IL Y A UN PASSAGE",
       "weight": 1
     },
     {
       "category": "Symboles et mystère",
-      "text": "C'est un secret",
-      "weight": 1
-    },
-    {
-      "category": "Symboles et mystère",
-      "text": "Je pense à esprit",
-      "weight": 1
-    },
-    {
-      "category": "Symboles et mystère",
-      "text": "Je pense à âme",
-      "weight": 1
-    },
-    {
-      "category": "Symboles et mystère",
-      "text": "Je pense à énergie",
-      "weight": 1
-    },
-    {
-      "category": "Symboles et mystère",
-      "text": "Je pense à présence",
-      "weight": 1
-    },
-    {
-      "category": "Symboles et mystère",
-      "text": "Je pense à absence",
-      "weight": 1
-    },
-    {
-      "category": "Symboles et mystère",
-      "text": "Je pense à spectre",
-      "weight": 1
-    },
-    {
-      "category": "Symboles et mystère",
-      "text": "Je pense à fantôme",
-      "weight": 1
-    },
-    {
-      "category": "Symboles et mystère",
-      "text": "Je pense à apparition",
-      "weight": 1
-    },
-    {
-      "category": "Symboles et mystère",
-      "text": "Je pense à silhouette",
-      "weight": 1
-    },
-    {
-      "category": "Symboles et mystère",
-      "text": "Je pense à voix",
-      "weight": 1
-    },
-    {
-      "category": "Symboles et mystère",
-      "text": "Je pense à message",
-      "weight": 1
-    },
-    {
-      "category": "Symboles et mystère",
-      "text": "Je pense à signe",
-      "weight": 1
-    },
-    {
-      "category": "Symboles et mystère",
-      "text": "Je pense à symbole",
-      "weight": 1
-    },
-    {
-      "category": "Symboles et mystère",
-      "text": "Je pense à cercle",
-      "weight": 1
-    },
-    {
-      "category": "Symboles et mystère",
-      "text": "Je pense à croix",
-      "weight": 1
-    },
-    {
-      "category": "Symboles et mystère",
-      "text": "Je pense à portail",
-      "weight": 1
-    },
-    {
-      "category": "Symboles et mystère",
-      "text": "Je pense à passage",
-      "weight": 1
-    },
-    {
-      "category": "Symboles et mystère",
-      "text": "Je pense à seuil",
-      "weight": 1
-    },
-    {
-      "category": "Symboles et mystère",
-      "text": "Je pense à rituel",
-      "weight": 1
-    },
-    {
-      "category": "Symboles et mystère",
-      "text": "Je pense à prière",
-      "weight": 1
-    },
-    {
-      "category": "Symboles et mystère",
-      "text": "Je pense à protection",
-      "weight": 1
-    },
-    {
-      "category": "Symboles et mystère",
-      "text": "Je pense à danger",
-      "weight": 1
-    },
-    {
-      "category": "Symboles et mystère",
-      "text": "Je pense à secret",
-      "weight": 1
-    },
-    {
-      "category": "Symboles et mystère",
-      "text": "Je pense à mystère",
-      "weight": 1
-    },
-    {
-      "category": "Symboles et mystère",
-      "text": "Je pense à vérité",
-      "weight": 1
-    },
-    {
-      "category": "Symboles et mystère",
-      "text": "Je pense à mensonge",
-      "weight": 1
-    },
-    {
-      "category": "Symboles et mystère",
-      "text": "Je pense à mémoire",
-      "weight": 1
-    },
-    {
-      "category": "Symboles et mystère",
-      "text": "Je pense à lien",
-      "weight": 1
-    },
-    {
-      "category": "Symboles et mystère",
-      "text": "Je pense à promesse",
-      "weight": 1
-    },
-    {
-      "category": "Symboles et mystère",
-      "text": "Je pense à serment",
-      "weight": 1
-    },
-    {
-      "category": "Symboles et mystère",
-      "text": "Je pense à sépulture",
-      "weight": 1
-    },
-    {
-      "category": "Symboles et mystère",
-      "text": "Je pense à tombe",
-      "weight": 1
-    },
-    {
-      "category": "Symboles et mystère",
-      "text": "Je pense à cercueil",
-      "weight": 1
-    },
-    {
-      "category": "Symboles et mystère",
-      "text": "Je pense à cloches",
-      "weight": 1
-    },
-    {
-      "category": "Symboles et mystère",
-      "text": "Je pense à sonnette",
-      "weight": 1
-    },
-    {
-      "category": "Symboles et mystère",
-      "text": "Je pense à bougie",
+      "text": "C'EST UN SECRET",
       "weight": 1
     },
     {
@@ -5000,6 +3055,1951 @@
     {
       "category": "Symboles et mystère",
       "text": "LE DERNIER AVERTISSEMENT",
+      "weight": 1
+    },
+    {
+      "category": "Réponses",
+      "text": "OUI, BIEN SÛR",
+      "weight": 1
+    },
+    {
+      "category": "Réponses",
+      "text": "NON, JAMAIS",
+      "weight": 1
+    },
+    {
+      "category": "Réponses",
+      "text": "JE NE PEUX PAS",
+      "weight": 1
+    },
+    {
+      "category": "Réponses",
+      "text": "JE VEUX",
+      "weight": 1
+    },
+    {
+      "category": "Réponses",
+      "text": "JE SUIS PRÊT",
+      "weight": 1
+    },
+    {
+      "category": "Réponses",
+      "text": "JE SUIS PRÊTE",
+      "weight": 1
+    },
+    {
+      "category": "Réponses",
+      "text": "PAS ENCORE",
+      "weight": 1
+    },
+    {
+      "category": "Réponses",
+      "text": "PAS ICI",
+      "weight": 1
+    },
+    {
+      "category": "Réponses",
+      "text": "C'EST MOI",
+      "weight": 1
+    },
+    {
+      "category": "Réponses",
+      "text": "CE N'EST PAS MOI",
+      "weight": 1
+    },
+    {
+      "category": "Réponses",
+      "text": "QUI EST LÀ ?",
+      "weight": 1
+    },
+    {
+      "category": "Réponses",
+      "text": "QUI PARLE ?",
+      "weight": 1
+    },
+    {
+      "category": "Réponses",
+      "text": "ENTENDS-TU ?",
+      "weight": 1
+    },
+    {
+      "category": "Réponses",
+      "text": "TU M'ENTENDS ?",
+      "weight": 1
+    },
+    {
+      "category": "Réponses",
+      "text": "JE REVIENS",
+      "weight": 1
+    },
+    {
+      "category": "Réponses",
+      "text": "ATTENDS-MOI",
+      "weight": 1
+    },
+    {
+      "category": "Réponses",
+      "text": "LAISSE-MOI",
+      "weight": 1
+    },
+    {
+      "category": "Réponses",
+      "text": "NE PARS PAS",
+      "weight": 1
+    },
+    {
+      "category": "Réponses",
+      "text": "NE ME TOUCHE PAS",
+      "weight": 1
+    },
+    {
+      "category": "Réponses",
+      "text": "APPROCHE",
+      "weight": 1
+    },
+    {
+      "category": "Réponses",
+      "text": "ÉLOIGNE-TOI",
+      "weight": 1
+    },
+    {
+      "category": "Réponses",
+      "text": "REGARDE",
+      "weight": 1
+    },
+    {
+      "category": "Réponses",
+      "text": "RÉPONDS",
+      "weight": 1
+    },
+    {
+      "category": "Réponses",
+      "text": "C'EST TERMINÉ",
+      "weight": 1
+    },
+    {
+      "category": "Réponses",
+      "text": "JE T'EN PRIE",
+      "weight": 1
+    },
+    {
+      "category": "Réponses",
+      "text": "POURQUOI MOI ?",
+      "weight": 1
+    },
+    {
+      "category": "Réponses",
+      "text": "QUE VEUX-TU ?",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "UN HOMME",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "UNE FEMME",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "UN ENFANT",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "UN BÉBÉ",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "UN ADOLESCENT",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "UN VIEIL HOMME",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "UNE VIEILLE FEMME",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "UN GARÇON",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "UNE FILLE",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "UN PÈRE",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "UNE MÈRE",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "UN FILS",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "UNE FILLE ADULTE",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "UN GRAND-PÈRE",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "UNE GRAND-MÈRE",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "UN ONCLE",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "UNE TANTE",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "UN COUSIN",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "UNE COUSINE",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "UN AMI",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "UNE AMIE",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "UNE VOISINE",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "UN INCONNU",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "UNE INCONNUE",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "UN VISITEUR",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "UN INVITÉ",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "UN PASSANT",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "UN SOLDAT",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "UN MÉDECIN",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "UN ENSEIGNANT",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "UN OUVRIER",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "UN ARTISAN",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "UN VOYAGEUR",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "UN PROTECTEUR",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "UN PRISONNIER",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "UN MESSAGER",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "UN PROPRIÉTAIRE",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "UN LOCATAIRE",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "UN MARI",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "UNE ÉPOUSE",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "UN FIANCÉ",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "UNE FIANCÉE",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "UN PARTENAIRE",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "UN COLLÈGUE",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "UN CHEF",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "UN ENFANT PERDU",
+      "weight": 1
+    },
+    {
+      "category": "Émotions",
+      "text": "ANGOISSE",
+      "weight": 1
+    },
+    {
+      "category": "Émotions",
+      "text": "TERREUR",
+      "weight": 1
+    },
+    {
+      "category": "Émotions",
+      "text": "TRISTESSE PROFONDE",
+      "weight": 1
+    },
+    {
+      "category": "Émotions",
+      "text": "GRANDE JOIE",
+      "weight": 1
+    },
+    {
+      "category": "Émotions",
+      "text": "RAGE",
+      "weight": 1
+    },
+    {
+      "category": "Émotions",
+      "text": "AMERTUME",
+      "weight": 1
+    },
+    {
+      "category": "Émotions",
+      "text": "ABANDON",
+      "weight": 1
+    },
+    {
+      "category": "Émotions",
+      "text": "HAINE",
+      "weight": 1
+    },
+    {
+      "category": "Émotions",
+      "text": "PEUR DU NOIR",
+      "weight": 1
+    },
+    {
+      "category": "Émotions",
+      "text": "ÉPUISEMENT",
+      "weight": 1
+    },
+    {
+      "category": "Émotions",
+      "text": "IMPATIENCE",
+      "weight": 1
+    },
+    {
+      "category": "Émotions",
+      "text": "MALAISE",
+      "weight": 1
+    },
+    {
+      "category": "Émotions",
+      "text": "BIENVEILLANCE",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "DANS LA MAISON",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "À L'EXTÉRIEUR",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "DANS LA CHAMBRE",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "DANS LA CUISINE",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "DANS LE SALON",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "DANS LA SALLE DE BAIN",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "DANS LE GRENIER",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "DANS LE SOUS-SOL",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "DANS LE COULOIR",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "DANS L'ESCALIER",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "PRÈS DE LA PORTE",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "DERRIÈRE LA FENÊTRE",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "SOUS LE LIT",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "DERRIÈRE LE MUR",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "AU REZ-DE-CHAUSSÉE",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "À L'ÉTAGE",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "DANS LE GARAGE",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "DANS LA GRANGE",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "DANS LA GRANGE À FOI",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "AU CIMETIÈRE",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "DANS UNE ÉGLISE",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "DANS UNE CHAPELLE",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "À L'ÉCOLE",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "À L'HÔPITAL",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "À LA GARE",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "SUR LE QUAI",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "DANS UN TRAIN",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "SUR LA ROUTE",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "SOUS LE PONT",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "AU BORD DE LA RIVIÈRE",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "PRÈS DU LAC",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "AU BORD DE LA MER",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "DANS LA FORÊT",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "AU MILIEU DES BOIS",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "DANS UN CHAMP",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "DANS UN JARDIN",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "DANS UN PARC",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "DANS UN CHÂTEAU",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "DANS LES RUINES",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "DANS UNE USINE",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "DANS UN ATELIER",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "DANS UNE PRISON",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "DANS UN HÔTEL",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "DANS UN COULOIR SOMBRE",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "DANS UNE PIÈCE FERMÉE",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "DANS UN ENDROIT ABANDONNÉ",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "SOUS LA TERRE",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "DANS UN TUNNEL",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "DANS UNE GROTTE",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "PRÈS DE L'ENTRÉE",
+      "weight": 1
+    },
+    {
+      "category": "Temps et souvenirs",
+      "text": "AUTREFOIS",
+      "weight": 1
+    },
+    {
+      "category": "Temps et souvenirs",
+      "text": "DANS LE PASSÉ",
+      "weight": 1
+    },
+    {
+      "category": "Temps et souvenirs",
+      "text": "DANS LE FUTUR",
+      "weight": 1
+    },
+    {
+      "category": "Temps et souvenirs",
+      "text": "HIER MATIN",
+      "weight": 1
+    },
+    {
+      "category": "Temps et souvenirs",
+      "text": "HIER SOIR",
+      "weight": 1
+    },
+    {
+      "category": "Temps et souvenirs",
+      "text": "CETTE NUIT",
+      "weight": 1
+    },
+    {
+      "category": "Temps et souvenirs",
+      "text": "LA NUIT DERNIÈRE",
+      "weight": 1
+    },
+    {
+      "category": "Temps et souvenirs",
+      "text": "DEMAIN MATIN",
+      "weight": 1
+    },
+    {
+      "category": "Temps et souvenirs",
+      "text": "DEMAIN SOIR",
+      "weight": 1
+    },
+    {
+      "category": "Temps et souvenirs",
+      "text": "AU LEVER DU SOLEIL",
+      "weight": 1
+    },
+    {
+      "category": "Temps et souvenirs",
+      "text": "AU COUCHER DU SOLEIL",
+      "weight": 1
+    },
+    {
+      "category": "Temps et souvenirs",
+      "text": "À MIDI",
+      "weight": 1
+    },
+    {
+      "category": "Temps et souvenirs",
+      "text": "À L'AUBE",
+      "weight": 1
+    },
+    {
+      "category": "Temps et souvenirs",
+      "text": "EN HIVER",
+      "weight": 1
+    },
+    {
+      "category": "Temps et souvenirs",
+      "text": "AU PRINTEMPS",
+      "weight": 1
+    },
+    {
+      "category": "Temps et souvenirs",
+      "text": "EN ÉTÉ",
+      "weight": 1
+    },
+    {
+      "category": "Temps et souvenirs",
+      "text": "EN AUTOMNE",
+      "weight": 1
+    },
+    {
+      "category": "Temps et souvenirs",
+      "text": "IL Y A UN AN",
+      "weight": 1
+    },
+    {
+      "category": "Temps et souvenirs",
+      "text": "IL Y A DIX ANS",
+      "weight": 1
+    },
+    {
+      "category": "Temps et souvenirs",
+      "text": "IL Y A CENT ANS",
+      "weight": 1
+    },
+    {
+      "category": "Temps et souvenirs",
+      "text": "PENDANT L'ENFANCE",
+      "weight": 1
+    },
+    {
+      "category": "Temps et souvenirs",
+      "text": "QUAND J'ÉTAIS PETIT",
+      "weight": 1
+    },
+    {
+      "category": "Temps et souvenirs",
+      "text": "LE JOUR DE MA MORT",
+      "weight": 1
+    },
+    {
+      "category": "Temps et souvenirs",
+      "text": "LE JOUR DU DÉPART",
+      "weight": 1
+    },
+    {
+      "category": "Temps et souvenirs",
+      "text": "LE DERNIER JOUR",
+      "weight": 1
+    },
+    {
+      "category": "Temps et souvenirs",
+      "text": "LE PREMIER JOUR",
+      "weight": 1
+    },
+    {
+      "category": "Temps et souvenirs",
+      "text": "UNE AUTRE ÉPOQUE",
+      "weight": 1
+    },
+    {
+      "category": "Temps et souvenirs",
+      "text": "UN ANNIVERSAIRE",
+      "weight": 1
+    },
+    {
+      "category": "Temps et souvenirs",
+      "text": "UNE DATE PRÉCISE",
+      "weight": 1
+    },
+    {
+      "category": "Temps et souvenirs",
+      "text": "UN JOUR DE FÊTE",
+      "weight": 1
+    },
+    {
+      "category": "Temps et souvenirs",
+      "text": "UN JOUR DE DEUIL",
+      "weight": 1
+    },
+    {
+      "category": "Temps et souvenirs",
+      "text": "LE LENDEMAIN",
+      "weight": 1
+    },
+    {
+      "category": "Temps et souvenirs",
+      "text": "LA VEILLE",
+      "weight": 1
+    },
+    {
+      "category": "Temps et souvenirs",
+      "text": "TRÈS BIENTÔT",
+      "weight": 1
+    },
+    {
+      "category": "Temps et souvenirs",
+      "text": "PAS TOUT DE SUITE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "UNE VIEILLE PHOTO",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "UN PORTRAIT",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "UN ALBUM",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "UNE LETTRE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "UNE ENVELOPPE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "UN JOURNAL INTIME",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "UN LIVRE OUVERT",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "UN LIVRE FERMÉ",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "UN CAHIER",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "UN DESSIN",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "UNE PEINTURE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "UN CADRE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "UN MIROIR",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "UNE BOUGIE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "UN CHANDELIER",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "UNE LAMPE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "UNE TORCHE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "UNE ALLUMETTE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "UNE BOÎTE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "UN COFFRE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "UNE VALISE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "UN SAC",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "UN PORTEFEUILLE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "UNE CLÉ",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "UNE SERRURE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "UNE PORTE FERMÉE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "UNE FENÊTRE OUVERTE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "UNE MONTRE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "UNE HORLOGE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "UNE PENDULE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "UN BIJOU",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "UNE BAGUE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "UN COLLIER",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "UN BRACELET",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "UNE CHAÎNE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "UNE MÉDAILLE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "UNE CROIX",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "UN CHAPELET",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "UN JOUET",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "UNE POUPÉE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "UN OURS EN PELUCHE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "UN VÊTEMENT",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "UN MANTEAU",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "UNE CHAUSSURE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "UN CHAPEAU",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "UNE COUVERTURE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "UN DRAP",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "UN DRAPEAU",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "UNE TASSE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "UN VERRE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "UNE ASSIETTE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "UN COUTEAU",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "UNE FOURCHETTE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "UNE CUILLÈRE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "UNE TABLE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "UNE CHAISE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "UN FAUTEUIL",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "UN BERCEAU",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "UN LIT",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "UN MATELAS",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "UNE RADIO",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "UN TÉLÉPHONE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "UN APPAREIL PHOTO",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "UNE TÉLÉVISION",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "UN ORDINATEUR",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "UNE BOÎTE À MUSIQUE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "UN INSTRUMENT",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "UNE CLOCHE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "UNE SONNETTE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "UN OUTIL",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "UN MARTEAU",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "UNE SCIE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "UNE PELLE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "UNE CORDE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "UNE CHAÎNETTE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "UN VERROU",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "UNE BOÎTE EN BOIS",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "UNE BOÎTE EN MÉTAL",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "UNE BOÎTE À BIJOUX",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "UNE PIÈCE DE MONNAIE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "UN BILLET",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "UN TICKET",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "UNE CARTE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "UN PLAN",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "UNE CARTE POSTALE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "UN DOCUMENT",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "UN CERTIFICAT",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "UN MÉDAILLON",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "UN RUBAN",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "UN TISSU",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "UN RIDEAU",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "UN TAPIS",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "UN VASE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "UN POT",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "UNE STATUETTE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "UNE FIGURINE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "UNE SCULPTURE",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "UN BRUIT SOURD",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "UN CRAQUEMENT",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "UN GRINCEMENT",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "UN CHUCHOTEMENT",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "UN SOUFFLE",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "UN SOUFFLE FROID",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "UN PAS LENT",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "DES PAS RAPIDES",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "UN TAPOTEMENT",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "UN COUP",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "UN CHOC",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "UNE VIBRATION",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "UN TREMBLEMENT",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "UNE PRESSION",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "UNE PRESSION FORTE",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "UNE MAIN FROIDE",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "UNE MAIN CHAUDE",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "UN CONTACT",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "UN EFFLEUREMENT",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "UNE CARESSE",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "UN FRISSON",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "UN FRISSON SOUDAIN",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "DES FOURMILLEMENTS",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "UN PICOTEMENT",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "UNE DOULEUR",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "UNE DOULEUR SOURDE",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "UNE BRÛLURE",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "UNE SENSATION DE FROID",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "UNE SENSATION DE CHALEUR",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "UN COURANT D'AIR",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "UNE ODEUR DE FUMÉE",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "UNE ODEUR DE TERRE",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "UNE ODEUR DE FLEURS",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "UNE ODEUR DE PARFUM",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "UNE ODEUR DE BOIS",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "UNE ODEUR DE POUSSIÈRE",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "UNE LUMIÈRE FAIBLE",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "UNE LUMIÈRE VIVE",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "UNE OMBRE",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "UNE SILHOUETTE",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "UNE FORME FLOUE",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "UN ÉCHO LOINTAIN",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "UN BRUIT DE PAS",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "UN CLAQUEMENT",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "UN SOUPIR",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "UN RIRE",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "UN SANGLOT",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "UNE RESPIRATION",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "UN BATTEMENT",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "UN BATTEMENT DE CŒUR",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "UN VERTIGE",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "UNE FATIGUE SOUDAINE",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "UNE LOURDEUR",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "UNE LÉGÈRETÉ",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "UNE PRÉSENCE DERRIÈRE",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "UNE IMPRESSION D'ÊTRE OBSERVÉ",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "UN MOUVEMENT À GAUCHE",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "UN MOUVEMENT À DROITE",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "ENTRE",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "SORS",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "RESTE ICI",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "ATTENDS ICI",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "APPROCHE-TOI",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "AVANCE",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "RECULE",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "MONTE",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "DESCENDS",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "TOURNE À GAUCHE",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "TOURNE À DROITE",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "REGARDE DEVANT",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "REGARDE DERRIÈRE",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "LÈVE LES YEUX",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "BAISSE LES YEUX",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "FERME LA PORTE",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "OUVRE LA FENÊTRE",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "ALLUME LA LUMIÈRE",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "ÉTEINS LA LUMIÈRE",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "FAIS DU BRUIT",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "TOUCHE-MOI",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "PRENDS-MOI LA MAIN",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "LÂCHE-MOI",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "APPELLE-MOI",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "DIS TON NOM",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "MONTRE-TOI",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "CACHE-TOI",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "SORS DE LÀ",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "NE T'APPROCHE PAS",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "ÉCOUTE BIEN",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "PARLE PLUS FORT",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "PARLE PLUS BAS",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "RÉPONDS-MOI",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "RÉPÈTE ENCORE",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "AIDE-NOUS",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "PROTÈGE-MOI",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "SOUVIENS-TOI",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "N'OUBLIE PAS",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "ARRÊTE",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "NE T'ARRÊTE PAS",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "CHOISIS",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "GUIDE-MOI",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "MONTRE LE CHEMIN",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "FAIS ATTENTION",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "NE REGARDE PAS",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "REVIENS DEMAIN",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "PLUIE FORTE",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "GRÊLE",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "VENT FORT",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "RAFALE DE VENT",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "BRUME",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "PLEINE LUNE",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "CIEL NOIR",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "CIEL ROUGE",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "EAU QUI COULE",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "EAU QUI GOUTTE",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "EAU TROUBLE",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "RUISSEAU",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "CASCADE",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "ÉTANG",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "BOUE",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "TERRE HUMIDE",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "FLAMME",
       "weight": 1
     }
   ]
