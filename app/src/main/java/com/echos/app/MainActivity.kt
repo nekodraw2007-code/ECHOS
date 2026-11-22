@@ -391,6 +391,7 @@ class MainActivity : Activity(), SensorEventListener {
         sessionActive = true
         nextWordAt = 0L
         shuffledWordIndexes = (0 until activeWordPool().size).toMutableList()
+        shuffledWordIndexes.shuffle()
         sessionButton.text = "ARRÊTER LA SESSION"
         statusView.text = "SESSION ACTIVE · ANALYSE DES SIGNATURES"
         statusView.setTextColor(accent)
