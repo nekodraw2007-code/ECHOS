@@ -398,7 +398,7 @@ class MainActivity : Activity(), SensorEventListener {
         val dictionaryIndex = (adjusted / 10000L).toInt()
         if ((signatureMatch && dictionaryIndex in pool.indices) || physicalChange) {
             val selected = if (signatureMatch && dictionaryIndex in pool.indices) pool[dictionaryIndex]
-                else pool[((signature / 10000L).toInt().absoluteValue) % pool.size]
+                else pool[((signature / 10000L).toInt().coerceAtLeast(0)) % pool.size]
             emitWord(selected, "signature $bucket/$tolerance · Δ %.2f µT".format(Locale.FRANCE, delta))
             val maxDelay = ((1f - sensitivity) * 120f + 70f).toInt().coerceAtLeast(10)
             nextWordAt = now + Random.nextLong(10, maxDelay.toLong() + 1) * 1000L
@@ -654,7 +654,10 @@ class MainActivity : Activity(), SensorEventListener {
             val v = getSystemService(VIBRATOR_SERVICE) as Vibrator
             if (v.hasVibrator()) {
                 if (android.os.Build.VERSION.SDK_INT >= 26) v.vibrate(VibrationEffect.createOneShot(100, VibrationEffect.DEFAULT_AMPLITUDE))
-                else @Suppress("DEPRECATION") v.vibrate(100)
+                else {
+                    @Suppress("DEPRECATION")
+                    v.vibrate(100)
+                }
             }
         } catch (_: Exception) {}
     }
