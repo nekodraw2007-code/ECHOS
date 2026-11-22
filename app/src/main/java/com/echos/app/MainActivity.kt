@@ -297,13 +297,15 @@ class MainActivity : Activity(), SensorEventListener {
                 }
             }
             Sensor.TYPE_ACCELEROMETER -> {
-                accelerationMagnitude = sqrt(v[0]*v[0] + v[1]*v[1] + v[2]*v[2])
+                val preciseAcceleration = sqrt(v[0].toDouble()*v[0] + v[1].toDouble()*v[1] + v[2].toDouble()*v[2])
+                accelerationMagnitude = preciseAcceleration.toFloat()
                 if (calibrating && magnetic == null && magneticUncalibrated == null) collectCalibration(accelerationMagnitude)
-                else if (sessionActive && magnetic == null && magneticUncalibrated == null) processMotionSignature(accelerationMagnitude.toDouble())
+                else if (sessionActive && magnetic == null && magneticUncalibrated == null) processMotionSignature(preciseAcceleration)
             }
             Sensor.TYPE_GYROSCOPE -> {
-                rotationMagnitude = sqrt(v[0]*v[0] + v[1]*v[1] + v[2]*v[2])
-                if (sessionActive && magnetic == null && magneticUncalibrated == null) processMotionSignature(rotationMagnitude.toDouble())
+                val preciseRotation = sqrt(v[0].toDouble()*v[0] + v[1].toDouble()*v[1] + v[2].toDouble()*v[2])
+                rotationMagnitude = preciseRotation.toFloat()
+                if (sessionActive && magnetic == null && magneticUncalibrated == null) processMotionSignature(preciseRotation)
             }
         }
     }
