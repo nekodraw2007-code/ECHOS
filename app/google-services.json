@@ -8,16 +8,28 @@
     {
       "client_info": {
         "mobilesdk_app_id": "1:26674230114:android:8cd8f4943537b67d24723b",
-        "android_client_info": { "package_name": "com.echos.app" }
+        "android_client_info": {
+          "package_name": "com.echos.app"
+        }
       },
       "oauth_client": [
+        {
+          "client_id": "26674230114-pgs7oul00mj0cm2tv2fdfe5on5ck4sf8.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.echos.app",
+            "certificate_hash": "073550113859f487753a7fb8525a0ca0960e5989"
+          }
+        },
         {
           "client_id": "26674230114-dqdgo8s144450dq6285le4p3nd15ufsq.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
-        { "current_key": "AIzaSyBf-AwHoeT30b7N7OMx1-MyoAz_t9FxaoU" }
+        {
+          "current_key": "AIzaSyBf-AwHoeT30b7N7OMx1-MyoAz_t9FxaoU"
+        }
       ],
       "services": {
         "appinvite_service": {
