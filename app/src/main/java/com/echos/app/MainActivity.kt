@@ -1226,7 +1226,7 @@ class MainActivity : Activity(), SensorEventListener {
 
     private fun signOutGoogle() {
         firebaseAuth?.signOut()
-        lifecycleScope.launch {
+        syncScope.launch {
             runCatching { CredentialManager.create(this@MainActivity).clearCredentialState(
                 androidx.credentials.ClearCredentialStateRequest()
             ) }
