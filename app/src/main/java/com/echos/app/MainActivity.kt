@@ -77,6 +77,7 @@ class MainActivity : Activity(), SensorEventListener {
     private var noiseFloor = 0.08f
     private var magneticMagnitude = 0f
     private var magneticDelta = 0f
+    private var lastMagneticSignature = ""
     private var accelerationMagnitude = 0f
     private var rotationMagnitude = 0f
     private var nextWordAt = 0L
@@ -430,13 +431,14 @@ class MainActivity : Activity(), SensorEventListener {
                 val preciseAcceleration = sqrt(v[0].toDouble()*v[0] + v[1].toDouble()*v[1] + v[2].toDouble()*v[2])
                 accelerationMagnitude = preciseAcceleration.toFloat()
                 if (calibrating && magnetic == null && magneticUncalibrated == null) collectCalibration(accelerationMagnitude)
-                else if (sessionActive) processMotionSignature(v[0].toDouble(), v[1].toDouble(), v[2].toDouble(), "accéléromètre")
+                // L'accéléromètre est conservé pour le diagnostic, mais un mouvement seul
+                // ne peut jamais déclencher un mot. Les mots viennent du magnétomètre.
             }
             Sensor.TYPE_GYROSCOPE, 15, 16 -> {
                 val preciseRotation = sqrt(v[0].toDouble()*v[0] + v[1].toDouble()*v[1] + v[2].toDouble()*v[2])
                 rotationMagnitude = preciseRotation.toFloat()
                 if (calibrating && magnetic == null && magneticUncalibrated == null) collectCalibration(rotationMagnitude)
-                else if (sessionActive) processMotionSignature(v[0].toDouble(), v[1].toDouble(), v[2].toDouble(), "gyroscope")
+                // Le gyroscope ne déclenche pas de mot : il reste disponible pour les mesures.
             }
         }
     }
@@ -556,10 +558,16 @@ class MainActivity : Activity(), SensorEventListener {
     @Synchronized
     private fun processMagneticSignature(x: Double, y: Double, z: Double, magnitude: Double) {
         val now = System.currentTimeMillis()
-        if (now - nextWordAt < 1_000L) return
+        if (!calibrated) return
+        if (now < nextWordAt) return
         val pool = activeWordPool()
         if (pool.isEmpty()) return
         ensureSensorOrder(pool.size)
+
+        // Le champ doit s'écarter nettement du niveau mesuré pendant la calibration.
+        // Cela filtre le bruit de fond et empêche une valeur stable de produire des mots.
+        val minimumChange = (noiseFloor * (4.0 - sensitivity.toDouble() * 2.0)).coerceAtLeast(0.12)
+        if (abs(magnitude - baseline.toDouble()) < minimumChange) return
 
         // GhostTube calcule sqrt(x² + y² + z²), puis ignore les trois premières décimales.
         val norm = sqrt(x * x + y * y + z * z)
@@ -575,12 +583,12 @@ class MainActivity : Activity(), SensorEventListener {
         if (remainder != 0 && remainder > tolerance) return
 
         val index = (raw - remainder) / 10_000
-        if (index in 1..pool.size) {
-            orderedEntry(pool, index)?.let { entry ->
-                emitWord(entry, "signature magnétique · " + "%.1f".format(Locale.FRANCE, magnitude) + " µT", digits)
-            }
-            val upperExclusive = (70f + (1f - sensitivity) * 120f).toInt().coerceAtLeast(11)
-            nextWordAt = now + Random.nextInt(10, upperExclusive) * 1_000L
+        if (index in 1..pool.size && digits != lastMagneticSignature) {
+            val entry = orderedEntry(pool, index) ?: return
+            lastMagneticSignature = digits
+            emitWord(entry, "signature magnétique · variation %.2f µT".format(Locale.FRANCE, abs(magnitude - baseline)), digits)
+            // Un délai plus long laisse le champ se stabiliser et évite les rafales de mots.
+            nextWordAt = now + Random.nextInt(30, 91) * 1_000L
         }
     }
 
