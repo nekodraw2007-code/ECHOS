@@ -304,7 +304,7 @@ class MainActivity : Activity(), SensorEventListener {
                 magneticMagnitude = preciseMagnitude.toFloat()
                 magneticDelta = abs(preciseMagnitude - baseline.toDouble()).toFloat()
                 if (calibrating) collectCalibration(magneticMagnitude)
-                else if (sessionActive) processMagneticSignature(preciseMagnitude, abs(preciseMagnitude - baseline.toDouble()))
+                else if (sessionActive) processMagneticSignature(x.toDouble(), y.toDouble(), z.toDouble(), preciseMagnitude, abs(preciseMagnitude - baseline.toDouble()))
                 if (::fieldView.isInitialized) {
                     fieldView.text = "%.1f µT".format(Locale.FRANCE, magneticMagnitude)
                     deltaView.text = "Variation depuis calibration : %.2f µT".format(Locale.FRANCE, magneticDelta)
@@ -388,36 +388,46 @@ class MainActivity : Activity(), SensorEventListener {
         addHistory("Session démarrée · mode $currentMode")
     }
 
-    // Reproduit le principe visible dans GhostTube : une signature est construite à partir des décimales
-    // de la mesure, puis une plage de tolérance dépend de la sensibilité.
-    private fun processMagneticSignature(value: Double, delta: Double) {
+    // Moteur ECHOS : signature déterministe dérivée des trois axes du magnétomètre.
+    // La sensibilité règle la tolérance de correspondance et le délai entre deux sorties.
+    // Ce moteur s'inspire des comportements observables de GhostTube sans prétendre
+    // reproduire son code propriétaire ni attribuer une origine paranormale aux mots.
+    private fun processMagneticSignature(x: Double, y: Double, z: Double, magnitude: Double, delta: Double) {
         val now = System.currentTimeMillis()
-        if (now - lastSignatureAt < 1000L || now < nextWordAt) return
+        if (now - lastSignatureAt < 900L || now < nextWordAt) return
         lastSignatureAt = now
+
         val pool = activeWordPool()
         if (pool.isEmpty()) return
-        val digits = decimalSignature(value, 3)
-        // GhostTube's reconstructed magnetic branch takes only the first
-        // digit-count required by dictionarySize * 10000, then splits index/remainder.
-        val digitCount = (pool.size * 10000).toString().length - 1
-        val signature = digits.take(digitCount).toLongOrNull() ?: 0L
-        val bucket = (signature % 10000L).toInt()
-        val tolerance = 10 + (sensitivity * 90f).toInt()
-        var adjusted = signature
-        var signatureMatch = bucket == 0
-        if (bucket <= tolerance) {
-            adjusted -= bucket
-            signatureMatch = true
-        }
-        // A real field jump is also accepted as a practical fallback for phones
-        // whose sensor precision makes the decimal-signature route unusually quiet.
-        val physicalChangeThreshold = maxOf(0.18f, noiseFloor * (4.2f - sensitivity * 2.8f)).toDouble()
-        val physicalChange = delta >= physicalChangeThreshold
-        val dictionaryIndex = (adjusted / 10000L).toInt()
-        if ((signatureMatch && dictionaryIndex in pool.indices) || physicalChange) {
-            val selected = if (signatureMatch && dictionaryIndex in pool.indices) pool[dictionaryIndex]
-                else pool[((signature / 10000L).toInt().coerceAtLeast(0)) % pool.size]
-            emitWord(selected, "signature $bucket/$tolerance · Δ %.2f µT".format(Locale.FRANCE, delta))
+
+        // Quantification des axes : plus stable que l'extraction des décimales d'une magnitude
+        // calculée en virgule flottante, qui variait trop peu ou de façon non pertinente.
+        val qx = (x * 100.0).toLong()
+        val qy = (y * 100.0).toLong()
+        val qz = (z * 100.0).toLong()
+        val qDelta = (delta * 1000.0).toLong()
+        val signature = qx * 73856093L xor qy * 19349663L xor qz * 83492791L xor qDelta * 2654435761L
+        val signatureBucket = (kotlin.math.abs(signature % 100L)).toInt()
+        val tolerance = (10 + sensitivity * 90f).toInt().coerceIn(10, 100)
+
+        // Une correspondance de signature peut produire un mot même dans un environnement
+        // stable ; une variation mesurée importante constitue un second chemin de déclenchement.
+        val physicalThreshold = maxOf(0.06, noiseFloor.toDouble() * (2.8 - sensitivity * 1.8))
+        val physicalChange = delta >= physicalThreshold
+        val signatureMatch = signatureBucket < tolerance
+
+        if (signatureMatch || physicalChange) {
+            val positiveHash = kotlin.math.abs(signature)
+            val weightedIndex = ((positiveHash / 100L) % pool.size.toLong()).toInt()
+            val selected = if (pool[weightedIndex].text.equals(lastWord, true) && pool.size > 1) {
+                pool[(weightedIndex + 1) % pool.size]
+            } else pool[weightedIndex]
+
+            emitWord(
+                selected,
+                "signature $signatureBucket/$tolerance · champ %.2f µT · Δ %.2f µT".format(Locale.FRANCE, magnitude, delta)
+            )
+
             val maxDelay = ((1f - sensitivity) * 120f + 70f).toInt().coerceAtLeast(10)
             nextWordAt = now + Random.nextLong(10, maxDelay.toLong() + 1) * 1000L
         }
@@ -429,13 +439,14 @@ class MainActivity : Activity(), SensorEventListener {
         lastSignatureAt = now
         val pool = activeWordPool()
         if (pool.isEmpty()) return
-        val digits = decimalSignature(value, 0)
-        val rotated = digits.drop(3) + digits.take(3)
-        val bucket = rotated.take(4).toIntOrNull() ?: 9999
-        val tolerance = (sensitivity * 30f).toInt() + 1
-        if (bucket <= tolerance || bucket >= 10000 - tolerance) {
-            val indexDigits = rotated.drop(5).take(8).toIntOrNull() ?: 0
-            emitWord(pool[indexDigits % pool.size], "signature mouvement $bucket/$tolerance")
+        val quantized = (kotlin.math.abs(value) * 1000.0).toLong()
+        val signature = (quantized * 2654435761L) xor (now / 900L)
+        val bucket = kotlin.math.abs(signature % 100L).toInt()
+        val tolerance = (10 + sensitivity * 90f).toInt().coerceIn(10, 100)
+        if (bucket < tolerance) {
+            val index = (kotlin.math.abs(signature / 100L) % pool.size.toLong()).toInt()
+            val selected = if (pool[index].text.equals(lastWord, true) && pool.size > 1) pool[(index + 1) % pool.size] else pool[index]
+            emitWord(selected, "signature mouvement $bucket/$tolerance")
             val maxDelay = ((1f - sensitivity) * 45f + 11f).toInt().coerceAtLeast(11)
             nextWordAt = now + Random.nextLong(10, maxDelay.toLong() + 1) * 1000L
         }
@@ -451,7 +462,9 @@ class MainActivity : Activity(), SensorEventListener {
 
     private fun activeWordPool(): List<WordEntry> {
         val base = baseEntries.filter { it.category in activeCategories && it.text.isNotBlank() }
-        val custom = customEntries.filter { it.category in activeCategories && it.text.isNotBlank() }.flatMap { entry -> List(7) { entry } }
+            .flatMap { entry -> List(entry.weight.coerceIn(1, 5)) { entry } }
+        val custom = customEntries.filter { it.category in activeCategories && it.text.isNotBlank() }
+            .flatMap { entry -> List(7) { entry } }
         return base + custom
     }
 
