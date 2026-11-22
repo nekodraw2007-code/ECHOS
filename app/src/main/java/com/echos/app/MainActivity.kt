@@ -15,6 +15,8 @@ import android.os.Handler
 import android.os.HandlerThread
 import android.os.VibrationEffect
 import android.os.Vibrator
+import android.speech.tts.TextToSpeech
+import android.speech.tts.Voice
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.Gravity
@@ -53,6 +55,12 @@ class MainActivity : Activity(), SensorEventListener {
     private var gyroscopeThread: HandlerThread? = null
     private var magneticThread: HandlerThread? = null
     private val registeredSensorTypes = mutableSetOf<Int>()
+    private var speechEngine: TextToSpeech? = null
+    private var speechReady = false
+    private var dynamicVoicesEnabled = true
+    private var dynamicVoices: List<Voice> = emptyList()
+    private val motionSamples = mutableMapOf<String, MutableList<Double>>()
+    private val motionStableSince = mutableMapOf<String, Long>()
 
     private val baseEntries = mutableListOf<WordEntry>()
     private val customEntries = mutableListOf<WordEntry>()
@@ -96,6 +104,7 @@ class MainActivity : Activity(), SensorEventListener {
         gyroscopeUncalibrated = if (gyroscope == null) sensors.getDefaultSensor(16) else null
         loadDictionary()
         loadPreferences()
+        initializeSpeech()
         buildInterface()
         refreshSensorStatus()
     }
@@ -131,6 +140,7 @@ class MainActivity : Activity(), SensorEventListener {
         baseline = p.getFloat("baseline", 0f)
         noiseFloor = p.getFloat("noise_floor", 0.08f)
         calibrated = p.getBoolean("calibrated", false)
+        dynamicVoicesEnabled = p.getBoolean("dynamic_voices_enabled", true)
         val cats = p.getString("active_categories", "")!!.split("\n").filter { it.isNotBlank() }
         val categoryAliases = mapOf("Personnes" to "Personnes et identité", "Sensations" to "Sensations et corps")
         if (cats.isEmpty()) activeCategories.addAll(baseEntries.map { it.category }.distinct())
@@ -244,6 +254,18 @@ class MainActivity : Activity(), SensorEventListener {
         settings.addView(categoriesButton, match())
         settings.addView(button("CONSULTER LE DICTIONNAIRE") { showDictionary() }, match())
         settings.addView(button("MON DICTIONNAIRE PERSONNEL") { manageCustomDictionary() }, match())
+        settings.addView(Switch(this).apply {
+            text = "VOIX DYNAMIQUES (empreintes des capteurs)"
+            setTextColor(white)
+            textSize = 13f
+            isChecked = dynamicVoicesEnabled
+            setOnCheckedChangeListener { _, enabled ->
+                dynamicVoicesEnabled = enabled
+                getSharedPreferences("echos_preferences", MODE_PRIVATE).edit().putBoolean("dynamic_voices_enabled", enabled).apply()
+                if (!enabled) speechEngine?.stop()
+                toast(if (enabled) "Voix dynamiques activées" else "Voix désactivées")
+            }
+        }.apply { setPadding(0, dp(12), 0, dp(8)) }, match())
         page.addView(settings)
         page.addView(space(10))
 
@@ -282,6 +304,35 @@ class MainActivity : Activity(), SensorEventListener {
         sensitivityLabel.text = "$percent % · $level"
     }
 
+    private fun initializeSpeech() {
+        speechEngine = TextToSpeech(this) { status ->
+            speechReady = status == TextToSpeech.SUCCESS
+            if (speechReady) {
+                val engine = speechEngine ?: return@TextToSpeech
+                val french = if (Locale.getDefault().language == "fr") Locale.getDefault() else Locale.FRANCE
+                if (engine.isLanguageAvailable(french) >= TextToSpeech.LANG_AVAILABLE) engine.language = french
+                val voices = engine.voices ?: emptySet()
+                dynamicVoices = voices.filter { it.locale.language == french.language && !it.isNetworkConnectionRequired }.sortedBy { it.name }
+                    .ifEmpty { voices.filter { !it.isNetworkConnectionRequired }.sortedBy { it.name } }
+            }
+        }
+    }
+
+    private fun speakWithSensorVoice(text: String, fingerprint: String) {
+        if (!dynamicVoicesEnabled || !speechReady || fingerprint.length < 8) return
+        val engine = speechEngine ?: return
+        try {
+            val voiceDigit = fingerprint[5].digitToIntOrNull() ?: 0
+            val pitchDigit = fingerprint[6].digitToIntOrNull() ?: 5
+            val rateDigit = fingerprint[7].digitToIntOrNull() ?: 5
+            if (dynamicVoices.isNotEmpty()) engine.voice = dynamicVoices[voiceDigit % dynamicVoices.size]
+            engine.setPitch(0.82f + (pitchDigit / 9f) * 0.38f)
+            engine.setSpeechRate(0.82f + (rateDigit / 9f) * 0.34f)
+            val params = Bundle().apply { putFloat("volume", 0.85f) }
+            engine.speak(text, TextToSpeech.QUEUE_FLUSH, params, "echos-${System.nanoTime()}")
+        } catch (_: Exception) { }
+    }
+
     private fun refreshSensorStatus() {
         if (!::sensorLabel.isInitialized) return
         val hasMag = magnetic != null || magneticUncalibrated != null
@@ -300,7 +351,7 @@ class MainActivity : Activity(), SensorEventListener {
 
     // GhostTube utilise un HandlerThread distinct par capteur et un délai de 2.
     // Les capteurs ne sont abonnés que pendant l'écoute.
-    private fun startGhostTubeSensorListeners() {
+    private fun startGhostTubeSensorListeners(): Int {
         stopGhostTubeSensorListeners()
         val magSensor = magnetic ?: magneticUncalibrated
         if (magSensor != null) {
@@ -515,7 +566,7 @@ class MainActivity : Activity(), SensorEventListener {
         val index = (raw - remainder) / 10_000
         if (index in 1..pool.size) {
             orderedEntry(pool, index)?.let { entry ->
-                emitWord(entry, "signature magnétique · " + "%.1f".format(Locale.FRANCE, magnitude) + " µT")
+                emitWord(entry, "signature magnétique · " + "%.1f".format(Locale.FRANCE, magnitude) + " µT", digits)
             }
             val upperExclusive = (70f + (1f - sensitivity) * 120f).toInt().coerceAtLeast(11)
             nextWordAt = now + Random.nextInt(10, upperExclusive) * 1_000L
@@ -525,13 +576,14 @@ class MainActivity : Activity(), SensorEventListener {
     @Synchronized
     private fun processMotionSignature(x: Double, y: Double, z: Double, source: String) {
         val now = System.currentTimeMillis()
+        val norm = sqrt(x * x + y * y + z * z)
+        if (!isMotionStable(source, norm, now)) return
         if (now - nextWordAt < 1_000L) return
         val pool = activeWordPool()
         if (pool.isEmpty()) return
         ensureSensorOrder(pool.size)
 
         // GhostTube garde 20 décimales et fait pivoter les trois premières à la fin.
-        val norm = sqrt(x * x + y * y + z * z)
         val fraction = sensorFraction(norm)
         if (fraction.isEmpty()) return
         val first20 = repeatDigitsTo20(fraction, inclusive = false)
@@ -546,7 +598,7 @@ class MainActivity : Activity(), SensorEventListener {
                 val index = signature.substring(5, end).toIntOrNull()
                 if (index != null) {
                     orderedEntry(pool, index)?.let { entry ->
-                        emitWord(entry, "signature " + source + " · " + "%.4f".format(Locale.FRANCE, norm))
+                        emitWord(entry, "signature " + source + " · " + "%.4f".format(Locale.FRANCE, norm), signature)
                         val upperExclusive = ((1f - sensitivity) * 45f).toInt() + 11
                         nextWordAt = now + Random.nextInt(10, upperExclusive.coerceAtLeast(11)) * 1_000L
                     }
@@ -556,6 +608,19 @@ class MainActivity : Activity(), SensorEventListener {
             ensureSensorOrder(pool.size)
             shuffledWordIndexes.shuffle()
         }
+    }
+
+    private fun isMotionStable(source: String, magnitude: Double, now: Long): Boolean {
+        val samples = motionSamples.getOrPut(source) { mutableListOf() }
+        samples.add(magnitude)
+        if (samples.size > 12) samples.removeAt(0)
+        if (samples.size < 12) return false
+        val spread = (samples.maxOrNull() ?: magnitude) - (samples.minOrNull() ?: magnitude)
+        val threshold = if (source == "accéléromètre") 0.08 else 0.008
+        if (spread > threshold) { motionStableSince[source] = 0L; return false }
+        val since = motionStableSince[source] ?: 0L
+        if (since == 0L) { motionStableSince[source] = now; return false }
+        return now - since >= 1_500L
     }
 
     private fun ensureSensorOrder(size: Int) {
@@ -574,11 +639,12 @@ class MainActivity : Activity(), SensorEventListener {
         return base + custom
     }
 
-    private fun emitWord(entry: WordEntry, reason: String) {
+    private fun emitWord(entry: WordEntry, reason: String, fingerprint: String) {
         runOnUiThread {
             wordView.text = entry.text
             addHistory("Mot : ${entry.text} · ${entry.category} · $reason")
             vibrate()
+            speakWithSensorVoice(entry.text, fingerprint)
         }
     }
 
@@ -771,6 +837,14 @@ class MainActivity : Activity(), SensorEventListener {
     private fun refreshHistory() {
         if (::historyView.isInitialized) historyView.text =
             if (history.isEmpty()) "Aucun mot détecté." else history.take(12).joinToString("\n\n")
+    }
+
+    override fun onDestroy() {
+        speechEngine?.stop()
+        speechEngine?.shutdown()
+        speechEngine = null
+        speechReady = false
+        super.onDestroy()
     }
 
     private fun vibrate() {
