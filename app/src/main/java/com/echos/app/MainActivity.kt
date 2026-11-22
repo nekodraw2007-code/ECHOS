@@ -306,6 +306,26 @@ class MainActivity : Activity(), SensorEventListener {
         })
         home.addView(sensCard)
         home.addView(space(14))
+        // Zone de résultat principale : le mot déclenché reste visible en très grand.
+        val detectedCard = card().apply {
+            background = rounded(Color.rgb(8, 22, 43), 20)
+            setPadding(dp(18), dp(22), dp(18), dp(22))
+            gravity = Gravity.CENTER
+        }
+        detectedCard.addView(text("DERNIER MOT DÉTECTÉ", 10, accent, true).apply {
+            gravity = Gravity.CENTER
+            letterSpacing = 0.10f
+        })
+        wordView = text("EN ATTENTE", 38, white, true).apply {
+            gravity = Gravity.CENTER
+            textAlignment = View.TEXT_ALIGNMENT_CENTER
+            setPadding(0, dp(16), 0, dp(12))
+            maxLines = 2
+            includeFontPadding = true
+        }
+        detectedCard.addView(wordView, LinearLayout.LayoutParams(-1, -2))
+        home.addView(detectedCard)
+        home.addView(space(14))
         home.addView(text("MOTS RÉCENTS", 11, accent, true))
         recentWordsView = text("Aucun mot détecté pour le moment.", 13, muted)
         recentWordsView.setLineSpacing(dp(5).toFloat(), 1f)
@@ -603,9 +623,15 @@ class MainActivity : Activity(), SensorEventListener {
                 magneticDelta = if (baseline > 0f) abs(preciseMagnitude - baseline.toDouble()).toFloat() else 0f
                 if (calibrating) collectCalibration(magneticMagnitude)
                 else if (sessionActive) processMagneticSignature(x.toDouble(), y.toDouble(), z.toDouble(), preciseMagnitude)
+                // Les callbacks capteurs tournent sur des HandlerThreads :
+                // toute mise à jour des vues doit être exécutée sur le thread UI.
                 if (::fieldView.isInitialized) {
-                    fieldView.text = "%.1f µT".format(Locale.FRANCE, magneticMagnitude)
-                    deltaView.text = "Variation depuis calibration : %.2f µT".format(Locale.FRANCE, magneticDelta)
+                    val magnitudeText = "%.1f µT".format(Locale.FRANCE, magneticMagnitude)
+                    val deltaText = "Variation depuis calibration : %.2f µT".format(Locale.FRANCE, magneticDelta)
+                    runOnUiThread {
+                        if (::fieldView.isInitialized) fieldView.text = magnitudeText
+                        if (::deltaView.isInitialized) deltaView.text = deltaText
+                    }
                 }
             }
             Sensor.TYPE_LINEAR_ACCELERATION -> {
@@ -909,7 +935,13 @@ class MainActivity : Activity(), SensorEventListener {
 
     private fun emitWord(entry: WordEntry, reason: String, fingerprint: String) {
         runOnUiThread {
-            wordView.text = entry.text
+            if (::wordView.isInitialized) {
+                wordView.text = entry.text
+                wordView.setTextColor(white)
+                wordView.animate().cancel()
+                wordView.alpha = 0.35f
+                wordView.animate().alpha(1f).setDuration(260L).start()
+            }
             addHistory("Mot : ${entry.text} · ${entry.category} · $reason")
             vibrate()
             speakWithSensorVoice(entry.text, fingerprint)
@@ -1214,8 +1246,13 @@ class MainActivity : Activity(), SensorEventListener {
                     toast("Identifiant Google non reconnu.")
                 }
             } catch (e: GetCredentialException) {
-                Log.e("ECHOS_SYNC", "Google Credential Manager", e)
-                toast("Connexion Google annulée ou indisponible.")
+                Log.e("ECHOS_SYNC", "Google Credential Manager: ${e::class.java.name}: ${e.message}", e)
+                val detail = when (e) {
+                    is androidx.credentials.exceptions.GetCredentialCancellationException -> "Connexion annulée."
+                    is androidx.credentials.exceptions.NoCredentialException -> "Aucun compte Google disponible. Vérifie qu'un compte Google est ajouté sur le téléphone."
+                    else -> "Échec Google : ${e.message ?: e::class.java.simpleName}"
+                }
+                runOnUiThread { toast(detail) }
             } catch (e: Exception) {
                 Log.e("ECHOS_SYNC", "Erreur connexion Google", e)
                 toast("Erreur de connexion : ${e.localizedMessage ?: "inconnue"}")
