@@ -339,7 +339,7 @@ class MainActivity : Activity(), SensorEventListener {
 
     override fun onResume() {
         super.onResume()
-        if (sessionActive) startGhostTubeSensorListeners()
+        if (sessionActive || calibrating) startGhostTubeSensorListeners()
     }
 
     override fun onPause() {
@@ -391,6 +391,8 @@ class MainActivity : Activity(), SensorEventListener {
         calibrating = true
         calibrated = false
         sessionActive = false
+        stopGhostTubeSensorListeners()
+        startGhostTubeSensorListeners()
         sessionButton.text = "DÉMARRER LA SESSION"
         statusView.text = "CALIBRATION EN COURS · GARDE LE TÉLÉPHONE IMMOBILE"
         statusView.setTextColor(orange)
@@ -412,6 +414,7 @@ class MainActivity : Activity(), SensorEventListener {
         noiseFloor = (deviations[deviations.size / 2] * 1.4826f).coerceAtLeast(0.015f)
         calibrated = true
         calibrating = false
+        stopGhostTubeSensorListeners()
         getSharedPreferences("echos_preferences", MODE_PRIVATE).edit()
             .putFloat("baseline", baseline).putFloat("noise_floor", noiseFloor).putBoolean("calibrated", true).apply()
         statusView.text = "CALIBRATION TERMINÉE · ${calibrationValues.size} MESURES"
