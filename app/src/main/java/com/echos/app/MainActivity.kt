@@ -60,6 +60,8 @@ class MainActivity : Activity(), SensorEventListener {
     private val gravityVector = FloatArray(3)
     private var gravityInitialized = false
     private var magneticReference = Double.NaN
+    private var magneticReferenceVector: DoubleArray? = null
+    private val motionTriggerActive = mutableMapOf<String, Boolean>()
     private var lastProximityNear: Boolean? = null
     private val registeredSensorTypes = mutableSetOf<Int>()
     private var speechEngine: TextToSpeech? = null
@@ -590,7 +592,9 @@ class MainActivity : Activity(), SensorEventListener {
         }
         sessionActive = true
         nextWordAt = 0L
-        magneticReference = if (calibrated && baseline > 0f && (magnetic != null || magneticUncalibrated != null)) baseline.toDouble() else Double.NaN
+        magneticReference = Double.NaN
+        magneticReferenceVector = null
+        motionTriggerActive.clear()
         lastProximityNear = null
         gravityInitialized = false
         motionSamples.clear()
@@ -626,67 +630,88 @@ class MainActivity : Activity(), SensorEventListener {
     }
 
     @Synchronized
+    @Synchronized
     private fun processMagneticSignature(x: Double, y: Double, z: Double, magnitude: Double) {
         val now = System.currentTimeMillis()
-        if (!magnitude.isFinite() || magnitude <= 0.0 || now < nextWordAt) return
+        if (!magnitude.isFinite() || magnitude <= 0.0) return
+
+        val currentVector = doubleArrayOf(x, y, z)
+        val referenceVector = magneticReferenceVector
+        if (referenceVector == null || !magneticReference.isFinite()) {
+            magneticReferenceVector = currentVector
+            magneticReference = magnitude
+            return
+        }
+
+        // Une valeur stable n'est jamais une raison de produire un mot.
+        // On attend une variation réelle du champ par rapport à la dernière
+        // empreinte acceptée, en tenant compte du bruit mesuré à la calibration.
+        val vectorDelta = sqrt(
+            (x - referenceVector[0]) * (x - referenceVector[0]) +
+            (y - referenceVector[1]) * (y - referenceVector[1]) +
+            (z - referenceVector[2]) * (z - referenceVector[2])
+        )
+        val magnitudeDelta = abs(magnitude - magneticReference)
+        val noiseThreshold = if (calibrated) noiseFloor.toDouble() * 4.0 else 0.0
+        val sensitivityThreshold = 0.35 + (1.0 - sensitivity.toDouble()) * 1.20
+        val threshold = maxOf(0.35, noiseThreshold, sensitivityThreshold)
+        if (maxOf(vectorDelta, magnitudeDelta) < threshold) return
+        if (now < nextWordAt) return
+
         val pool = activeWordPool()
         if (pool.isEmpty()) return
-        ensureSensorOrder(pool.size)
-
-        // Le magnétomètre fournit une signature à chaque fenêtre d'analyse.
-        // Ne pas exiger une variation minimale : un champ stable reste une mesure
-        // exploitable, comme sur les appareils où le signal ambiant est peu variable.
-        val raw = listOf(x, y, z, magnitude).joinToString("|") {
+        val fingerprint = listOf(x, y, z, magnitude).joinToString("|") {
             BigDecimal(it).stripTrailingZeros().toPlainString()
-        }
-        val fingerprint = raw.filter { it.isDigit() }.take(20).padEnd(20, '0')
-        val cooldownSeconds = 9 + ((1f - sensitivity) * 26f).toInt()
-        val timeSlot = now / (cooldownSeconds * 1_000L)
-        val seed = (fingerprint + "|" + timeSlot).hashCode()
+        }.filter { it.isDigit() }.take(20).padEnd(20, '0')
+        val seed = fingerprint.hashCode()
         val entry = selectBalancedEntry(pool, seed) ?: return
 
+        magneticReferenceVector = currentVector
         magneticReference = magnitude
         lastMagneticSignature = fingerprint
-        emitWord(entry, "signature magnétique · champ %.2f µT".format(Locale.FRANCE, magnitude), fingerprint)
-        nextWordAt = now + cooldownSeconds * 1_000L
+        emitWord(entry, "variation magnétique · Δ %.2f µT".format(Locale.FRANCE, maxOf(vectorDelta, magnitudeDelta)), fingerprint)
+        nextWordAt = now + (10 + ((1f - sensitivity) * 30f).toInt()) * 1_000L
     }
 
     @Synchronized
+    @Synchronized
     private fun processMotionSignature(x: Double, y: Double, z: Double, source: String) {
         val now = System.currentTimeMillis()
-        if (now < nextWordAt) return
         val norm = sqrt(x * x + y * y + z * z)
         if (!norm.isFinite()) return
 
-        // Les mesures brutes de l'accéléromètre conservent la gravité : elles donnent
-        // une signature même sur un appareil dépourvu de magnétomètre et posé immobile.
-        // Les voies linéaire et gyroscope ne sont exploitées que si leur signal est réel.
-        val minimumSignal = when {
-            source == "gyroscope" -> 0.018
-            source == "accéléromètre linéaire" -> 0.025
-            else -> 1.0
+        // L'accéléromètre brut est déjà filtré pour retirer la gravité avant
+        // d'arriver ici. Les seuils ci-dessous empêchent le bruit de fond et
+        // les micro-mouvements de devenir des déclencheurs.
+        val baseThreshold = when {
+            source == "gyroscope" -> 0.10
+            source == "accéléromètre linéaire" -> 0.30
+            else -> 0.30
         }
-        if (norm < minimumSignal) {
-            motionStableSince[source] = 0L
+        val threshold = baseThreshold + (1.0 - sensitivity.toDouble()) * baseThreshold * 2.0
+        val resetThreshold = threshold * 0.45
+        val active = motionTriggerActive[source] == true
+
+        if (norm <= resetThreshold) {
+            motionTriggerActive[source] = false
             return
         }
-        if (!isMotionStable(source, norm, now)) return
+        if (active || norm < threshold || now < nextWordAt) return
 
         val pool = activeWordPool()
         if (pool.isEmpty()) return
-        ensureSensorOrder(pool.size)
         val fraction = sensorFraction(norm)
         if (fraction.isEmpty()) return
         val digits = repeatDigitsTo20(fraction, inclusive = false)
         if (digits.length < 20) return
         val signature = digits.substring(3, 20) + digits.substring(0, 3)
-        val combined = listOf(x, y, z, norm, signature).joinToString("|")
-        val fingerprint = combined.filter { it.isDigit() }.take(20).padEnd(20, '0')
-        val seed = (fingerprint + "|" + source).hashCode()
-        val entry = selectBalancedEntry(pool, seed) ?: return
+        val fingerprint = (listOf(x, y, z, norm, signature).joinToString("|"))
+            .filter { it.isDigit() }.take(20).padEnd(20, '0')
+        val entry = selectBalancedEntry(pool, fingerprint.hashCode()) ?: return
 
-        emitWord(entry, "signature $source · %.4f".format(Locale.FRANCE, norm), fingerprint)
-        nextWordAt = now + (9 + ((1f - sensitivity) * 26f).toInt()) * 1_000L
+        motionTriggerActive[source] = true
+        emitWord(entry, "variation de mouvement · $source · %.4f".format(Locale.FRANCE, norm), fingerprint)
+        nextWordAt = now + (10 + ((1f - sensitivity) * 30f).toInt()) * 1_000L
     }
 
     @Synchronized
@@ -704,20 +729,10 @@ class MainActivity : Activity(), SensorEventListener {
     }
 
     private fun isMotionStable(source: String, magnitude: Double, now: Long): Boolean {
-        val samples = motionSamples.getOrPut(source) { mutableListOf() }
-        samples.add(magnitude)
-        if (samples.size > 12) samples.removeAt(0)
-        if (samples.size < 12) return false
-        val spread = (samples.maxOrNull() ?: magnitude) - (samples.minOrNull() ?: magnitude)
-        val threshold = when {
-            source == "gyroscope" -> 0.012
-            source == "accéléromètre linéaire" -> 0.08
-            else -> 0.12
-        }
-        if (spread > threshold) { motionStableSince[source] = 0L; return false }
-        val since = motionStableSince[source] ?: 0L
-        if (since == 0L) { motionStableSince[source] = now; return false }
-        return now - since >= 1_500L
+        // Conservée pour compatibilité avec les appels existants :
+        // le déclenchement est désormais événementiel, jamais basé sur
+        // une période de stabilité du téléphone.
+        return true
     }
 
     private fun ensureSensorOrder(size: Int) {
