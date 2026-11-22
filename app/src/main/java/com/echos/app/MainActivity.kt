@@ -33,8 +33,8 @@ import kotlinx.coroutines.SupervisorJob
 import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
-import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.auth.api.identity.GetSignInIntentRequest
+import com.google.android.gms.auth.api.identity.Identity
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
@@ -1205,9 +1205,10 @@ class MainActivity : Activity(), SensorEventListener {
 
     private val googleSignInRequestCode = 7401
 
-    // Ouvre explicitement le sélecteur de compte Google (popup système).
+    // Ouvre la véritable fenêtre Google, puis récupère le jeton du compte choisi.
     private fun startGoogleSignIn() {
-        if (firebaseAuth == null) {
+        val auth = firebaseAuth
+        if (auth == null) {
             toast("Configuration Firebase manquante : google-services.json")
             return
         }
@@ -1216,51 +1217,84 @@ class MainActivity : Activity(), SensorEventListener {
             toast("ID client OAuth Web absent. Vérifie la configuration Google dans Firebase.")
             return
         }
+
+        googleSignInButton.isEnabled = false
+        googleSignInButton.text = "OUVERTURE DE GOOGLE…"
         try {
-            val options = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(getString(webClientIdRes))
-                .requestEmail()
+            val request = GetSignInIntentRequest.builder()
+                .setServerClientId(getString(webClientIdRes))
                 .build()
-            val client = GoogleSignIn.getClient(this, options)
-            startActivityForResult(client.signInIntent, googleSignInRequestCode)
+            Identity.getSignInClient(this).getSignInIntent(request)
+                .addOnSuccessListener { pendingIntent ->
+                    try {
+                        startIntentSenderForResult(
+                            pendingIntent.intentSender,
+                            googleSignInRequestCode,
+                            null,
+                            0,
+                            0,
+                            0
+                        )
+                    } catch (e: Exception) {
+                        Log.e("ECHOS_SYNC", "Impossible de lancer la fenêtre Google", e)
+                        toast("Impossible d'ouvrir Google : ${e.localizedMessage ?: "erreur inconnue"}")
+                        refreshAccountUi()
+                    }
+                }
+                .addOnFailureListener { error ->
+                    Log.e("ECHOS_SYNC", "Préparation de la connexion Google échouée", error)
+                    toast("Google ne peut pas ouvrir la connexion : ${error.localizedMessage ?: "erreur inconnue"}")
+                    refreshAccountUi()
+                }
         } catch (e: Exception) {
-            Log.e("ECHOS_SYNC", "Impossible d'ouvrir la fenêtre Google", e)
-            toast("Impossible d'ouvrir la connexion Google : ${e.localizedMessage ?: "erreur inconnue"}")
+            Log.e("ECHOS_SYNC", "Erreur au démarrage de Google Sign-In", e)
+            toast("Erreur Google : ${e.localizedMessage ?: "inconnue"}")
+            refreshAccountUi()
         }
     }
 
-    @Deprecated("Google Sign-In renvoie le compte choisi via le résultat de l'activité")
+    @Deprecated("Résultat de la fenêtre Google")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: android.content.Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode != googleSignInRequestCode) return
+
         if (resultCode != RESULT_OK || data == null) {
-            toast("Connexion Google annulée.")
+            Log.w("ECHOS_SYNC", "Fenêtre Google fermée sans résultat (resultCode=$resultCode, data=${data != null})")
+            toast("La fenêtre Google s'est fermée sans valider le compte. Réessaie.")
+            refreshAccountUi()
             return
         }
+
         try {
-            val task = GoogleSignIn.getSignedInAccountFromIntent(data)
-            val account = task.getResult(ApiException::class.java)
-            val token = account.idToken
+            val signInCredential = Identity.getSignInClient(this)
+                .getSignInCredentialFromIntent(data)
+            val token = signInCredential.googleIdToken
             if (token.isNullOrBlank()) {
+                Log.e("ECHOS_SYNC", "Google a renvoyé un résultat sans ID token")
                 toast("Google n'a pas fourni de jeton. Vérifie le client OAuth Web Firebase.")
+                refreshAccountUi()
                 return
             }
-            val credential = GoogleAuthProvider.getCredential(token, null)
-            firebaseAuth?.signInWithCredential(credential)
+
+            val firebaseCredential = GoogleAuthProvider.getCredential(token, null)
+            firebaseAuth?.signInWithCredential(firebaseCredential)
                 ?.addOnSuccessListener {
                     toast("Connexion Google réussie. Synchronisation en cours…")
                     refreshAccountUi()
                 }
                 ?.addOnFailureListener { error ->
-                    Log.e("ECHOS_SYNC", "Échec Firebase Auth", error)
-                    toast("Connexion impossible : ${error.localizedMessage ?: "erreur Firebase"}")
+                    Log.e("ECHOS_SYNC", "Échec Firebase Auth après sélection Google", error)
+                    toast("Connexion Firebase impossible : ${error.localizedMessage ?: "erreur inconnue"}")
+                    refreshAccountUi()
                 }
         } catch (e: ApiException) {
-            Log.e("ECHOS_SYNC", "Sélection du compte Google échouée: ${e.statusCode}", e)
-            toast("Échec de la fenêtre Google (code ${e.statusCode}). Réessaie.")
+            Log.e("ECHOS_SYNC", "Récupération du compte Google échouée (code ${e.statusCode})", e)
+            toast("Google n'a pas validé la connexion (code ${e.statusCode}). Vérifie la configuration OAuth.")
+            refreshAccountUi()
         } catch (e: Exception) {
-            Log.e("ECHOS_SYNC", "Erreur de connexion Google", e)
-            toast("Erreur de connexion : ${e.localizedMessage ?: "inconnue"}")
+            Log.e("ECHOS_SYNC", "Erreur lors du retour de la fenêtre Google", e)
+            toast("Erreur après sélection du compte : ${e.localizedMessage ?: "inconnue"}")
+            refreshAccountUi()
         }
     }
 
