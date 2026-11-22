@@ -286,10 +286,11 @@ class MainActivity : Activity(), SensorEventListener {
         when (event.sensor.type) {
             Sensor.TYPE_MAGNETIC_FIELD, Sensor.TYPE_MAGNETIC_FIELD_UNCALIBRATED -> {
                 val x = v[0]; val y = v[1]; val z = v[2]
-                magneticMagnitude = sqrt(x*x + y*y + z*z)
-                magneticDelta = abs(magneticMagnitude - baseline)
+                val preciseMagnitude = sqrt(x.toDouble()*x + y.toDouble()*y + z.toDouble()*z)
+                magneticMagnitude = preciseMagnitude.toFloat()
+                magneticDelta = abs(preciseMagnitude - baseline.toDouble()).toFloat()
                 if (calibrating) collectCalibration(magneticMagnitude)
-                else if (sessionActive) processMagneticSignature(magneticMagnitude, magneticDelta)
+                else if (sessionActive) processMagneticSignature(preciseMagnitude, abs(preciseMagnitude - baseline.toDouble()))
                 if (::fieldView.isInitialized) {
                     fieldView.text = "%.1f µT".format(Locale.FRANCE, magneticMagnitude)
                     deltaView.text = "Variation depuis calibration : %.2f µT".format(Locale.FRANCE, magneticDelta)
@@ -298,11 +299,11 @@ class MainActivity : Activity(), SensorEventListener {
             Sensor.TYPE_ACCELEROMETER -> {
                 accelerationMagnitude = sqrt(v[0]*v[0] + v[1]*v[1] + v[2]*v[2])
                 if (calibrating && magnetic == null && magneticUncalibrated == null) collectCalibration(accelerationMagnitude)
-                else if (sessionActive && magnetic == null && magneticUncalibrated == null) processMotionSignature(accelerationMagnitude)
+                else if (sessionActive && magnetic == null && magneticUncalibrated == null) processMotionSignature(accelerationMagnitude.toDouble())
             }
             Sensor.TYPE_GYROSCOPE -> {
                 rotationMagnitude = sqrt(v[0]*v[0] + v[1]*v[1] + v[2]*v[2])
-                if (sessionActive && magnetic == null && magneticUncalibrated == null) processMotionSignature(rotationMagnitude)
+                if (sessionActive && magnetic == null && magneticUncalibrated == null) processMotionSignature(rotationMagnitude.toDouble())
             }
         }
     }
@@ -372,13 +373,13 @@ class MainActivity : Activity(), SensorEventListener {
 
     // Reproduit le principe visible dans GhostTube : une signature est construite à partir des décimales
     // de la mesure, puis une plage de tolérance dépend de la sensibilité.
-    private fun processMagneticSignature(value: Float, delta: Float) {
+    private fun processMagneticSignature(value: Double, delta: Double) {
         val now = System.currentTimeMillis()
         if (now - lastSignatureAt < 1000L || now < nextWordAt) return
         lastSignatureAt = now
         val pool = activeWordPool()
         if (pool.isEmpty()) return
-        val digits = decimalSignature(value)
+        val digits = decimalSignature(value, 3)
         // GhostTube's reconstructed magnetic branch takes only the first
         // digit-count required by dictionarySize * 10000, then splits index/remainder.
         val digitCount = (pool.size * 10000).toString().length - 1
@@ -393,7 +394,7 @@ class MainActivity : Activity(), SensorEventListener {
         }
         // A real field jump is also accepted as a practical fallback for phones
         // whose sensor precision makes the decimal-signature route unusually quiet.
-        val physicalChangeThreshold = maxOf(0.18f, noiseFloor * (4.2f - sensitivity * 2.8f))
+        val physicalChangeThreshold = maxOf(0.18f, noiseFloor * (4.2f - sensitivity * 2.8f)).toDouble()
         val physicalChange = delta >= physicalChangeThreshold
         val dictionaryIndex = (adjusted / 10000L).toInt()
         if ((signatureMatch && dictionaryIndex in pool.indices) || physicalChange) {
@@ -405,13 +406,13 @@ class MainActivity : Activity(), SensorEventListener {
         }
     }
 
-    private fun processMotionSignature(value: Float) {
+    private fun processMotionSignature(value: Double) {
         val now = System.currentTimeMillis()
         if (now - lastSignatureAt < 1000L || now < nextWordAt) return
         lastSignatureAt = now
         val pool = activeWordPool()
         if (pool.isEmpty()) return
-        val digits = decimalSignature(value)
+        val digits = decimalSignature(value, 0)
         val rotated = digits.drop(3) + digits.take(3)
         val bucket = rotated.take(4).toIntOrNull() ?: 9999
         val tolerance = (sensitivity * 30f).toInt() + 1
@@ -423,10 +424,12 @@ class MainActivity : Activity(), SensorEventListener {
         }
     }
 
-    private fun decimalSignature(value: Float): String {
-        val decimal = BigDecimal(value.toString()).abs().stripTrailingZeros().toPlainString()
+    private fun decimalSignature(value: Double, dropLeadingDigits: Int): String {
+        val decimal = BigDecimal(value.toString()).abs().toPlainString()
         val fraction = decimal.substringAfter('.', "0").filter { it.isDigit() }.ifEmpty { "0" }
-        return (fraction + fraction + fraction + fraction).take(20).padEnd(20, '0')
+        var digits = fraction.drop(dropLeadingDigits).ifEmpty { "0" }
+        while (digits.length <= 20) digits += digits
+        return digits.take(20)
     }
 
     private fun activeWordPool(): List<WordEntry> {
