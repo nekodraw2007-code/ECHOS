@@ -15,6 +15,30 @@ android {
         versionName '1.1.0'
     }
 
+    signingConfigs {
+        release {
+            def ksPath = System.getenv('ECHOS_KEYSTORE_PATH')
+            if (ksPath) {
+                storeFile file(ksPath)
+                storePassword System.getenv('ECHOS_KEYSTORE_PASSWORD')
+                keyAlias System.getenv('ECHOS_KEY_ALIAS')
+                keyPassword System.getenv('ECHOS_KEY_PASSWORD')
+            }
+        }
+    }
+
+    buildTypes {
+        debug {
+            // Standard Android debug signature (v1/v2), suitable for installation tests.
+        }
+        release {
+            minifyEnabled false
+            if (System.getenv('ECHOS_KEYSTORE_PATH')) {
+                signingConfig signingConfigs.release
+            }
+        }
+    }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
@@ -36,4 +60,3 @@ dependencies {
     implementation 'com.google.android.gms:play-services-auth:21.3.0'
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.8.7'
 }
-
