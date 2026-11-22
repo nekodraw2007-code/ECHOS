@@ -337,7 +337,7 @@ class MainActivity : Activity(), SensorEventListener {
             AlertDialog.Builder(this).setTitle("Effacer l'historique ?")
                 .setMessage("Tous les mots enregistrés seront supprimés.")
                 .setNegativeButton("Annuler", null)
-                .setPositiveButton("Effacer") { _, _ -> history.clear(); persistHistory(); refreshHistory() }
+                .setPositiveButton("Effacer") { _, _ -> clearHistoryEverywhere() }
                 .show()
         }, match())
         pages.add(scrollPage(historyPage))
@@ -1147,7 +1147,6 @@ class MainActivity : Activity(), SensorEventListener {
                     customInitialSyncDone = false
                 } else {
                     attachCloudListeners(user.uid)
-                    syncCustomDictionaryToCloud()
                     syncHistoryToCloud()
                 }
             }
@@ -1330,6 +1329,25 @@ class MainActivity : Activity(), SensorEventListener {
         )
         doc.set(payload, SetOptions.merge())
             .addOnFailureListener { Log.e("ECHOS_SYNC", "Envoi dictionnaire", it) }
+    }
+
+    private fun clearHistoryEverywhere() {
+        history.clear()
+        applyingRemoteSync = true
+        getSharedPreferences("echos_preferences", MODE_PRIVATE).edit()
+            .putString("history", "").apply()
+        applyingRemoteSync = false
+        refreshHistory()
+        val user = firebaseAuth?.currentUser ?: return
+        val collection = firestore?.collection("users")?.document(user.uid)?.collection("echos_history") ?: return
+        collection.get().addOnSuccessListener { snapshot ->
+            val batches = snapshot.documents.chunked(450)
+            batches.forEach { docs ->
+                val batch = firestore?.batch() ?: return@forEach
+                docs.forEach { batch.delete(it.reference) }
+                batch.commit()
+            }
+        }.addOnFailureListener { Log.e("ECHOS_SYNC", "Suppression historique cloud", it) }
     }
 
     private fun syncHistoryToCloud() {
