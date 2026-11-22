@@ -117,8 +117,9 @@ class MainActivity : Activity(), SensorEventListener {
         noiseFloor = p.getFloat("noise_floor", 0.08f)
         calibrated = p.getBoolean("calibrated", false)
         val cats = p.getString("active_categories", "")!!.split("\n").filter { it.isNotBlank() }
+        val categoryAliases = mapOf("Personnes" to "Personnes et identité", "Sensations" to "Sensations et corps")
         if (cats.isEmpty()) activeCategories.addAll(baseEntries.map { it.category }.distinct())
-        else activeCategories.addAll(cats)
+        else activeCategories.addAll(cats.map { categoryAliases[it] ?: it })
         val savedCats = p.getString("custom_categories", "")!!.split("\n").filter { it.isNotBlank() }
         customCategories.addAll(savedCats)
         try {
@@ -128,6 +129,19 @@ class MainActivity : Activity(), SensorEventListener {
                 customEntries.add(WordEntry(o.getString("category"), o.getString("text"), 1, true))
             }
         } catch (_: Exception) {}
+        // One-time migration from ECHOS 1.0.x custom-word storage.
+        val legacyWords = p.getString("custom_words", "")!!.split("\n").filter { it.isNotBlank() }
+        if (legacyWords.isNotEmpty() && customEntries.isEmpty()) {
+            customCategories.add("Personnalisés")
+            activeCategories.add("Personnalisés")
+            legacyWords.forEach { customEntries.add(WordEntry("Personnalisés", it, 1, true)) }
+            saveCustomDictionary()
+        }
+        // The expanded library introduces new categories; activate them on the first v2 dictionary launch.
+        if (!p.getBoolean("dictionary_v2_initialized", false)) {
+            activeCategories.addAll(baseEntries.map { it.category }.distinct())
+            p.edit().putBoolean("dictionary_v2_initialized", true).apply()
+        }
         history.addAll(p.getString("history", "")!!.split("\n").filter { it.isNotBlank() }.take(60))
     }
 
