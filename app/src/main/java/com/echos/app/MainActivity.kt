@@ -67,6 +67,8 @@ class MainActivity : Activity(), SensorEventListener {
     private var lastSignatureAt = 0L
     private var nextWordAt = 0L
     private var lastWord = ""
+    private var lastWordAt = 0L
+    private var shuffledWordIndexes = mutableListOf<Int>()
     private var sessionStartedAt = 0L
     private var currentMode = "MAGNÉTIQUE"
 
@@ -305,7 +307,7 @@ class MainActivity : Activity(), SensorEventListener {
                 magneticMagnitude = preciseMagnitude.toFloat()
                 magneticDelta = abs(preciseMagnitude - baseline.toDouble()).toFloat()
                 if (calibrating) collectCalibration(magneticMagnitude)
-                else if (sessionActive) processMagneticSignature(x.toDouble(), y.toDouble(), z.toDouble(), preciseMagnitude, abs(preciseMagnitude - baseline.toDouble()))
+                else if (sessionActive) processMagneticSignature(x.toDouble(), y.toDouble(), z.toDouble(), preciseMagnitude)
                 if (::fieldView.isInitialized) {
                     fieldView.text = "%.1f µT".format(Locale.FRANCE, magneticMagnitude)
                     deltaView.text = "Variation depuis calibration : %.2f µT".format(Locale.FRANCE, magneticDelta)
@@ -315,13 +317,13 @@ class MainActivity : Activity(), SensorEventListener {
                 val preciseAcceleration = sqrt(v[0].toDouble()*v[0] + v[1].toDouble()*v[1] + v[2].toDouble()*v[2])
                 accelerationMagnitude = preciseAcceleration.toFloat()
                 if (calibrating && magnetic == null && magneticUncalibrated == null) collectCalibration(accelerationMagnitude)
-                else if (sessionActive) processMotionSignature(preciseAcceleration)
+                else if (sessionActive) processMotionSignature(v[0].toDouble(), v[1].toDouble(), v[2].toDouble(), preciseAcceleration, "accéléromètre")
             }
             Sensor.TYPE_GYROSCOPE -> {
                 val preciseRotation = sqrt(v[0].toDouble()*v[0] + v[1].toDouble()*v[1] + v[2].toDouble()*v[2])
                 rotationMagnitude = preciseRotation.toFloat()
                 if (calibrating && magnetic == null && magneticUncalibrated == null) collectCalibration(rotationMagnitude)
-                else if (sessionActive) processMotionSignature(preciseRotation)
+                else if (sessionActive) processMotionSignature(v[0].toDouble(), v[1].toDouble(), v[2].toDouble(), preciseRotation, "gyroscope")
             }
         }
     }
@@ -377,12 +379,7 @@ class MainActivity : Activity(), SensorEventListener {
             toast("Aucun capteur de mouvement ou magnétique disponible sur cet appareil.")
             return
         }
-        // La calibration améliore la référence magnétique, mais ne doit pas bloquer
-        // le mode accéléromètre/gyroscope sur les appareils sans magnétomètre.
-        if (!calibrated && (magnetic != null || magneticUncalibrated != null)) {
-            toast("Calibre le magnétomètre avant de démarrer.")
-            return
-        }
+        // La calibration est facultative : les signatures sont calculées depuis les valeurs brutes.
         if (baseEntries.isEmpty()) {
             toast("Le dictionnaire n'a pas pu être chargé.")
             return
@@ -399,95 +396,91 @@ class MainActivity : Activity(), SensorEventListener {
         addHistory("Session démarrée · mode $currentMode")
     }
 
-    // Moteur ECHOS : signature déterministe dérivée des trois axes du magnétomètre.
-    // La sensibilité règle la tolérance de correspondance et le délai entre deux sorties.
-    // Ce moteur s'inspire des comportements observables de GhostTube sans prétendre
-    // reproduire son code propriétaire ni attribuer une origine paranormale aux mots.
-    private fun processMagneticSignature(x: Double, y: Double, z: Double, magnitude: Double, delta: Double) {
+    // Moteur de signatures inspiré de la mécanique observable de GhostTube.
+    // Les deux voies utilisent les décimales des mesures, une fenêtre de sensibilité et un index dictionnaire.
+    // Une sortie de secours évite un écran éternellement vide quand aucune signature ne correspond.
+    private fun processMagneticSignature(x: Double, y: Double, z: Double, magnitude: Double) {
         val now = System.currentTimeMillis()
         if (now - lastSignatureAt < 900L || now < nextWordAt) return
         lastSignatureAt = now
-
         val pool = activeWordPool()
         if (pool.isEmpty()) return
-
-        // Quantification des axes : plus stable que l'extraction des décimales d'une magnitude
-        // calculée en virgule flottante, qui variait trop peu ou de façon non pertinente.
-        val qx = (x * 100.0).toLong()
-        val qy = (y * 100.0).toLong()
-        val qz = (z * 100.0).toLong()
-        val qDelta = (delta * 1000.0).toLong()
-        val signature = qx * 73856093L xor qy * 19349663L xor qz * 83492791L xor qDelta * 2654435761L
-        val signatureBucket = (kotlin.math.abs(signature % 100L)).toInt()
-        val tolerance = (10 + sensitivity * 90f).toInt().coerceIn(10, 100)
-
-        // Une correspondance de signature peut produire un mot même dans un environnement
-        // stable ; une variation mesurée importante constitue un second chemin de déclenchement.
-        val physicalThreshold = maxOf(0.06, noiseFloor.toDouble() * (2.8 - sensitivity * 1.8))
-        val physicalChange = delta >= physicalThreshold
-        val signatureMatch = signatureBucket < tolerance
-
-        if (signatureMatch || physicalChange) {
-            val positiveHash = kotlin.math.abs(signature)
-            val weightedIndex = ((positiveHash / 100L) % pool.size.toLong()).toInt()
-            val selected = if (pool[weightedIndex].text.equals(lastWord, true) && pool.size > 1) {
-                pool[(weightedIndex + 1) % pool.size]
-            } else pool[weightedIndex]
-
-            emitWord(
-                selected,
-                "signature $signatureBucket/$tolerance · champ %.2f µT · Δ %.2f µT".format(Locale.FRANCE, magnitude, delta)
-            )
-
-            val maxDelay = ((1f - sensitivity) * 24f + 5f).toInt().coerceAtLeast(5)
-            nextWordAt = now + Random.nextLong(4, maxDelay.toLong() + 1) * 1000L
-        }
+        ensureSensorOrder(pool.size)
+        val signatureMagnitude = sqrt(x * x * x * x + y * y * y * y + z * z * z * z)
+        val digits = decimalDigits(signatureMagnitude, dropLeading = 3, rotate = false)
+        val prefixLength = ((pool.size.toLong() * 10_000L).toString().length - 1).coerceIn(1, digits.length)
+        val raw = digits.take(prefixLength).toLongOrNull()
+        val tolerance = (10 + sensitivity * 90f).toInt()
+        val remainder = raw?.rem(10_000L)
+        val index = if (raw != null && remainder != null && (remainder == 0L || remainder <= tolerance.toLong())) (raw - remainder) / 10_000L else null
+        if (index != null && index > 0L && index < pool.size.toLong()) {
+            orderedEntry(pool, index.toInt())?.let { entry ->
+                emitWord(entry, "signature magnétique · " + "%.1f".format(Locale.FRANCE, magnitude) + " µT")
+                nextWordAt = now + (70f + (1f - sensitivity) * 120f).toLong() * 1000L
+            }
+        } else emitFallbackIfDue(pool, signatureMagnitude, "secours magnétique", now)
+        shuffledWordIndexes.shuffle()
     }
 
     private var motionSamples = 0
     private var lastMotionValue = 0.0
     private var motionEnergy = 0.0
 
-    private fun processMotionSignature(value: Double) {
-        if (!value.isFinite()) return
+    private fun processMotionSignature(x: Double, y: Double, z: Double, magnitude: Double, source: String) {
+        if (!magnitude.isFinite()) return
         val now = System.currentTimeMillis()
         motionSamples++
-        val difference = abs(value - lastMotionValue)
-        lastMotionValue = value
+        val difference = abs(magnitude - lastMotionValue)
+        lastMotionValue = magnitude
         motionEnergy = motionEnergy * 0.88 + difference * 0.12
-
-        if (now - lastSignatureAt < 650L || now < nextWordAt) return
+        if (now - lastSignatureAt < 900L || now < nextWordAt) return
         val pool = activeWordPool()
         if (pool.isEmpty()) return
-
-        // Les capteurs de mouvement donnent une magnitude gravitationnelle quasi constante
-        // lorsque le téléphone est immobile. On combine donc énergie récente et valeur mesurée.
-        // Le seuil s'adapte à la sensibilité et permet aussi un mode sans magnétomètre.
-        val threshold = 0.0025 + (1.0 - sensitivity) * 0.045
-        val activeMotion = motionEnergy >= threshold
-        val readyFallback = motionSamples >= 12 && now - sessionStartedAt >= 2500L
-        if (!activeMotion && !readyFallback) return
-
+        ensureSensorOrder(pool.size)
         lastSignatureAt = now
-        val quantized = (abs(value) * 1000.0).toLong()
-        val energyCode = (motionEnergy * 100000.0).toLong()
-        val signature = (quantized * 2654435761L) xor (energyCode * 31L) xor (now / 700L)
-        val index = (kotlin.math.abs(signature / 100L) % pool.size.toLong()).toInt()
-        val selected = if (pool[index].text.equals(lastWord, true) && pool.size > 1) pool[(index + 1) % pool.size] else pool[index]
-
-        emitWord(selected, if (activeMotion) "mouvement détecté · énergie %.4f".format(Locale.FRANCE, motionEnergy) else "mode capteurs de mouvement · signature")
-        val maxDelay = ((1f - sensitivity) * 24f + 5f).toInt().coerceAtLeast(5)
-        nextWordAt = now + Random.nextLong(4, maxDelay.toLong() + 1) * 1000L
+        val digits = decimalDigits(magnitude, dropLeading = 0, rotate = true)
+        val gate = digits.take(4).toIntOrNull() ?: -1
+        val tolerance = (sensitivity * 30f).toInt() + 1
+        val indexEnd = (kotlin.math.floor(kotlin.math.log10(pool.size.toDouble())).toInt() + 5).coerceIn(5, digits.length)
+        val index = if (gate >= 0 && (gate <= tolerance || gate >= 10_000 - tolerance) && indexEnd > 5) digits.substring(5, indexEnd).toIntOrNull() else null
+        if (index != null && index > 0 && index < pool.size) {
+            orderedEntry(pool, index)?.let { entry ->
+                emitWord(entry, "signature " + source + " · énergie " + "%.4f".format(Locale.FRANCE, motionEnergy))
+                nextWordAt = now + (11f + (1f - sensitivity) * 45f).toLong() * 1000L
+            }
+        } else emitFallbackIfDue(pool, magnitude + motionEnergy, "secours " + source, now)
+        shuffledWordIndexes.shuffle()
     }
 
-    private fun decimalSignature(value: Double, dropLeadingDigits: Int): String {
-        val decimal = BigDecimal(value.toString()).abs().toPlainString()
-        val fraction = decimal.substringAfter('.', "0").filter { it.isDigit() }.ifEmpty { "0" }
-        var digits = fraction.drop(dropLeadingDigits).ifEmpty { "0" }
+    private fun decimalDigits(value: Double, dropLeading: Int, rotate: Boolean): String {
+        val decimal = BigDecimal(abs(value).toString()).toPlainString()
+        val fraction = decimal.substringAfter(".", "0").filter { it.isDigit() }.ifEmpty { "0" }
+        var digits = fraction.drop(dropLeading).ifEmpty { "0" }
         while (digits.length <= 20) digits += digits
-        return digits.take(20)
+        digits = digits.take(20)
+        return if (rotate && digits.length >= 20) digits.substring(3) + digits.substring(0, 3) else digits
     }
 
+    private fun ensureSensorOrder(size: Int) {
+        if (shuffledWordIndexes.size != size) {
+            shuffledWordIndexes = (0 until size).toMutableList()
+            shuffledWordIndexes.shuffle()
+        }
+    }
+
+    private fun orderedEntry(pool: List<WordEntry>, index: Int): WordEntry? {
+        if (index !in shuffledWordIndexes.indices) return null
+        return pool.getOrNull(shuffledWordIndexes[index])
+    }
+
+    private fun emitFallbackIfDue(pool: List<WordEntry>, signal: Double, reason: String, now: Long) {
+        val reference = maxOf(sessionStartedAt, lastWordAt)
+        if (now - reference < 12_000L || pool.isEmpty()) return
+        val raw = abs((signal * 1_000_000.0).toLong()) xor (now / 1_200L)
+        val index = Math.floorMod(raw, pool.size.toLong()).toInt()
+        emitWord(pool[index], reason + " · aucune signature exploitable")
+        nextWordAt = now + 8_000L
+    }
     private fun activeWordPool(): List<WordEntry> {
         val base = baseEntries.filter { it.category in activeCategories && it.text.isNotBlank() }
             .flatMap { entry -> List(entry.weight.coerceIn(1, 5)) { entry } }
@@ -512,6 +505,7 @@ class MainActivity : Activity(), SensorEventListener {
     private fun emitWord(entry: WordEntry, reason: String) {
         if (entry.text == lastWord && activeWordPool().size > 1) return
         lastWord = entry.text
+        lastWordAt = System.currentTimeMillis()
         runOnUiThread {
             wordView.text = entry.text
             addHistory("Mot : ${entry.text} · ${entry.category} · $reason")
