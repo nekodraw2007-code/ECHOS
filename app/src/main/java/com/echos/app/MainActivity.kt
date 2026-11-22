@@ -51,9 +51,16 @@ class MainActivity : Activity(), SensorEventListener {
     private var accelerometerUncalibrated: Sensor? = null
     private var gyroscope: Sensor? = null
     private var gyroscopeUncalibrated: Sensor? = null
+    private var linearAccelerometer: Sensor? = null
+    private var proximity: Sensor? = null
     private var accelerometerThread: HandlerThread? = null
     private var gyroscopeThread: HandlerThread? = null
     private var magneticThread: HandlerThread? = null
+    private var proximityThread: HandlerThread? = null
+    private val gravityVector = FloatArray(3)
+    private var gravityInitialized = false
+    private var magneticReference = Double.NaN
+    private var lastProximityNear: Boolean? = null
     private val registeredSensorTypes = mutableSetOf<Int>()
     private var speechEngine: TextToSpeech? = null
     private var speechReady = false
@@ -103,6 +110,8 @@ class MainActivity : Activity(), SensorEventListener {
         accelerometerUncalibrated = if (accelerometer == null) sensors.getDefaultSensor(35) else null
         gyroscope = sensors.getDefaultSensor(Sensor.TYPE_GYROSCOPE)
         gyroscopeUncalibrated = if (gyroscope == null) sensors.getDefaultSensor(16) else null
+        linearAccelerometer = sensors.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION)
+        proximity = sensors.getDefaultSensor(Sensor.TYPE_PROXIMITY)
         loadDictionary()
         loadPreferences()
         initializeSpeech()
@@ -346,7 +355,9 @@ class MainActivity : Activity(), SensorEventListener {
         sensorLabel.text = "Magnétomètre : " + if (hasMag) "disponible" else "absent"
         sensorLabel.append("\nAccéléromètre : " + if (accelerometer != null || accelerometerUncalibrated != null) "disponible" else "absent")
         sensorLabel.append("\nGyroscope : " + if (gyroscope != null || gyroscopeUncalibrated != null) "disponible" else "absent")
-        currentMode = if (hasMag) "MAGNÉTIQUE" else "MOUVEMENT"
+        sensorLabel.append("\nAccéléromètre linéaire : " + if (linearAccelerometer != null) "disponible" else "absent")
+        sensorLabel.append("\nProximité : " + if (proximity != null) "disponible" else "absent")
+        currentMode = if (hasMag) "MULTICAPTEURS" else "MOUVEMENT / PROXIMITÉ"
         statusView.text = when {
             !hasMag && accelerometer == null && accelerometerUncalibrated == null && gyroscope == null && gyroscopeUncalibrated == null -> "Aucun capteur compatible détecté"
             calibrated -> "Capteurs prêts · calibration enregistrée"
@@ -371,13 +382,22 @@ class MainActivity : Activity(), SensorEventListener {
             }
         }
         val accelSensor = accelerometer ?: accelerometerUncalibrated
-        if (accelSensor != null) {
+        if (accelSensor != null || linearAccelerometer != null) {
             accelerometerThread = HandlerThread("AccelerometerThread").apply { start() }
-            if (sensors.registerListener(this, accelSensor, 2, Handler(accelerometerThread!!.looper))) {
+            val handler = Handler(accelerometerThread!!.looper)
+            if (accelSensor != null && sensors.registerListener(this, accelSensor, 2, handler)) {
                 registeredSensorTypes.add(accelSensor.type)
-            } else {
-                accelerometerThread?.quitSafely()
-                accelerometerThread = null
+            }
+            if (linearAccelerometer != null && sensors.registerListener(this, linearAccelerometer, 2, handler)) {
+                registeredSensorTypes.add(linearAccelerometer!!.type)
+            }
+            if (accelSensor == null && linearAccelerometer == null ||
+                accelSensor != null && accelSensor.type !in registeredSensorTypes ||
+                linearAccelerometer != null && linearAccelerometer!!.type !in registeredSensorTypes) {
+                if (registeredSensorTypes.none { it == Sensor.TYPE_ACCELEROMETER || it == 35 || it == Sensor.TYPE_LINEAR_ACCELERATION }) {
+                    accelerometerThread?.quitSafely()
+                    accelerometerThread = null
+                }
             }
         }
         val gyroSensor = gyroscope ?: gyroscopeUncalibrated
@@ -390,6 +410,15 @@ class MainActivity : Activity(), SensorEventListener {
                 gyroscopeThread = null
             }
         }
+        if (proximity != null) {
+            proximityThread = HandlerThread("ProximitySensorThread").apply { start() }
+            if (sensors.registerListener(this, proximity, 2, Handler(proximityThread!!.looper))) {
+                registeredSensorTypes.add(proximity!!.type)
+            } else {
+                proximityThread?.quitSafely()
+                proximityThread = null
+            }
+        }
         return registeredSensorTypes.size
     }
 
@@ -399,9 +428,11 @@ class MainActivity : Activity(), SensorEventListener {
         magneticThread?.quitSafely()
         accelerometerThread?.quitSafely()
         gyroscopeThread?.quitSafely()
+        proximityThread?.quitSafely()
         magneticThread = null
         accelerometerThread = null
         gyroscopeThread = null
+        proximityThread = null
     }
 
     override fun onResume() {
@@ -425,7 +456,7 @@ class MainActivity : Activity(), SensorEventListener {
                 val x = v[0]; val y = v[1]; val z = v[2]
                 val preciseMagnitude = sqrt(x.toDouble()*x + y.toDouble()*y + z.toDouble()*z)
                 magneticMagnitude = preciseMagnitude.toFloat()
-                magneticDelta = abs(preciseMagnitude - baseline.toDouble()).toFloat()
+                magneticDelta = if (baseline > 0f) abs(preciseMagnitude - baseline.toDouble()).toFloat() else 0f
                 if (calibrating) collectCalibration(magneticMagnitude)
                 else if (sessionActive) processMagneticSignature(x.toDouble(), y.toDouble(), z.toDouble(), preciseMagnitude)
                 if (::fieldView.isInitialized) {
@@ -433,30 +464,53 @@ class MainActivity : Activity(), SensorEventListener {
                     deltaView.text = "Variation depuis calibration : %.2f µT".format(Locale.FRANCE, magneticDelta)
                 }
             }
+            Sensor.TYPE_LINEAR_ACCELERATION -> {
+                val norm = sqrt(v[0].toDouble()*v[0] + v[1].toDouble()*v[1] + v[2].toDouble()*v[2])
+                accelerationMagnitude = norm.toFloat()
+                if (calibrating && magnetic == null && magneticUncalibrated == null) collectCalibration(accelerationMagnitude)
+                else if (sessionActive) processMotionSignature(v[0].toDouble(), v[1].toDouble(), v[2].toDouble(), "accéléromètre linéaire")
+            }
             Sensor.TYPE_ACCELEROMETER, 35 -> {
                 val preciseAcceleration = sqrt(v[0].toDouble()*v[0] + v[1].toDouble()*v[1] + v[2].toDouble()*v[2])
                 accelerationMagnitude = preciseAcceleration.toFloat()
-                if (calibrating && magnetic == null && magneticUncalibrated == null) collectCalibration(accelerationMagnitude)
-                else if (sessionActive && magnetic == null && magneticUncalibrated == null) {
-                    // Voie de secours inspirée de GhostTube : la signature n'est évaluée
-                    // qu'après stabilisation des mesures, jamais sur le simple mouvement.
-                    processMotionSignature(v[0].toDouble(), v[1].toDouble(), v[2].toDouble(), "accéléromètre")
+                // À défaut de capteur linéaire, on retire la gravité par filtre passe-haut.
+                // Cela évite qu'un téléphone simplement posé déclenche un mot à partir des 9,8 m/s².
+                val alpha = 0.88f
+                if (!gravityInitialized) {
+                    for (i in 0..2) gravityVector[i] = v[i]
+                    gravityInitialized = true
+                }
+                val linear = DoubleArray(3) { i ->
+                    gravityVector[i] += alpha * (v[i] - gravityVector[i])
+                    (v[i] - gravityVector[i]).toDouble()
+                }
+                if (linearAccelerometer == null) {
+                    val linearNorm = sqrt(linear[0]*linear[0] + linear[1]*linear[1] + linear[2]*linear[2])
+                    if (calibrating && magnetic == null && magneticUncalibrated == null) collectCalibration(linearNorm.toFloat())
+                    else if (sessionActive) processMotionSignature(linear[0], linear[1], linear[2], "accéléromètre")
                 }
             }
             Sensor.TYPE_GYROSCOPE, 15, 16 -> {
                 val preciseRotation = sqrt(v[0].toDouble()*v[0] + v[1].toDouble()*v[1] + v[2].toDouble()*v[2])
                 rotationMagnitude = preciseRotation.toFloat()
                 if (calibrating && magnetic == null && magneticUncalibrated == null) collectCalibration(rotationMagnitude)
-                else if (sessionActive && magnetic == null && magneticUncalibrated == null) {
-                    processMotionSignature(v[0].toDouble(), v[1].toDouble(), v[2].toDouble(), "gyroscope")
-                }
+                else if (sessionActive) processMotionSignature(v[0].toDouble(), v[1].toDouble(), v[2].toDouble(), "gyroscope")
+            }
+            Sensor.TYPE_PROXIMITY -> {
+                if (!sessionActive || v.isEmpty()) return
+                val maxRange = event.sensor.maximumRange.toDouble()
+                val isNear = v[0].toDouble() < maxRange
+                val previous = lastProximityNear
+                lastProximityNear = isNear
+                if (previous != null && previous != isNear) processProximitySignature(v[0].toDouble(), maxRange, isNear)
             }
         }
     }
 
     private fun startCalibration() {
         if (magnetic == null && magneticUncalibrated == null && accelerometer == null &&
-            accelerometerUncalibrated == null && gyroscope == null && gyroscopeUncalibrated == null) {
+            accelerometerUncalibrated == null && linearAccelerometer == null && gyroscope == null &&
+            gyroscopeUncalibrated == null && proximity == null) {
             toast("Aucun capteur compatible sur cet appareil.")
             return
         }
@@ -523,8 +577,8 @@ class MainActivity : Activity(), SensorEventListener {
             return
         }
         val hasAnySensor = magnetic != null || magneticUncalibrated != null || accelerometer != null ||
-            accelerometerUncalibrated != null || gyroscope != null ||
-            gyroscopeUncalibrated != null
+            accelerometerUncalibrated != null || linearAccelerometer != null || gyroscope != null ||
+            gyroscopeUncalibrated != null || proximity != null
         if (!hasAnySensor) {
             toast("Aucun capteur de mouvement ou magnétique disponible sur cet appareil.")
             return
@@ -536,6 +590,11 @@ class MainActivity : Activity(), SensorEventListener {
         }
         sessionActive = true
         nextWordAt = 0L
+        magneticReference = if (calibrated && baseline > 0f && (magnetic != null || magneticUncalibrated != null)) baseline.toDouble() else Double.NaN
+        lastProximityNear = null
+        gravityInitialized = false
+        motionSamples.clear()
+        motionStableSince.clear()
         shuffledWordIndexes = (0 until activeWordPool().size).toMutableList()
         shuffledWordIndexes.shuffle()
         if (startGhostTubeSensorListeners() == 0) {
@@ -571,72 +630,101 @@ class MainActivity : Activity(), SensorEventListener {
         val now = System.currentTimeMillis()
         if (!magnitude.isFinite() || magnitude <= 0.0 || now < nextWordAt) return
 
+        // Référence initiale : le premier relevé ne déclenche jamais de mot.
+        // Une variation réelle du champ est nécessaire, contrairement à l'ancienne
+        // version qui émettait un mot à chaque fin de délai même avec un champ immobile.
+        if (!magneticReference.isFinite()) {
+            magneticReference = magnitude
+            return
+        }
+        val deviation = abs(magnitude - magneticReference)
+        val calibratedNoise = if (calibrated) noiseFloor.toDouble() else 0.0
+        val threshold = maxOf(
+            0.30,
+            calibratedNoise * (3.5 - sensitivity * 2.7),
+            0.35 + (1f - sensitivity) * 1.45f
+        )
+        if (deviation < threshold) {
+            // Adaptation lente du niveau de référence pour suivre les dérives ambiantes.
+            magneticReference = magneticReference * 0.998 + magnitude * 0.002
+            return
+        }
+
         val pool = activeWordPool()
         if (pool.isEmpty()) return
         ensureSensorOrder(pool.size)
-
-        // Empreinte calculée uniquement à partir des mesures du magnétomètre.
-        // On ne demande plus qu'une combinaison décimale très rare apparaisse :
-        // ce filtre pouvait empêcher tout mot de sortir pendant une session entière.
-        val rawFingerprint = listOf(x, y, z, magnitude).joinToString("|") {
+        val rawFingerprint = listOf(x, y, z, magnitude, deviation).joinToString("|") {
             BigDecimal(it).stripTrailingZeros().toPlainString()
         }
-        val fingerprint = rawFingerprint
-            .filter { it.isDigit() }
-            .take(20)
-            .padEnd(20, '0')
+        val fingerprint = rawFingerprint.filter { it.isDigit() }.take(20).padEnd(20, '0')
+        if (fingerprint == lastMagneticSignature) {
+            magneticReference = magnitude
+            return
+        }
 
-        // Une fenêtre temporelle évite les déclenchements en rafale :
-        // le mot est choisi à partir de l'empreinte magnétique observée dans cette fenêtre.
-        val cooldownSeconds = 10 + ((1f - sensitivity) * 35f).toInt()
+        val cooldownSeconds = 8 + ((1f - sensitivity) * 32f).toInt()
         val timeSlot = now / (cooldownSeconds * 1_000L)
         val seed = (fingerprint + timeSlot.toString()).hashCode()
         val entry = selectBalancedEntry(pool, seed) ?: return
 
         lastMagneticSignature = fingerprint
-        emitWord(
-            entry,
-            "empreinte magnétique · champ %.2f µT".format(Locale.FRANCE, magnitude),
-            fingerprint
-        )
+        magneticReference = magnitude
+        emitWord(entry, "variation magnétique · Δ %.2f µT".format(Locale.FRANCE, deviation), fingerprint)
         nextWordAt = now + cooldownSeconds * 1_000L
     }
 
     @Synchronized
     private fun processMotionSignature(x: Double, y: Double, z: Double, source: String) {
         val now = System.currentTimeMillis()
+        if (now < nextWordAt) return
         val norm = sqrt(x * x + y * y + z * z)
+        // Un gyroscope immobile et un accéléromètre dont la gravité a été retirée
+        // ne doivent pas produire de signature artificielle composée de zéros.
+        val minimumSignal = if (source == "gyroscope") 0.018 else 0.045
+        if (!norm.isFinite() || norm < minimumSignal) {
+            motionStableSince[source] = 0L
+            return
+        }
         if (!isMotionStable(source, norm, now)) return
-        if (now - nextWordAt < 1_000L) return
         val pool = activeWordPool()
         if (pool.isEmpty()) return
         ensureSensorOrder(pool.size)
 
-        // GhostTube garde 20 décimales et fait pivoter les trois premières à la fin.
+        // Signature numérique de la mesure stabilisée. La voie mouvement reste active
+        // même lorsqu'un magnétomètre est présent : chaque capteur a son propre canal.
         val fraction = sensorFraction(norm)
         if (fraction.isEmpty()) return
         val first20 = repeatDigitsTo20(fraction, inclusive = false)
         if (first20.length < 20) return
         val signature = first20.substring(3, 20) + first20.substring(0, 3)
         val gate = signature.substring(0, 4).toIntOrNull() ?: return
-        val tolerance = (sensitivity * 30f).toInt() + 1
+        val tolerance = (sensitivity * 250f).toInt() + 1
 
         if (gate <= tolerance || gate >= 10_000 - tolerance) {
             val end = (kotlin.math.log10(pool.size.toDouble()).toInt() + 5).coerceAtMost(signature.length)
-            if (end > 5) {
-                val index = signature.substring(5, end).toIntOrNull()
-                if (index != null) {
-                    selectBalancedEntry(pool, signature.hashCode() xor index)?.let { entry ->
-                        emitWord(entry, "signature " + source + " · " + "%.4f".format(Locale.FRANCE, norm), signature)
-                        val upperExclusive = ((1f - sensitivity) * 45f).toInt() + 11
-                        nextWordAt = now + Random.nextInt(10, upperExclusive.coerceAtLeast(11)) * 1_000L
-                    }
-                }
-            }
-            // GhostTube mélange le dictionnaire après une signature mouvement acceptée.
+            if (end <= 5) return
+            val index = signature.substring(5, end).toIntOrNull() ?: return
+            val entry = selectBalancedEntry(pool, signature.hashCode() xor index) ?: return
+            emitWord(entry, "signature $source · %.4f".format(Locale.FRANCE, norm), signature)
+            val cooldownSeconds = 8 + ((1f - sensitivity) * 32f).toInt()
+            nextWordAt = now + cooldownSeconds * 1_000L
             ensureSensorOrder(pool.size)
             shuffledWordIndexes.shuffle()
         }
+    }
+
+    @Synchronized
+    private fun processProximitySignature(distance: Double, maxRange: Double, isNear: Boolean) {
+        val now = System.currentTimeMillis()
+        if (now < nextWordAt || maxRange <= 0.0) return
+        val pool = activeWordPool()
+        if (pool.isEmpty()) return
+        val fingerprint = (distance.toString() + "|" + maxRange.toString() + "|" + if (isNear) "1" else "0")
+            .filter { it.isDigit() }.take(20).padEnd(20, '0')
+        val seed = (fingerprint + now / 10_000L).hashCode()
+        val entry = selectBalancedEntry(pool, seed) ?: return
+        emitWord(entry, if (isNear) "proximité · objet proche" else "proximité · objet éloigné", fingerprint)
+        nextWordAt = now + (8 + ((1f - sensitivity) * 32f).toInt()) * 1_000L
     }
 
     private fun isMotionStable(source: String, magnitude: Double, now: Long): Boolean {
@@ -645,7 +733,7 @@ class MainActivity : Activity(), SensorEventListener {
         if (samples.size > 12) samples.removeAt(0)
         if (samples.size < 12) return false
         val spread = (samples.maxOrNull() ?: magnitude) - (samples.minOrNull() ?: magnitude)
-        val threshold = if (source == "accéléromètre") 0.08 else 0.008
+        val threshold = if (source.contains("accéléromètre")) 0.035 else 0.006
         if (spread > threshold) { motionStableSince[source] = 0L; return false }
         val since = motionStableSince[source] ?: 0L
         if (since == 0L) { motionStableSince[source] = now; return false }
