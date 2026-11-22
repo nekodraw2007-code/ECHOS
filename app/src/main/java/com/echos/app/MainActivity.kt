@@ -591,8 +591,7 @@ class MainActivity : Activity(), SensorEventListener {
         val cooldownSeconds = 10 + ((1f - sensitivity) * 35f).toInt()
         val timeSlot = now / (cooldownSeconds * 1_000L)
         val seed = (fingerprint + timeSlot.toString()).hashCode()
-        val index = Math.floorMod(seed, pool.size)
-        val entry = pool.getOrNull(index) ?: return
+        val entry = selectBalancedEntry(pool, seed) ?: return
 
         lastMagneticSignature = fingerprint
         emitWord(
@@ -627,7 +626,7 @@ class MainActivity : Activity(), SensorEventListener {
             if (end > 5) {
                 val index = signature.substring(5, end).toIntOrNull()
                 if (index != null) {
-                    orderedEntry(pool, index)?.let { entry ->
+                    selectBalancedEntry(pool, signature.hashCode() xor index)?.let { entry ->
                         emitWord(entry, "signature " + source + " · " + "%.4f".format(Locale.FRANCE, norm), signature)
                         val upperExclusive = ((1f - sensitivity) * 45f).toInt() + 11
                         nextWordAt = now + Random.nextInt(10, upperExclusive.coerceAtLeast(11)) * 1_000L
@@ -660,6 +659,20 @@ class MainActivity : Activity(), SensorEventListener {
     private fun orderedEntry(pool: List<WordEntry>, index: Int): WordEntry? {
         ensureSensorOrder(pool.size)
         return shuffledWordIndexes.getOrNull(index)?.let { pool.getOrNull(it) }
+    }
+
+    // Équilibre le tirage par catégorie : une catégorie très volumineuse
+    // (ex. les 465 prénoms) ne doit pas écraser les autres catégories.
+    // La catégorie ET le mot restent déterminés par l'empreinte du capteur.
+    private fun selectBalancedEntry(pool: List<WordEntry>, sensorSeed: Int): WordEntry? {
+        if (pool.isEmpty()) return null
+        val groups = pool.groupBy { it.category }.toSortedMap().values.toList()
+        if (groups.isEmpty()) return null
+        val categoryIndex = Math.floorMod(sensorSeed, groups.size)
+        val selectedCategory = groups[categoryIndex]
+        val mixedSeed = sensorSeed * 31 + (sensorSeed ushr 16) + 0x9E3779B9.toInt()
+        val wordIndex = Math.floorMod(mixedSeed, selectedCategory.size)
+        return selectedCategory.getOrNull(wordIndex)
     }
 
     private fun activeWordPool(): List<WordEntry> {
