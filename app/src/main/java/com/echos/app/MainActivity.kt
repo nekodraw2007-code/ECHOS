@@ -173,6 +173,12 @@ class MainActivity : Activity(), SensorEventListener {
             if (baseEntries.any { it.category == "Prénoms" }) activeCategories.add("Prénoms")
             p.edit().putBoolean("first_names_v1_initialized", true).apply()
         }
+        // Migration : rend la nouvelle catégorie Âges disponible immédiatement
+        // sans modifier les catégories que l'utilisateur a déjà désactivées.
+        if (!p.getBoolean("ages_category_v1_initialized", false)) {
+            if (baseEntries.any { it.category == "Âges" }) activeCategories.add("Âges")
+            p.edit().putBoolean("ages_category_v1_initialized", true).apply()
+        }
         history.addAll(p.getString("history", "")!!.split("\n").filter { it.isNotBlank() }.take(60))
     }
 
