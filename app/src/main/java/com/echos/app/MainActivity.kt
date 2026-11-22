@@ -67,6 +67,7 @@ class MainActivity : Activity(), SensorEventListener {
     private var lastSignatureAt = 0L
     private var nextWordAt = 0L
     private var lastWord = ""
+    private var sessionStartedAt = 0L
     private var currentMode = "MAGNÉTIQUE"
 
     private lateinit var statusView: TextView
@@ -371,8 +372,15 @@ class MainActivity : Activity(), SensorEventListener {
             addHistory("Session arrêtée")
             return
         }
-        if (!calibrated) {
-            toast("Effectue d'abord une calibration.")
+        val hasAnySensor = magnetic != null || magneticUncalibrated != null || accelerometer != null || gyroscope != null
+        if (!hasAnySensor) {
+            toast("Aucun capteur de mouvement ou magnétique disponible sur cet appareil.")
+            return
+        }
+        // La calibration améliore la référence magnétique, mais ne doit pas bloquer
+        // le mode accéléromètre/gyroscope sur les appareils sans magnétomètre.
+        if (!calibrated && (magnetic != null || magneticUncalibrated != null)) {
+            toast("Calibre le magnétomètre avant de démarrer.")
             return
         }
         if (baseEntries.isEmpty()) {
@@ -380,7 +388,10 @@ class MainActivity : Activity(), SensorEventListener {
             return
         }
         sessionActive = true
-        nextWordAt = System.currentTimeMillis() + 8000L
+        sessionStartedAt = System.currentTimeMillis()
+        motionSamples = 0
+        motionEnergy = 0.0
+        nextWordAt = System.currentTimeMillis() + 1800L
         lastSignatureAt = 0L
         sessionButton.text = "ARRÊTER LA SESSION"
         statusView.text = "SESSION ACTIVE · ANALYSE DES SIGNATURES"
@@ -428,28 +439,45 @@ class MainActivity : Activity(), SensorEventListener {
                 "signature $signatureBucket/$tolerance · champ %.2f µT · Δ %.2f µT".format(Locale.FRANCE, magnitude, delta)
             )
 
-            val maxDelay = ((1f - sensitivity) * 120f + 70f).toInt().coerceAtLeast(10)
-            nextWordAt = now + Random.nextLong(10, maxDelay.toLong() + 1) * 1000L
+            val maxDelay = ((1f - sensitivity) * 24f + 5f).toInt().coerceAtLeast(5)
+            nextWordAt = now + Random.nextLong(4, maxDelay.toLong() + 1) * 1000L
         }
     }
 
+    private var motionSamples = 0
+    private var lastMotionValue = 0.0
+    private var motionEnergy = 0.0
+
     private fun processMotionSignature(value: Double) {
+        if (!value.isFinite()) return
         val now = System.currentTimeMillis()
-        if (now - lastSignatureAt < 1000L || now < nextWordAt) return
-        lastSignatureAt = now
+        motionSamples++
+        val difference = abs(value - lastMotionValue)
+        lastMotionValue = value
+        motionEnergy = motionEnergy * 0.88 + difference * 0.12
+
+        if (now - lastSignatureAt < 650L || now < nextWordAt) return
         val pool = activeWordPool()
         if (pool.isEmpty()) return
-        val quantized = (kotlin.math.abs(value) * 1000.0).toLong()
-        val signature = (quantized * 2654435761L) xor (now / 900L)
-        val bucket = kotlin.math.abs(signature % 100L).toInt()
-        val tolerance = (10 + sensitivity * 90f).toInt().coerceIn(10, 100)
-        if (bucket < tolerance) {
-            val index = (kotlin.math.abs(signature / 100L) % pool.size.toLong()).toInt()
-            val selected = if (pool[index].text.equals(lastWord, true) && pool.size > 1) pool[(index + 1) % pool.size] else pool[index]
-            emitWord(selected, "signature mouvement $bucket/$tolerance")
-            val maxDelay = ((1f - sensitivity) * 45f + 11f).toInt().coerceAtLeast(11)
-            nextWordAt = now + Random.nextLong(10, maxDelay.toLong() + 1) * 1000L
-        }
+
+        // Les capteurs de mouvement donnent une magnitude gravitationnelle quasi constante
+        // lorsque le téléphone est immobile. On combine donc énergie récente et valeur mesurée.
+        // Le seuil s'adapte à la sensibilité et permet aussi un mode sans magnétomètre.
+        val threshold = 0.0025 + (1.0 - sensitivity) * 0.045
+        val activeMotion = motionEnergy >= threshold
+        val readyFallback = motionSamples >= 12 && now - sessionStartedAt >= 2500L
+        if (!activeMotion && !readyFallback) return
+
+        lastSignatureAt = now
+        val quantized = (abs(value) * 1000.0).toLong()
+        val energyCode = (motionEnergy * 100000.0).toLong()
+        val signature = (quantized * 2654435761L) xor (energyCode * 31L) xor (now / 700L)
+        val index = (kotlin.math.abs(signature / 100L) % pool.size.toLong()).toInt()
+        val selected = if (pool[index].text.equals(lastWord, true) && pool.size > 1) pool[(index + 1) % pool.size] else pool[index]
+
+        emitWord(selected, if (activeMotion) "mouvement détecté · énergie %.4f".format(Locale.FRANCE, motionEnergy) else "mode capteurs de mouvement · signature")
+        val maxDelay = ((1f - sensitivity) * 24f + 5f).toInt().coerceAtLeast(5)
+        nextWordAt = now + Random.nextLong(4, maxDelay.toLong() + 1) * 1000L
     }
 
     private fun decimalSignature(value: Double, dropLeadingDigits: Int): String {
