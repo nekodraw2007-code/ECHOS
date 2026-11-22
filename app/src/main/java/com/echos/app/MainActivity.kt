@@ -324,7 +324,7 @@ class MainActivity : Activity(), SensorEventListener {
             setTextColor(Color.rgb(3, 12, 27))
             background = rounded(accent, 14)
             layoutParams = LinearLayout.LayoutParams(dp(48), dp(48))
-            setOnClickListener { addCustomWord(); window.decorView.post { refreshCustomWords() } }
+            setOnClickListener { addCustomWord() }
         }
         customHeader.addView(addButton)
         customPage.addView(customHeader)
@@ -1037,11 +1037,10 @@ class MainActivity : Activity(), SensorEventListener {
 
     private fun addCustomWord() {
         if (customCategories.isEmpty()) {
-            AlertDialog.Builder(this).setTitle("Catégorie nécessaire")
-                .setMessage("Crée d'abord une catégorie personnelle.")
-                .setPositiveButton("Créer") { _, _ -> manageCustomDictionary() }
-                .setNegativeButton("Annuler", null).show()
-            return
+            customCategories.add("Personnalisés")
+            activeCategories.add("Personnalisés")
+            saveCustomDictionary()
+            savePreferences()
         }
         val input = EditText(this).apply { hint = "Mot ou phrase"; setTextColor(white) }
         val spinner = Spinner(this)
@@ -1061,6 +1060,7 @@ class MainActivity : Activity(), SensorEventListener {
                     activeCategories.add(category)
                     saveCustomDictionary()
                     savePreferences()
+                    refreshCustomWords()
                     toast("Entrée ajoutée.")
                 } else toast("Entrée vide, trop longue ou déjà présente.")
             }.setNegativeButton("Annuler", null).show()
@@ -1109,7 +1109,7 @@ class MainActivity : Activity(), SensorEventListener {
     }
 
     private fun addHistory(message: String) {
-        val stamp = SimpleDateFormat("dd/MM HH:mm:ss", Locale.FRANCE).format(Date())
+        val stamp = SimpleDateFormat("dd/MM/yyyy, HH:mm:ss", Locale.FRANCE).format(Date())
         history.add(0, "$stamp · $message")
         persistHistory()
         refreshHistory()
@@ -1122,14 +1122,14 @@ class MainActivity : Activity(), SensorEventListener {
 
     private fun refreshHistory() {
         if (::historyView.isInitialized) {
-            val grouped = history.groupBy { it.substringBefore(" · ") }
+            val grouped = history.groupBy { it.substringBefore(",") }
             historyView.text = if (history.isEmpty()) "Aucun mot détecté." else grouped.entries.joinToString("\n\n") { (date, entries) ->
                 "▰  $date\n" + entries.joinToString("\n") { "• " + it.substringAfter(" · ") }
             }
         }
         if (::recentWordsView.isInitialized) {
             recentWordsView.text = if (history.isEmpty()) "Aucun mot détecté pour le moment."
-            else history.take(5).joinToString("\n") { "• " + it.substringAfter(" · ").substringBefore(" · ") }
+            else history.take(5).joinToString("\n") { "• " + it.substringAfter("Mot : ").substringBefore(" · ") }
         }
     }
 
