@@ -21,7 +21,6 @@ import android.widget.*
 import org.json.JSONArray
 import org.json.JSONObject
 import java.math.BigDecimal
-import java.math.BigInteger
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -48,7 +47,6 @@ class MainActivity : Activity(), SensorEventListener {
     private var accelerometerUncalibrated: Sensor? = null
     private var gyroscope: Sensor? = null
     private var gyroscopeUncalibrated: Sensor? = null
-    private var gameRotationVector: Sensor? = null
 
     private val baseEntries = mutableListOf<WordEntry>()
     private val customEntries = mutableListOf<WordEntry>()
@@ -67,12 +65,8 @@ class MainActivity : Activity(), SensorEventListener {
     private var magneticDelta = 0f
     private var accelerationMagnitude = 0f
     private var rotationMagnitude = 0f
-    private var lastSignatureAt = 0L
     private var nextWordAt = 0L
-    private var lastWord = ""
-    private var lastWordAt = 0L
     private var shuffledWordIndexes = mutableListOf<Int>()
-    private var sessionStartedAt = 0L
     private var currentMode = "MAGNÉTIQUE"
 
     private lateinit var statusView: TextView
@@ -94,7 +88,6 @@ class MainActivity : Activity(), SensorEventListener {
         accelerometerUncalibrated = if (accelerometer == null) sensors.getDefaultSensor(35) else null
         gyroscope = sensors.getDefaultSensor(Sensor.TYPE_GYROSCOPE)
         gyroscopeUncalibrated = if (gyroscope == null) sensors.getDefaultSensor(16) else null
-        gameRotationVector = null
         loadDictionary()
         loadPreferences()
         buildInterface()
@@ -325,13 +318,13 @@ class MainActivity : Activity(), SensorEventListener {
                 val preciseAcceleration = sqrt(v[0].toDouble()*v[0] + v[1].toDouble()*v[1] + v[2].toDouble()*v[2])
                 accelerationMagnitude = preciseAcceleration.toFloat()
                 if (calibrating && magnetic == null && magneticUncalibrated == null) collectCalibration(accelerationMagnitude)
-                else if (sessionActive) processMotionSignature(v[0].toDouble(), v[1].toDouble(), v[2].toDouble(), preciseAcceleration, "accéléromètre")
+                else if (sessionActive) processMotionSignature(v[0].toDouble(), v[1].toDouble(), v[2].toDouble(), "accéléromètre")
             }
             Sensor.TYPE_GYROSCOPE, 16 -> {
                 val preciseRotation = sqrt(v[0].toDouble()*v[0] + v[1].toDouble()*v[1] + v[2].toDouble()*v[2])
                 rotationMagnitude = preciseRotation.toFloat()
                 if (calibrating && magnetic == null && magneticUncalibrated == null) collectCalibration(rotationMagnitude)
-                else if (sessionActive) processMotionSignature(v[0].toDouble(), v[1].toDouble(), v[2].toDouble(), preciseRotation, "gyroscope")
+                else if (sessionActive) processMotionSignature(v[0].toDouble(), v[1].toDouble(), v[2].toDouble(), "gyroscope")
             }
         }
     }
@@ -385,7 +378,7 @@ class MainActivity : Activity(), SensorEventListener {
         }
         val hasAnySensor = magnetic != null || magneticUncalibrated != null || accelerometer != null ||
             accelerometerUncalibrated != null || gyroscope != null ||
-            gyroscopeUncalibrated != null || gameRotationVector != null
+            gyroscopeUncalibrated != null
         if (!hasAnySensor) {
             toast("Aucun capteur de mouvement ou magnétique disponible sur cet appareil.")
             return
@@ -396,11 +389,7 @@ class MainActivity : Activity(), SensorEventListener {
             return
         }
         sessionActive = true
-        sessionStartedAt = System.currentTimeMillis()
-        motionSamples = 0
-        motionEnergy = 0.0
         nextWordAt = 0L
-        lastSignatureAt = 0L
         shuffledWordIndexes = (0 until activeWordPool().size).toMutableList()
         sessionButton.text = "ARRÊTER LA SESSION"
         statusView.text = "SESSION ACTIVE · ANALYSE DES SIGNATURES"
@@ -453,7 +442,7 @@ class MainActivity : Activity(), SensorEventListener {
         }
     }
 
-    private fun processMotionSignature(x: Double, y: Double, z: Double, magnitude: Double, source: String) {
+    private fun processMotionSignature(x: Double, y: Double, z: Double, source: String) {
         val now = System.currentTimeMillis()
         if (now - nextWordAt < 1_000L) return
         val pool = activeWordPool()
@@ -504,22 +493,7 @@ class MainActivity : Activity(), SensorEventListener {
         return base + custom
     }
 
-    private fun selectWeighted(pool: List<WordEntry>, rawIndex: Int): WordEntry {
-        val total = pool.sumOf { it.weight.coerceAtLeast(1) }
-        var target = rawIndex.coerceAtLeast(0) % total
-        for (entry in pool) {
-            target -= entry.weight.coerceAtLeast(1)
-            if (target < 0) {
-                if (entry.text == lastWord && pool.size > 1) return pool[(pool.indexOf(entry) + 1) % pool.size]
-                return entry
-            }
-        }
-        return pool.first()
-    }
-
     private fun emitWord(entry: WordEntry, reason: String) {
-        lastWord = entry.text
-        lastWordAt = System.currentTimeMillis()
         runOnUiThread {
             wordView.text = entry.text
             addHistory("Mot : ${entry.text} · ${entry.category} · $reason")
