@@ -99,9 +99,12 @@ class MainActivity : Activity(), SensorEventListener {
         val prefs = getSharedPreferences("echos_preferences", MODE_PRIVATE)
         threshold = prefs.getFloat("threshold", 2f)
         cooldownSeconds = prefs.getInt("cooldown", 9)
+        mode = prefs.getInt("mode", MODE_AUTO).coerceIn(MODE_AUTO, MODE_MAGNETIC)
         customWords.addAll(prefs.getString("custom_words", "")!!.split("\n").filter { it.isNotBlank() })
         history.addAll(prefs.getString("history", "")!!.split("\n").filter { it.isNotBlank() }.take(60))
-        activeCategories.addAll(dictionary.keys)
+        val savedCategories = prefs.getString("active_categories", "")!!.split("\n").filter { it.isNotBlank() }
+        activeCategories.addAll(if (savedCategories.isEmpty()) dictionary.keys else savedCategories.filter { it in dictionary.keys })
+        if (activeCategories.isEmpty()) activeCategories.addAll(dictionary.keys)
         buildInterface()
         refreshSensorInfo()
         refreshHistory()
@@ -248,6 +251,7 @@ class MainActivity : Activity(), SensorEventListener {
                 mode = which
                 calibrated = false
                 sessionActive = false
+                getSharedPreferences("echos_preferences", MODE_PRIVATE).edit().putInt("mode", mode).apply()
                 sessionButton.text = "DÉMARRER LA SESSION"
                 modeButton.text = modeLabel()
                 refreshSensorInfo()
