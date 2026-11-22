@@ -129,6 +129,9 @@ class MainActivity : Activity(), SensorEventListener {
     private var firestore: FirebaseFirestore? = null
     private var customSyncListener: ListenerRegistration? = null
     private var historySyncListener: ListenerRegistration? = null
+    private var settingsSyncListener: ListenerRegistration? = null
+    private var settingsInitialSyncDone = false
+    private var syncStatusMessage = "En attente de synchronisation"
     private val syncScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
     private var applyingRemoteSync = false
     private var customInitialSyncDone = false
@@ -1187,12 +1190,18 @@ class MainActivity : Activity(), SensorEventListener {
                 if (user == null) {
                     customSyncListener?.remove()
                     historySyncListener?.remove()
+                    settingsSyncListener?.remove()
                     customSyncListener = null
                     historySyncListener = null
+                    settingsSyncListener = null
                     customInitialSyncDone = false
+                    settingsInitialSyncDone = false
+                    syncStatusMessage = "Compte déconnecté · données conservées sur l'appareil"
                 } else {
+                    syncStatusMessage = "Connexion au cloud…"
                     attachCloudListeners(user.uid)
                     syncHistoryToCloud()
+                    syncPreferencesToCloud()
                 }
             }
         } catch (e: Exception) {
@@ -1204,7 +1213,7 @@ class MainActivity : Activity(), SensorEventListener {
         if (!::accountStatusView.isInitialized) return
         val user = firebaseAuth?.currentUser
         if (user != null) {
-            accountStatusView.text = "Connecté : ${user.displayName ?: user.email ?: "Compte Google"}\nSynchronisation activée"
+            accountStatusView.text = "Connecté : ${user.displayName ?: user.email ?: "Compte Google"}\n$syncStatusMessage"
             googleSignInButton.isEnabled = false
             googleSignInButton.text = "COMPTE GOOGLE CONNECTÉ"
             signOutButton.isEnabled = true
@@ -1317,7 +1326,9 @@ class MainActivity : Activity(), SensorEventListener {
         val db = firestore ?: return
         customSyncListener?.remove()
         historySyncListener?.remove()
+        settingsSyncListener?.remove()
         customInitialSyncDone = false
+        settingsInitialSyncDone = false
 
         customSyncListener = cloudUserDocument(uid)?.addSnapshotListener { snapshot, error ->
             if (error != null) {
@@ -1357,6 +1368,53 @@ class MainActivity : Activity(), SensorEventListener {
                 applyingRemoteSync = false
             }
         }
+
+        settingsSyncListener = db.collection("users").document(uid).collection("echos").document("settings")
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    Log.e("ECHOS_SYNC", "Écoute des réglages", error)
+                    setSyncStatus("Erreur de lecture cloud : ${error.localizedMessage ?: "accès refusé"}")
+                    return@addSnapshotListener
+                }
+                if (snapshot == null) return@addSnapshotListener
+                if (!snapshot.exists()) {
+                    settingsInitialSyncDone = true
+                    syncPreferencesToCloud()
+                    return@addSnapshotListener
+                }
+                val remoteUpdatedAt = snapshot.getLong("updatedAt") ?: 0L
+                val localUpdatedAt = getSharedPreferences("echos_preferences", MODE_PRIVATE).getLong("preferences_updated_at", 0L)
+                if (!settingsInitialSyncDone && localUpdatedAt > remoteUpdatedAt) {
+                    settingsInitialSyncDone = true
+                    syncPreferencesToCloud()
+                    return@addSnapshotListener
+                }
+                settingsInitialSyncDone = true
+                applyingRemoteSync = true
+                sensitivity = (snapshot.getDouble("sensitivity")?.toFloat() ?: sensitivity).coerceIn(0f, 1f)
+                baseline = snapshot.getDouble("baseline")?.toFloat() ?: baseline
+                noiseFloor = snapshot.getDouble("noiseFloor")?.toFloat() ?: noiseFloor
+                calibrated = snapshot.getBoolean("calibrated") ?: calibrated
+                dynamicVoicesEnabled = snapshot.getBoolean("dynamicVoicesEnabled") ?: dynamicVoicesEnabled
+                val remoteCategories = (snapshot.get("activeCategories") as? List<*>)?.filterIsInstance<String>()
+                if (remoteCategories != null) {
+                    activeCategories.clear()
+                    activeCategories.addAll(remoteCategories)
+                }
+                getSharedPreferences("echos_preferences", MODE_PRIVATE).edit()
+                    .putFloat("sensitivity", sensitivity)
+                    .putFloat("baseline", baseline)
+                    .putFloat("noise_floor", noiseFloor)
+                    .putBoolean("calibrated", calibrated)
+                    .putBoolean("dynamic_voices_enabled", dynamicVoicesEnabled)
+                    .putString("active_categories", activeCategories.joinToString("\n"))
+                    .putLong("preferences_updated_at", remoteUpdatedAt)
+                    .apply()
+                applyingRemoteSync = false
+                if (::sensitivityLabel.isInitialized) updateSensitivityLabel()
+                if (::categoriesButton.isInitialized) categoriesButton.text = "${activeCategories.size} catégories actives"
+                setSyncStatus("Réglages synchronisés")
+            }
 
         historySyncListener = db.collection("users").document(uid).collection("echos_history")
             .addSnapshotListener { snapshot, error ->
@@ -1404,7 +1462,11 @@ class MainActivity : Activity(), SensorEventListener {
             "updatedAt" to System.currentTimeMillis()
         )
         doc.set(payload, SetOptions.merge())
-            .addOnFailureListener { Log.e("ECHOS_SYNC", "Envoi dictionnaire", it) }
+            .addOnSuccessListener { setSyncStatus("Dictionnaire sauvegardé") }
+            .addOnFailureListener {
+                Log.e("ECHOS_SYNC", "Envoi dictionnaire", it)
+                setSyncStatus("Échec sauvegarde dictionnaire : ${it.localizedMessage ?: "vérifie les règles Firestore"}")
+            }
     }
 
     private fun clearHistoryEverywhere() {
@@ -1435,7 +1497,41 @@ class MainActivity : Activity(), SensorEventListener {
             collection.document(id).set(
                 mapOf("line" to line, "createdAt" to historySortKey(line)),
                 SetOptions.merge()
-            ).addOnFailureListener { Log.e("ECHOS_SYNC", "Envoi historique", it) }
+            ).addOnFailureListener {
+                Log.e("ECHOS_SYNC", "Envoi historique", it)
+                setSyncStatus("Échec sauvegarde historique : ${it.localizedMessage ?: "vérifie les règles Firestore"}")
+            }
+        }
+    }
+
+    private fun syncPreferencesToCloud() {
+        val user = firebaseAuth?.currentUser ?: return
+        val db = firestore ?: return
+        val payload = mapOf(
+            "sensitivity" to sensitivity.toDouble(),
+            "baseline" to baseline.toDouble(),
+            "noiseFloor" to noiseFloor.toDouble(),
+            "calibrated" to calibrated,
+            "dynamicVoicesEnabled" to dynamicVoicesEnabled,
+            "activeCategories" to activeCategories.toList(),
+            "updatedAt" to getSharedPreferences("echos_preferences", MODE_PRIVATE).getLong("preferences_updated_at", System.currentTimeMillis())
+        )
+        db.collection("users").document(user.uid).collection("echos").document("settings")
+            .set(payload, SetOptions.merge())
+            .addOnSuccessListener { setSyncStatus("Données et réglages sauvegardés") }
+            .addOnFailureListener {
+                Log.e("ECHOS_SYNC", "Envoi des réglages", it)
+                setSyncStatus("Échec sauvegarde réglages : ${it.localizedMessage ?: "vérifie les règles Firestore"}")
+            }
+    }
+
+    private fun setSyncStatus(message: String) {
+        syncStatusMessage = message
+        runOnUiThread {
+            val user = firebaseAuth?.currentUser
+            if (::accountStatusView.isInitialized && user != null) {
+                accountStatusView.text = "Connecté : ${user.displayName ?: user.email ?: "Compte Google"}\\n$message"
+            }
         }
     }
 
@@ -1452,13 +1548,17 @@ class MainActivity : Activity(), SensorEventListener {
     }
 
     private fun savePreferences() {
+        val updatedAt = System.currentTimeMillis()
         getSharedPreferences("echos_preferences", MODE_PRIVATE).edit()
             .putFloat("sensitivity", sensitivity)
             .putFloat("baseline", baseline)
             .putFloat("noise_floor", noiseFloor)
             .putBoolean("calibrated", calibrated)
+            .putBoolean("dynamic_voices_enabled", dynamicVoicesEnabled)
             .putString("active_categories", activeCategories.joinToString("\n"))
+            .putLong("preferences_updated_at", updatedAt)
             .apply()
+        if (!applyingRemoteSync) syncPreferencesToCloud()
     }
 
     private fun addHistory(message: String) {
