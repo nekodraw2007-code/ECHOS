@@ -1,0 +1,35 @@
+{
+  "project_info": {
+    "project_number": "26674230114",
+    "project_id": "ghostvoice-ab261",
+    "storage_bucket": "ghostvoice-ab261.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:26674230114:android:8cd8f4943537b67d24723b",
+        "android_client_info": { "package_name": "com.echos.app" }
+      },
+      "oauth_client": [
+        {
+          "client_id": "26674230114-dqdgo8s144450dq6285le4p3nd15ufsq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        { "current_key": "AIzaSyBf-AwHoeT30b7N7OMx1-MyoAz_t9FxaoU" }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "26674230114-dqdgo8s144450dq6285le4p3nd15ufsq.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
