@@ -379,17 +379,27 @@ class MainActivity : Activity(), SensorEventListener {
         val pool = activeWordPool()
         if (pool.isEmpty()) return
         val digits = decimalSignature(value)
-        val signature = try { BigInteger(digits) } catch (_: Exception) { BigInteger.ZERO }
-        val range = BigInteger.valueOf(pool.sumOf { it.weight.coerceAtLeast(1) }.toLong() * 10000L)
-        val mapped = signature.mod(range)
-        val bucket = mapped.mod(BigInteger.valueOf(10000L)).toInt()
+        // GhostTube's reconstructed magnetic branch takes only the first
+        // digit-count required by dictionarySize * 10000, then splits index/remainder.
+        val digitCount = (pool.size * 10000).toString().length - 1
+        val signature = digits.take(digitCount).toLongOrNull() ?: 0L
+        val bucket = (signature % 10000L).toInt()
         val tolerance = 10 + (sensitivity * 90f).toInt()
+        var adjusted = signature
+        var signatureMatch = bucket == 0
+        if (bucket <= tolerance) {
+            adjusted -= bucket
+            signatureMatch = true
+        }
+        // A real field jump is also accepted as a practical fallback for phones
+        // whose sensor precision makes the decimal-signature route unusually quiet.
         val physicalChangeThreshold = maxOf(0.18f, noiseFloor * (4.2f - sensitivity * 2.8f))
-        val signatureMatch = bucket <= tolerance
         val physicalChange = delta >= physicalChangeThreshold
-        if (signatureMatch || physicalChange) {
-            val weightedIndex = mapped.divide(BigInteger.valueOf(10000L)).toInt()
-            emitWord(selectWeighted(pool, weightedIndex), "signature $bucket/$tolerance · Δ %.2f µT".format(Locale.FRANCE, delta))
+        val dictionaryIndex = (adjusted / 10000L).toInt()
+        if ((signatureMatch && dictionaryIndex in pool.indices) || physicalChange) {
+            val selected = if (signatureMatch && dictionaryIndex in pool.indices) pool[dictionaryIndex]
+                else pool[((signature / 10000L).toInt().absoluteValue) % pool.size]
+            emitWord(selected, "signature $bucket/$tolerance · Δ %.2f µT".format(Locale.FRANCE, delta))
             val maxDelay = ((1f - sensitivity) * 120f + 70f).toInt().coerceAtLeast(10)
             nextWordAt = now + Random.nextLong(10, maxDelay.toLong() + 1) * 1000L
         }
@@ -420,8 +430,9 @@ class MainActivity : Activity(), SensorEventListener {
     }
 
     private fun activeWordPool(): List<WordEntry> {
-        val all = baseEntries.filter { it.category in activeCategories } + customEntries.filter { it.category in activeCategories }
-        return all.filter { it.text.isNotBlank() }
+        val base = baseEntries.filter { it.category in activeCategories && it.text.isNotBlank() }
+        val custom = customEntries.filter { it.category in activeCategories && it.text.isNotBlank() }.flatMap { entry -> List(7) { entry } }
+        return base + custom
     }
 
     private fun selectWeighted(pool: List<WordEntry>, rawIndex: Int): WordEntry {
