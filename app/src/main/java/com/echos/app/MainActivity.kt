@@ -3,6 +3,7 @@ package com.echos.app
 import android.app.Activity
 import android.app.AlertDialog
 import android.content.Context
+import android.util.Log
 import android.graphics.Color
 import android.graphics.Typeface
 import android.graphics.drawable.GradientDrawable
@@ -25,10 +26,25 @@ import android.view.ViewGroup
 import android.widget.*
 import org.json.JSONArray
 import org.json.JSONObject
+import androidx.credentials.CredentialManager
+import androidx.credentials.GetCredentialRequest
+import androidx.credentials.CustomCredential
+import androidx.credentials.exceptions.GetCredentialException
+import androidx.lifecycle.lifecycleScope
+import com.google.android.libraries.identity.googleid.GetGoogleIdOption
+import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
+import com.google.firebase.FirebaseApp
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.GoogleAuthProvider
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ListenerRegistration
+import com.google.firebase.firestore.SetOptions
+import kotlinx.coroutines.launch
 import java.math.BigDecimal
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import java.security.MessageDigest
 import kotlin.math.abs
 import kotlin.math.sqrt
 import kotlin.random.Random
@@ -105,6 +121,16 @@ class MainActivity : Activity(), SensorEventListener {
     private lateinit var categoriesButton: Button
     private lateinit var recentWordsView: TextView
     private lateinit var customWordsContainer: LinearLayout
+    private lateinit var accountStatusView: TextView
+    private lateinit var googleSignInButton: Button
+    private lateinit var signOutButton: Button
+
+    private var firebaseAuth: FirebaseAuth? = null
+    private var firestore: FirebaseFirestore? = null
+    private var customSyncListener: ListenerRegistration? = null
+    private var historySyncListener: ListenerRegistration? = null
+    private var applyingRemoteSync = false
+    private var customInitialSyncDone = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -119,9 +145,11 @@ class MainActivity : Activity(), SensorEventListener {
         proximity = sensors.getDefaultSensor(Sensor.TYPE_PROXIMITY)
         loadDictionary()
         loadPreferences()
+        initializeFirebaseSync()
         initializeSpeech()
         buildInterface()
         refreshSensorStatus()
+        refreshAccountUi()
     }
 
     private fun loadDictionary() {
@@ -368,6 +396,16 @@ class MainActivity : Activity(), SensorEventListener {
             }
         }, match())
         settingsPage.addView(voiceCard)
+        settingsPage.addView(space(12))
+        val accountCard = card()
+        accountCard.addView(text("COMPTE ET SYNCHRONISATION", 10, accent, true))
+        accountStatusView = text("Non connecté · données enregistrées sur cet appareil", 12, muted)
+        accountCard.addView(accountStatusView)
+        googleSignInButton = button("SE CONNECTER AVEC GOOGLE") { startGoogleSignIn() }
+        accountCard.addView(googleSignInButton, match())
+        signOutButton = button("SE DÉCONNECTER") { signOutGoogle() }
+        accountCard.addView(signOutButton, match())
+        settingsPage.addView(accountCard)
         settingsPage.addView(space(12))
         val aboutCard = card()
         aboutCard.addView(text("À PROPOS", 10, accent, true))
@@ -1087,6 +1125,223 @@ class MainActivity : Activity(), SensorEventListener {
             .setNegativeButton("Annuler", null).show()
     }
 
+    private fun initializeFirebaseSync() {
+        try {
+            if (FirebaseApp.getApps(this).isEmpty()) {
+                Log.w("ECHOS_SYNC", "Firebase non configuré : google-services.json manquant.")
+                return
+            }
+            firebaseAuth = FirebaseAuth.getInstance()
+            firestore = FirebaseFirestore.getInstance()
+            firebaseAuth?.addAuthStateListener { auth ->
+                val user = auth.currentUser
+                runOnUiThread { refreshAccountUi() }
+                if (user == null) {
+                    customSyncListener?.remove()
+                    historySyncListener?.remove()
+                    customSyncListener = null
+                    historySyncListener = null
+                    customInitialSyncDone = false
+                } else {
+                    attachCloudListeners(user.uid)
+                    syncCustomDictionaryToCloud()
+                    syncHistoryToCloud()
+                }
+            }
+        } catch (e: Exception) {
+            Log.e("ECHOS_SYNC", "Initialisation Firebase impossible", e)
+        }
+    }
+
+    private fun refreshAccountUi() {
+        if (!::accountStatusView.isInitialized) return
+        val user = firebaseAuth?.currentUser
+        if (user != null) {
+            accountStatusView.text = "Connecté : ${user.displayName ?: user.email ?: "Compte Google"}\nSynchronisation activée"
+            googleSignInButton.isEnabled = false
+            googleSignInButton.text = "COMPTE GOOGLE CONNECTÉ"
+            signOutButton.isEnabled = true
+        } else {
+            val configured = firebaseAuth != null
+            accountStatusView.text = if (configured) "Non connecté · connexion Google disponible" else
+                "Firebase non configuré. Ajoute le fichier google-services.json du projet Firebase pour activer la connexion."
+            googleSignInButton.isEnabled = configured
+            googleSignInButton.text = "SE CONNECTER AVEC GOOGLE"
+            signOutButton.isEnabled = false
+        }
+    }
+
+    private fun startGoogleSignIn() {
+        val auth = firebaseAuth
+        if (auth == null) {
+            toast("Configuration Firebase manquante : google-services.json")
+            return
+        }
+        val webClientIdRes = resources.getIdentifier("default_web_client_id", "string", packageName)
+        if (webClientIdRes == 0) {
+            toast("ID client OAuth Web absent. Télécharge google-services.json après avoir activé Google dans Firebase.")
+            return
+        }
+        lifecycleScope.launch {
+            try {
+                val googleOption = GetGoogleIdOption.Builder()
+                    .setServerClientId(getString(webClientIdRes))
+                    .setFilterByAuthorizedAccounts(false)
+                    .setAutoSelectEnabled(false)
+                    .build()
+                val request = GetCredentialRequest.Builder()
+                    .addCredentialOption(googleOption)
+                    .build()
+                val manager = CredentialManager.create(this@MainActivity)
+                val result = manager.getCredential(this@MainActivity, request)
+                val credential = result.credential
+                if (credential is CustomCredential &&
+                    credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
+                    val googleToken = GoogleIdTokenCredential.createFrom(credential.data)
+                    val firebaseCredential = GoogleAuthProvider.getCredential(googleToken.idToken, null)
+                    auth.signInWithCredential(firebaseCredential)
+                        .addOnSuccessListener {
+                            toast("Connexion Google réussie. Synchronisation en cours…")
+                            refreshAccountUi()
+                        }
+                        .addOnFailureListener { error ->
+                            Log.e("ECHOS_SYNC", "Échec Firebase Auth", error)
+                            toast("Connexion impossible : ${error.localizedMessage ?: "erreur Firebase"}")
+                        }
+                } else {
+                    toast("Identifiant Google non reconnu.")
+                }
+            } catch (e: GetCredentialException) {
+                Log.e("ECHOS_SYNC", "Google Credential Manager", e)
+                toast("Connexion Google annulée ou indisponible.")
+            } catch (e: Exception) {
+                Log.e("ECHOS_SYNC", "Erreur connexion Google", e)
+                toast("Erreur de connexion : ${e.localizedMessage ?: "inconnue"}")
+            }
+        }
+    }
+
+    private fun signOutGoogle() {
+        firebaseAuth?.signOut()
+        lifecycleScope.launch {
+            runCatching { CredentialManager.create(this@MainActivity).clearCredentialState(
+                androidx.credentials.ClearCredentialStateRequest()
+            ) }
+            toast("Déconnecté. Les données locales sont conservées.")
+            refreshAccountUi()
+        }
+    }
+
+    private fun cloudUserDocument(uid: String) =
+        firestore?.collection("users")?.document(uid)?.collection("echos")?.document("dictionary")
+
+    private fun attachCloudListeners(uid: String) {
+        val db = firestore ?: return
+        customSyncListener?.remove()
+        historySyncListener?.remove()
+        customInitialSyncDone = false
+
+        customSyncListener = cloudUserDocument(uid)?.addSnapshotListener { snapshot, error ->
+            if (error != null) {
+                Log.e("ECHOS_SYNC", "Écoute dictionnaire", error)
+                return@addSnapshotListener
+            }
+            if (snapshot == null) return@addSnapshotListener
+            if (!snapshot.exists()) {
+                syncCustomDictionaryToCloud()
+                return@addSnapshotListener
+            }
+            val remoteEntries = (snapshot.get("entries") as? List<*>)?.mapNotNull { raw ->
+                val item = raw as? Map<*, *> ?: return@mapNotNull null
+                val category = item["category"] as? String ?: return@mapNotNull null
+                val word = item["text"] as? String ?: return@mapNotNull null
+                WordEntry(category, word, 1, true)
+            } ?: emptyList()
+            val remoteCategories = (snapshot.get("categories") as? List<*>)?.filterIsInstance<String>() ?: emptyList()
+            applyingRemoteSync = true
+            if (!customInitialSyncDone) {
+                val merged = (customEntries + remoteEntries).distinctBy { it.category.lowercase(Locale.ROOT) + "|" + it.text.lowercase(Locale.ROOT) }
+                customEntries.clear()
+                customEntries.addAll(merged)
+                customCategories.addAll(remoteCategories)
+                customInitialSyncDone = true
+                saveCustomDictionary()
+                refreshCustomWordsIfReady()
+                applyingRemoteSync = false
+                syncCustomDictionaryToCloud()
+            } else {
+                customEntries.clear()
+                customEntries.addAll(remoteEntries)
+                customCategories.clear()
+                customCategories.addAll(remoteCategories)
+                saveCustomDictionary()
+                refreshCustomWordsIfReady()
+                applyingRemoteSync = false
+            }
+        }
+
+        historySyncListener = db.collection("users").document(uid).collection("echos_history")
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    Log.e("ECHOS_SYNC", "Écoute historique", error)
+                    return@addSnapshotListener
+                }
+                if (snapshot == null) return@addSnapshotListener
+                val remote = snapshot.documents.mapNotNull { it.getString("line") }
+                if (remote.isNotEmpty()) {
+                    applyingRemoteSync = true
+                    val merged = (history + remote).distinct()
+                    history.clear()
+                    history.addAll(merged.sortedByDescending { historySortKey(it) })
+                    getSharedPreferences("echos_preferences", MODE_PRIVATE).edit()
+                        .putString("history", history.joinToString("\n")).apply()
+                    refreshHistory()
+                    applyingRemoteSync = false
+                }
+                syncHistoryToCloud()
+            }
+    }
+
+    private fun refreshCustomWordsIfReady() {
+        if (::customWordsContainer.isInitialized) refreshCustomWords()
+    }
+
+    private fun historySortKey(line: String): Long {
+        val dateText = line.substringBefore(" · ")
+        return runCatching { SimpleDateFormat("dd/MM/yyyy, HH:mm:ss", Locale.FRANCE).parse(dateText)?.time ?: 0L }.getOrDefault(0L)
+    }
+
+    private fun stableDocumentId(value: String): String {
+        val bytes = MessageDigest.getInstance("SHA-256").digest(value.toByteArray(Charsets.UTF_8))
+        return bytes.joinToString("") { "%02x".format(it) }
+    }
+
+    private fun syncCustomDictionaryToCloud() {
+        val user = firebaseAuth?.currentUser ?: return
+        val doc = cloudUserDocument(user.uid) ?: return
+        val entries = customEntries.map { mapOf("category" to it.category, "text" to it.text) }
+        val payload = mapOf(
+            "entries" to entries,
+            "categories" to customCategories.toList(),
+            "updatedAt" to System.currentTimeMillis()
+        )
+        doc.set(payload, SetOptions.merge())
+            .addOnFailureListener { Log.e("ECHOS_SYNC", "Envoi dictionnaire", it) }
+    }
+
+    private fun syncHistoryToCloud() {
+        val user = firebaseAuth?.currentUser ?: return
+        val db = firestore ?: return
+        val collection = db.collection("users").document(user.uid).collection("echos_history")
+        history.forEach { line ->
+            val id = stableDocumentId(line)
+            collection.document(id).set(
+                mapOf("line" to line, "createdAt" to historySortKey(line)),
+                SetOptions.merge()
+            ).addOnFailureListener { Log.e("ECHOS_SYNC", "Envoi historique", it) }
+        }
+    }
+
     private fun saveCustomDictionary() {
         val arr = JSONArray()
         customEntries.forEach {
@@ -1096,6 +1351,7 @@ class MainActivity : Activity(), SensorEventListener {
             .putString("custom_entries", arr.toString())
             .putString("custom_categories", customCategories.joinToString("\n"))
             .apply()
+        if (!applyingRemoteSync) syncCustomDictionaryToCloud()
     }
 
     private fun savePreferences() {
@@ -1118,6 +1374,7 @@ class MainActivity : Activity(), SensorEventListener {
     private fun persistHistory() {
         getSharedPreferences("echos_preferences", MODE_PRIVATE).edit()
             .putString("history", history.joinToString("\n")).apply()
+        if (!applyingRemoteSync) syncHistoryToCloud()
     }
 
     private fun refreshHistory() {
