@@ -52,6 +52,7 @@ class MainActivity : Activity(), SensorEventListener {
     private var accelerometerThread: HandlerThread? = null
     private var gyroscopeThread: HandlerThread? = null
     private var magneticThread: HandlerThread? = null
+    private val registeredSensorTypes = mutableSetOf<Int>()
 
     private val baseEntries = mutableListOf<WordEntry>()
     private val customEntries = mutableListOf<WordEntry>()
@@ -241,7 +242,7 @@ class MainActivity : Activity(), SensorEventListener {
         })
         categoriesButton = button("CATÉGORIES ACTIVES") { chooseCategories() }
         settings.addView(categoriesButton, match())
-        settings.addView(button("CONSULTER LES 1 000 MOTS") { showDictionary() }, match())
+        settings.addView(button("CONSULTER LE DICTIONNAIRE") { showDictionary() }, match())
         settings.addView(button("MON DICTIONNAIRE PERSONNEL") { manageCustomDictionary() }, match())
         page.addView(settings)
         page.addView(space(10))
@@ -304,7 +305,9 @@ class MainActivity : Activity(), SensorEventListener {
         val magSensor = magnetic ?: magneticUncalibrated
         if (magSensor != null) {
             magneticThread = HandlerThread("MagnetometerSensorThread").apply { start() }
-            if (!sensors.registerListener(this, magSensor, 2, Handler(magneticThread!!.looper))) {
+            if (sensors.registerListener(this, magSensor, 2, Handler(magneticThread!!.looper))) {
+                registeredSensorTypes.add(magSensor.type)
+            } else {
                 magneticThread?.quitSafely()
                 magneticThread = null
             }
@@ -312,7 +315,9 @@ class MainActivity : Activity(), SensorEventListener {
         val accelSensor = accelerometer ?: accelerometerUncalibrated
         if (accelSensor != null) {
             accelerometerThread = HandlerThread("AccelerometerThread").apply { start() }
-            if (!sensors.registerListener(this, accelSensor, 2, Handler(accelerometerThread!!.looper))) {
+            if (sensors.registerListener(this, accelSensor, 2, Handler(accelerometerThread!!.looper))) {
+                registeredSensorTypes.add(accelSensor.type)
+            } else {
                 accelerometerThread?.quitSafely()
                 accelerometerThread = null
             }
@@ -320,15 +325,19 @@ class MainActivity : Activity(), SensorEventListener {
         val gyroSensor = gyroscope ?: gyroscopeUncalibrated
         if (gyroSensor != null) {
             gyroscopeThread = HandlerThread("GyroscopeThread").apply { start() }
-            if (!sensors.registerListener(this, gyroSensor, 2, Handler(gyroscopeThread!!.looper))) {
+            if (sensors.registerListener(this, gyroSensor, 2, Handler(gyroscopeThread!!.looper))) {
+                registeredSensorTypes.add(gyroSensor.type)
+            } else {
                 gyroscopeThread?.quitSafely()
                 gyroscopeThread = null
             }
         }
+        return registeredSensorTypes.size
     }
 
     private fun stopGhostTubeSensorListeners() {
         sensors.unregisterListener(this)
+        registeredSensorTypes.clear()
         magneticThread?.quitSafely()
         accelerometerThread?.quitSafely()
         gyroscopeThread?.quitSafely()
@@ -372,7 +381,7 @@ class MainActivity : Activity(), SensorEventListener {
                 if (calibrating && magnetic == null && magneticUncalibrated == null) collectCalibration(accelerationMagnitude)
                 else if (sessionActive) processMotionSignature(v[0].toDouble(), v[1].toDouble(), v[2].toDouble(), "accéléromètre")
             }
-            Sensor.TYPE_GYROSCOPE, 16 -> {
+            Sensor.TYPE_GYROSCOPE, 15, 16 -> {
                 val preciseRotation = sqrt(v[0].toDouble()*v[0] + v[1].toDouble()*v[1] + v[2].toDouble()*v[2])
                 rotationMagnitude = preciseRotation.toFloat()
                 if (calibrating && magnetic == null && magneticUncalibrated == null) collectCalibration(rotationMagnitude)
@@ -392,7 +401,13 @@ class MainActivity : Activity(), SensorEventListener {
         calibrated = false
         sessionActive = false
         stopGhostTubeSensorListeners()
-        startGhostTubeSensorListeners()
+        if (startGhostTubeSensorListeners() == 0) {
+            calibrating = false
+            toast("Android n'a pas pu activer les capteurs détectés.")
+            statusView.text = "ÉCHEC D'ACTIVATION DES CAPTEURS"
+            statusView.setTextColor(red)
+            return
+        }
         sessionButton.text = "DÉMARRER LA SESSION"
         statusView.text = "CALIBRATION EN COURS · GARDE LE TÉLÉPHONE IMMOBILE"
         statusView.setTextColor(orange)
@@ -448,7 +463,13 @@ class MainActivity : Activity(), SensorEventListener {
         nextWordAt = 0L
         shuffledWordIndexes = (0 until activeWordPool().size).toMutableList()
         shuffledWordIndexes.shuffle()
-        startGhostTubeSensorListeners()
+        if (startGhostTubeSensorListeners() == 0) {
+            sessionActive = false
+            toast("Android n'a pas pu activer les capteurs détectés.")
+            statusView.text = "ÉCHEC D'ACTIVATION DES CAPTEURS"
+            statusView.setTextColor(red)
+            return
+        }
         sessionButton.text = "ARRÊTER LA SESSION"
         statusView.text = "SESSION ACTIVE · ANALYSE DES SIGNATURES"
         statusView.setTextColor(accent)
