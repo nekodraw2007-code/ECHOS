@@ -11,6 +11,8 @@ import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.os.Bundle
+import android.os.Handler
+import android.os.HandlerThread
 import android.os.VibrationEffect
 import android.os.Vibrator
 import android.text.Editable
@@ -47,6 +49,9 @@ class MainActivity : Activity(), SensorEventListener {
     private var accelerometerUncalibrated: Sensor? = null
     private var gyroscope: Sensor? = null
     private var gyroscopeUncalibrated: Sensor? = null
+    private var accelerometerThread: HandlerThread? = null
+    private var gyroscopeThread: HandlerThread? = null
+    private var magneticThread: HandlerThread? = null
 
     private val baseEntries = mutableListOf<WordEntry>()
     private val customEntries = mutableListOf<WordEntry>()
@@ -55,7 +60,7 @@ class MainActivity : Activity(), SensorEventListener {
     private val history = mutableListOf<String>()
     private val calibrationValues = mutableListOf<Float>()
 
-    private var sensitivity = 0.82f
+    private var sensitivity = 0.5f
     private var sessionActive = false
     private var calibrating = false
     private var calibrated = false
@@ -114,7 +119,14 @@ class MainActivity : Activity(), SensorEventListener {
 
     private fun loadPreferences() {
         val p = getSharedPreferences("echos_preferences", MODE_PRIVATE)
-        sensitivity = p.getFloat("sensitivity", 0.82f).coerceIn(0f, 1f)
+        // GhostTube 6.2.5 initialise son coefficient interne B à 0,5.
+        // Migration unique : corrige l'ancien défaut ECHOS trop élevé.
+        if (!p.getBoolean("ghosttube_sensor_v1", false)) {
+            sensitivity = 0.5f
+            p.edit().putFloat("sensitivity", 0.5f).putBoolean("ghosttube_sensor_v1", true).apply()
+        } else {
+            sensitivity = p.getFloat("sensitivity", 0.5f).coerceIn(0f, 1f)
+        }
         baseline = p.getFloat("baseline", 0f)
         noiseFloor = p.getFloat("noise_floor", 0.08f)
         calibrated = p.getBoolean("calibrated", false)
@@ -280,18 +292,53 @@ class MainActivity : Activity(), SensorEventListener {
         fieldView.text = if (hasMag) "%.1f µT".format(Locale.FRANCE, magneticMagnitude) else "INDISPONIBLE"
     }
 
+    // GhostTube utilise un HandlerThread distinct par capteur et un délai de 2.
+    // Les capteurs ne sont abonnés que pendant l'écoute.
+    private fun startGhostTubeSensorListeners() {
+        stopGhostTubeSensorListeners()
+        val magSensor = magnetic ?: magneticUncalibrated
+        if (magSensor != null) {
+            magneticThread = HandlerThread("MagnetometerSensorThread").apply { start() }
+            if (!sensors.registerListener(this, magSensor, 2, Handler(magneticThread!!.looper))) {
+                magneticThread?.quitSafely()
+                magneticThread = null
+            }
+        }
+        val accelSensor = accelerometer ?: accelerometerUncalibrated
+        if (accelSensor != null) {
+            accelerometerThread = HandlerThread("AccelerometerThread").apply { start() }
+            if (!sensors.registerListener(this, accelSensor, 2, Handler(accelerometerThread!!.looper))) {
+                accelerometerThread?.quitSafely()
+                accelerometerThread = null
+            }
+        }
+        val gyroSensor = gyroscope ?: gyroscopeUncalibrated
+        if (gyroSensor != null) {
+            gyroscopeThread = HandlerThread("GyroscopeThread").apply { start() }
+            if (!sensors.registerListener(this, gyroSensor, 2, Handler(gyroscopeThread!!.looper))) {
+                gyroscopeThread?.quitSafely()
+                gyroscopeThread = null
+            }
+        }
+    }
+
+    private fun stopGhostTubeSensorListeners() {
+        sensors.unregisterListener(this)
+        magneticThread?.quitSafely()
+        accelerometerThread?.quitSafely()
+        gyroscopeThread?.quitSafely()
+        magneticThread = null
+        accelerometerThread = null
+        gyroscopeThread = null
+    }
+
     override fun onResume() {
         super.onResume()
-        val magSensor = magnetic ?: magneticUncalibrated
-        if (magSensor != null) sensors.registerListener(this, magSensor, SensorManager.SENSOR_DELAY_GAME)
-        accelerometer?.let { sensors.registerListener(this, it, SensorManager.SENSOR_DELAY_GAME) }
-        accelerometerUncalibrated?.let { sensors.registerListener(this, it, SensorManager.SENSOR_DELAY_GAME) }
-        gyroscope?.let { sensors.registerListener(this, it, SensorManager.SENSOR_DELAY_GAME) }
-        gyroscopeUncalibrated?.let { sensors.registerListener(this, it, SensorManager.SENSOR_DELAY_GAME) }
+        if (sessionActive) startGhostTubeSensorListeners()
     }
 
     override fun onPause() {
-        sensors.unregisterListener(this)
+        stopGhostTubeSensorListeners()
         sessionActive = false
         if (::sessionButton.isInitialized) sessionButton.text = "DÉMARRER LA SESSION"
         super.onPause()
@@ -370,6 +417,7 @@ class MainActivity : Activity(), SensorEventListener {
     private fun toggleSession() {
         if (sessionActive) {
             sessionActive = false
+            stopGhostTubeSensorListeners()
             sessionButton.text = "DÉMARRER LA SESSION"
             statusView.text = "Session arrêtée"
             statusView.setTextColor(muted)
@@ -392,6 +440,7 @@ class MainActivity : Activity(), SensorEventListener {
         nextWordAt = 0L
         shuffledWordIndexes = (0 until activeWordPool().size).toMutableList()
         shuffledWordIndexes.shuffle()
+        startGhostTubeSensorListeners()
         sessionButton.text = "ARRÊTER LA SESSION"
         statusView.text = "SESSION ACTIVE · ANALYSE DES SIGNATURES"
         statusView.setTextColor(accent)
