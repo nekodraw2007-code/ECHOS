@@ -36,14 +36,14 @@ import kotlin.random.Random
 private data class WordEntry(val category: String, val text: String, val weight: Int = 1, val custom: Boolean = false)
 
 class MainActivity : Activity(), SensorEventListener {
-    private val bg = Color.rgb(8, 10, 8)
-    private val panel = Color.rgb(24, 28, 23)
-    private val panel2 = Color.rgb(34, 40, 31)
-    private val accent = Color.rgb(183, 232, 83)
-    private val white = Color.rgb(242, 244, 236)
-    private val muted = Color.rgb(151, 160, 143)
-    private val orange = Color.rgb(214, 190, 111)
-    private val red = Color.rgb(240, 111, 111)
+    private val bg = Color.rgb(5, 10, 22)
+    private val panel = Color.rgb(13, 24, 43)
+    private val panel2 = Color.rgb(20, 39, 67)
+    private val accent = Color.rgb(53, 160, 255)
+    private val white = Color.rgb(239, 246, 255)
+    private val muted = Color.rgb(139, 162, 190)
+    private val orange = Color.rgb(255, 190, 90)
+    private val red = Color.rgb(255, 105, 125)
 
     private lateinit var sensors: SensorManager
     private var magnetic: Sensor? = null
@@ -103,6 +103,8 @@ class MainActivity : Activity(), SensorEventListener {
     private lateinit var sensorLabel: TextView
     private lateinit var historyView: TextView
     private lateinit var categoriesButton: Button
+    private lateinit var recentWordsView: TextView
+    private lateinit var customWordsContainer: LinearLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -191,7 +193,7 @@ class MainActivity : Activity(), SensorEventListener {
             if (baseEntries.any { it.category == "Âges" }) activeCategories.add("Âges")
             p.edit().putBoolean("ages_category_v1_initialized", true).apply()
         }
-        history.addAll(p.getString("history", "")!!.split("\n").filter { it.isNotBlank() }.take(60))
+        history.addAll(p.getString("history", "")!!.split("\n").filter { it.isNotBlank() })
     }
 
     private fun buildInterface() {
@@ -200,216 +202,211 @@ class MainActivity : Activity(), SensorEventListener {
             setBackgroundColor(bg)
             fitsSystemWindows = true
         }
-
         val header = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
-            setPadding(dp(20), dp(12), dp(20), dp(14))
-            setBackgroundColor(Color.rgb(5, 7, 5))
+            setPadding(dp(20), dp(14), dp(20), dp(14))
+            setBackgroundColor(Color.rgb(3, 7, 17))
         }
         val brandRow = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL; gravity = Gravity.CENTER_VERTICAL }
-        val brand = text("ECHOS", 24, white, true)
-        brand.letterSpacing = 0.16f
+        val brand = text("ECHOS", 25, white, true).apply { letterSpacing = 0.16f }
         brandRow.addView(brand, LinearLayout.LayoutParams(0, -2, 1f))
-        brandRow.addView(text("● LIVE SENSOR", 10, accent, true))
+        brandRow.addView(text("● CAPTEURS ACTIFS", 10, accent, true))
         header.addView(brandRow)
-        header.addView(text("ENVIRONMENTAL WORD DETECTOR", 9, muted, true))
+        header.addView(text("DÉTECTION ENVIRONNEMENTALE", 10, muted, true))
         root.addView(header)
 
         val content = FrameLayout(this)
         root.addView(content, LinearLayout.LayoutParams(-1, 0, 1f))
-
-        fun makeScroll(builder: (LinearLayout) -> Unit): ScrollView {
-            val scroll = ScrollView(this).apply { setFillViewport(true); setBackgroundColor(bg) }
-            val column = LinearLayout(this).apply {
-                orientation = LinearLayout.VERTICAL
-                setPadding(dp(18), dp(18), dp(18), dp(24))
-            }
-            scroll.addView(column)
-            builder(column)
-            return scroll
+        fun makePage(): LinearLayout = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(dp(18), dp(18), dp(18), dp(22))
+            setBackgroundColor(bg)
         }
-        fun sectionTitle(title: String, subtitle: String): LinearLayout {
-            val block = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPadding(0, dp(4), 0, dp(14)) }
-            val titleView = text(title, 18, white, true)
-            titleView.letterSpacing = 0.06f
-            block.addView(titleView)
-            block.addView(text(subtitle, 10, muted))
-            return block
+        fun heading(title: String, subtitle: String): View {
+            val box = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPadding(0, 0, 0, dp(16)) }
+            box.addView(text(title, 21, white, true))
+            box.addView(text(subtitle, 11, muted))
+            return box
+        }
+        fun scrollPage(page: LinearLayout): ScrollView = ScrollView(this).apply {
+            isFillViewport = true
+            addView(page)
         }
         val pages = mutableListOf<View>()
 
-        val home = makeScroll { page ->
-            page.addView(sectionTitle("INVESTIGATION", "Mesures brutes des capteurs de ton appareil"))
-            val wordCard = card().apply {
-                background = rounded(Color.rgb(19, 24, 17), 18)
-                setPadding(dp(18), dp(18), dp(18), dp(18))
-            }
-            wordCard.addView(text("DERNIÈRE SIGNATURE DÉTECTÉE", 10, accent, true))
-            wordView = text("—", 42, white, true).apply {
-                gravity = Gravity.CENTER
-                minHeight = dp(128)
-                letterSpacing = 0.04f
-                setPadding(dp(4), dp(16), dp(4), dp(12))
-            }
-            wordCard.addView(wordView, match())
-            wordCard.addView(text("En attente d'une variation environnementale", 10, muted).apply { gravity = Gravity.CENTER })
-            page.addView(wordCard)
-            page.addView(space(14))
-
-            sessionButton = button("▶   DÉMARRER L'ÉCOUTE") { toggleSession() }.apply {
-                textSize = 14f
-                typeface = Typeface.DEFAULT_BOLD
-                background = rounded(accent, 14)
-                setTextColor(Color.rgb(12, 16, 9))
-                layoutParams = LinearLayout.LayoutParams(-1, dp(58))
-            }
-            page.addView(sessionButton)
-            page.addView(space(14))
-
-            val magneticCard = card()
-            val top = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL; gravity = Gravity.CENTER_VERTICAL }
-            top.addView(text("CHAMP MAGNÉTIQUE", 10, accent, true), LinearLayout.LayoutParams(0, -2, 1f))
-            top.addView(text("µT", 10, muted, true))
-            magneticCard.addView(top)
-            fieldView = text("—", 34, white, true)
-            magneticCard.addView(fieldView)
-            deltaView = text("Variation : en attente", 11, muted)
-            magneticCard.addView(deltaView)
-            val meter = ProgressBar(this, null, android.R.attr.progressBarStyleHorizontal).apply {
-                max = 100
-                progressTintList = android.content.res.ColorStateList.valueOf(accent)
-                progressBackgroundTintList = android.content.res.ColorStateList.valueOf(panel2)
-            }
-            magneticCard.addView(meter, LinearLayout.LayoutParams(-1, dp(5)).apply { topMargin = dp(12) })
-            page.addView(magneticCard)
-            page.addView(space(10))
-
-            statusView = text("INITIALISATION DES CAPTEURS…", 10, orange, true).apply {
-                gravity = Gravity.CENTER
-                background = rounded(panel2, 12)
-                setPadding(dp(12), dp(14), dp(12), dp(14))
-            }
-            page.addView(statusView, match())
-            page.addView(space(10))
-            val sensorsCard = card()
-            sensorsCard.addView(text("ÉTAT DES CAPTEURS", 10, accent, true))
-            sensorLabel = text("", 11, muted)
-            sensorLabel.setLineSpacing(dp(3).toFloat(), 1f)
-            sensorsCard.addView(sensorLabel)
-            page.addView(sensorsCard)
+        val home = makePage()
+        home.addView(heading("Accueil", "Ta session ECHOS en un coup d'œil"))
+        val startCard = card().apply {
+            background = rounded(Color.rgb(10, 31, 58), 20)
+            setPadding(dp(16), dp(18), dp(16), dp(18))
         }
-        pages.add(home)
-
-        val historyPage = makeScroll { page ->
-            page.addView(sectionTitle("HISTORIQUE", "Événements et mots détectés pendant les sessions"))
-            val box = card()
-            historyView = text("Aucun événement enregistré.", 12, white)
-            historyView.setLineSpacing(dp(5).toFloat(), 1f)
-            box.addView(historyView)
-            box.addView(button("EFFACER L'HISTORIQUE") {
-                history.clear()
-                persistHistory()
-                refreshHistory()
-            }, match())
-            page.addView(box)
+        startCard.addView(text("SESSION EN COURS", 10, accent, true))
+        sessionButton = button("▶   DÉMARRER LA SESSION") { toggleSession() }.apply {
+            textSize = 14f
+            typeface = Typeface.DEFAULT_BOLD
+            background = rounded(accent, 14)
+            setTextColor(Color.rgb(3, 12, 27))
+            layoutParams = LinearLayout.LayoutParams(-1, dp(58)).apply { topMargin = dp(14) }
         }
-        pages.add(historyPage)
+        startCard.addView(sessionButton)
+        home.addView(startCard)
+        home.addView(space(14))
 
-        val dictionaryPage = makeScroll { page ->
-            page.addView(sectionTitle("DICTIONNAIRE", "Entrées associées aux signatures des capteurs"))
-            val countCard = card()
-            countCard.addView(text("BIBLIOTHÈQUE DE MOTS", 10, accent, true))
-            countCard.addView(text("${baseEntries.size + customEntries.size} entrées disponibles", 23, white, true))
-            countCard.addView(text("Les entrées personnalisées restent enregistrées sur cet appareil.", 10, muted))
-            page.addView(countCard)
-            page.addView(space(12))
-            categoriesButton = button("CATÉGORIES ACTIVES · ${activeCategories.size}") { chooseCategories() }
-            page.addView(categoriesButton, match())
-            page.addView(button("PARCOURIR LE DICTIONNAIRE") { showDictionary() }, match())
-            page.addView(button("MON DICTIONNAIRE PERSONNEL") { manageCustomDictionary() }, match())
-        }
-        pages.add(dictionaryPage)
-
-        val settingsPage = makeScroll { page ->
-            page.addView(sectionTitle("RÉGLAGES", "Personnalise le comportement de la session"))
-            val sensitivityCard = card()
-            sensitivityCard.addView(text("SENSIBILITÉ", 10, accent, true))
-            sensitivityLabel = text("", 15, white, true)
-            sensitivityCard.addView(sensitivityLabel)
-            sensitivityCard.addView(SeekBar(this).apply {
-                max = 100
-                progress = (sensitivity * 100).toInt()
-                progressTintList = android.content.res.ColorStateList.valueOf(accent)
-                thumbTintList = android.content.res.ColorStateList.valueOf(accent)
-                setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-                    override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                        sensitivity = progress / 100f
-                        updateSensitivityLabel()
-                        savePreferences()
-                    }
-                    override fun onStartTrackingTouch(seekBar: SeekBar?) {}
-                    override fun onStopTrackingTouch(seekBar: SeekBar?) {}
-                })
-            })
-            sensitivityCard.addView(text("Une sensibilité élevée abaisse les seuils de variation ; elle ne doit pas créer de mots sans signal.", 10, muted))
-            page.addView(sensitivityCard)
-            page.addView(space(10))
-            val toolsCard = card()
-            toolsCard.addView(text("OUTILS DE MESURE", 10, accent, true))
-            toolsCard.addView(button("CALIBRER LE CAPTEUR MAGNÉTIQUE") { startCalibration() }, match())
-            toolsCard.addView(button("CATÉGORIES DU DICTIONNAIRE") { chooseCategories() }, match())
-            toolsCard.addView(button("CONSULTER LE DICTIONNAIRE") { showDictionary() }, match())
-            toolsCard.addView(button("GÉRER MES MOTS PERSONNELS") { manageCustomDictionary() }, match())
-            toolsCard.addView(Switch(this).apply {
-                text = "VOIX DYNAMIQUES"
-                setTextColor(white)
-                textSize = 13f
-                isChecked = dynamicVoicesEnabled
-                setOnCheckedChangeListener { _, enabled ->
-                    dynamicVoicesEnabled = enabled
-                    getSharedPreferences("echos_preferences", MODE_PRIVATE).edit().putBoolean("dynamic_voices_enabled", enabled).apply()
-                    if (!enabled) speechEngine?.stop()
-                    toast(if (enabled) "Voix dynamiques activées" else "Voix désactivées")
+        val sensCard = card()
+        val sensRow = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL; gravity = Gravity.CENTER_VERTICAL }
+        sensRow.addView(text("SENSIBILITÉ", 11, accent, true), LinearLayout.LayoutParams(0, -2, 1f))
+        sensitivityLabel = text("", 13, white, true)
+        sensRow.addView(sensitivityLabel)
+        sensCard.addView(sensRow)
+        sensCard.addView(SeekBar(this).apply {
+            max = 100
+            progress = (sensitivity * 100).toInt()
+            progressTintList = android.content.res.ColorStateList.valueOf(accent)
+            thumbTintList = android.content.res.ColorStateList.valueOf(accent)
+            setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+                override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                    sensitivity = progress / 100f
+                    updateSensitivityLabel()
+                    savePreferences()
                 }
-            }.apply { setPadding(0, dp(14), 0, dp(4)) }, match())
-            page.addView(toolsCard)
-            page.addView(space(10))
-            val info = card()
-            info.addView(text("À PROPOS DES MESURES", 10, accent, true))
-            info.addView(text("ECHOS réagit aux lectures physiques du téléphone. Les variations peuvent provenir d'objets métalliques, d'appareils électroniques, de mouvements ou du champ magnétique terrestre. Aucun résultat ne prouve une communication paranormale.", 11, muted))
-            page.addView(info)
-        }
-        pages.add(settingsPage)
+                override fun onStartTrackingTouch(seekBar: SeekBar?) {}
+                override fun onStopTrackingTouch(seekBar: SeekBar?) {}
+            })
+        })
+        home.addView(sensCard)
+        home.addView(space(14))
+        home.addView(text("MOTS RÉCENTS", 11, accent, true))
+        recentWordsView = text("Aucun mot détecté pour le moment.", 13, muted)
+        recentWordsView.setLineSpacing(dp(5).toFloat(), 1f)
+        val recentCard = card()
+        recentCard.addView(recentWordsView)
+        home.addView(recentCard)
+        home.addView(space(12))
+        val sensorCard = card()
+        sensorCard.addView(text("CAPTEURS", 10, accent, true))
+        statusView = text("En attente", 12, white, true)
+        sensorCard.addView(statusView)
+        fieldView = text("Champ magnétique : —", 11, muted)
+        sensorCard.addView(fieldView)
+        deltaView = text("Variation : —", 11, muted)
+        sensorCard.addView(deltaView)
+        sensorLabel = text("", 10, muted)
+        sensorCard.addView(sensorLabel)
+        home.addView(sensorCard)
+        pages.add(scrollPage(home))
 
-        pages.forEachIndexed { index, view ->
-            content.addView(view, FrameLayout.LayoutParams(-1, -1))
-            view.visibility = if (index == 0) View.VISIBLE else View.GONE
+        val historyPage = makePage()
+        historyPage.addView(heading("Historique", "Tous les mots prononcés, du plus récent au plus ancien"))
+        historyView = text("Aucun mot détecté.", 13, white)
+        historyView.setLineSpacing(dp(6).toFloat(), 1f)
+        val historyCard = card()
+        historyCard.addView(historyView)
+        historyPage.addView(historyCard)
+        historyPage.addView(button("EFFACER L'HISTORIQUE") {
+            AlertDialog.Builder(this).setTitle("Effacer l'historique ?")
+                .setMessage("Tous les mots enregistrés seront supprimés.")
+                .setNegativeButton("Annuler", null)
+                .setPositiveButton("Effacer") { _, _ -> history.clear(); persistHistory(); refreshHistory() }
+                .show()
+        }, match())
+        pages.add(scrollPage(historyPage))
+
+        val customPage = makePage()
+        val customHeader = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL; gravity = Gravity.CENTER_VERTICAL }
+        val customTitles = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
+        customTitles.addView(text("Personnalisé", 21, white, true))
+        customTitles.addView(text("Tes mots et phrases personnelles", 11, muted))
+        customHeader.addView(customTitles, LinearLayout.LayoutParams(0, -2, 1f))
+        val addButton = TextView(this).apply {
+            text = "+"
+            textSize = 30f
+            gravity = Gravity.CENTER
+            setTextColor(Color.rgb(3, 12, 27))
+            background = rounded(accent, 14)
+            layoutParams = LinearLayout.LayoutParams(dp(48), dp(48))
+            setOnClickListener { addCustomWord(); window.decorView.post { refreshCustomWords() } }
+        }
+        customHeader.addView(addButton)
+        customPage.addView(customHeader)
+        customPage.addView(space(14))
+        val customIntro = card()
+        customIntro.addView(text("MON DICTIONNAIRE PERSONNEL", 10, accent, true))
+        customIntro.addView(text("Ajoute tes propres mots et phrases. Ils sont sauvegardés localement sur cet appareil.", 11, muted))
+        customPage.addView(customIntro)
+        customPage.addView(space(10))
+        customWordsContainer = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
+        customPage.addView(customWordsContainer)
+        pages.add(scrollPage(customPage))
+
+        val settingsPage = makePage()
+        settingsPage.addView(heading("Paramètres", "Contrôle complet du dictionnaire et de l'application"))
+        val dictionaryCard = card()
+        dictionaryCard.addView(text("DICTIONNAIRE COMPLET", 10, accent, true))
+        dictionaryCard.addView(text("${baseEntries.size + customEntries.size} mots et expressions", 20, white, true))
+        dictionaryCard.addView(button("OUVRIR TOUT LE DICTIONNAIRE") { showDictionary() }, match())
+        dictionaryCard.addView(button("GÉRER LES CATÉGORIES ACTIVES") { chooseCategories() }, match())
+        categoriesButton = button("${activeCategories.size} catégories actives") { chooseCategories() }
+        dictionaryCard.addView(categoriesButton, match())
+        settingsPage.addView(dictionaryCard)
+        settingsPage.addView(space(12))
+        val sensorsCard = card()
+        sensorsCard.addView(text("CAPTEURS ET CALIBRATION", 10, accent, true))
+        sensorsCard.addView(button("CALIBRER LE CAPTEUR MAGNÉTIQUE") { startCalibration() }, match())
+        sensorsCard.addView(text("La sensibilité se règle directement depuis l'accueil.", 11, muted))
+        settingsPage.addView(sensorsCard)
+        settingsPage.addView(space(12))
+        val voiceCard = card()
+        voiceCard.addView(text("VOIX", 10, accent, true))
+        voiceCard.addView(Switch(this).apply {
+            text = "Voix dynamiques"
+            setTextColor(white)
+            isChecked = dynamicVoicesEnabled
+            setOnCheckedChangeListener { _, enabled ->
+                dynamicVoicesEnabled = enabled
+                getSharedPreferences("echos_preferences", MODE_PRIVATE).edit().putBoolean("dynamic_voices_enabled", enabled).apply()
+                if (!enabled) speechEngine?.stop()
+            }
+        }, match())
+        settingsPage.addView(voiceCard)
+        settingsPage.addView(space(12))
+        val aboutCard = card()
+        aboutCard.addView(text("À PROPOS", 10, accent, true))
+        aboutCard.addView(text("ECHOS associe les lectures des capteurs de ton téléphone à des signatures du dictionnaire. Les variations peuvent avoir des causes environnementales ordinaires et ne constituent pas une preuve de phénomène paranormal.", 11, muted))
+        settingsPage.addView(aboutCard)
+        pages.add(scrollPage(settingsPage))
+
+        pages.forEachIndexed { index, page ->
+            content.addView(page, FrameLayout.LayoutParams(-1, -1))
+            page.visibility = if (index == 0) View.VISIBLE else View.GONE
         }
         val nav = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
-            setPadding(dp(6), dp(7), dp(6), dp(8))
-            setBackgroundColor(Color.rgb(5, 7, 5))
+            setPadding(dp(5), dp(6), dp(5), dp(8))
+            setBackgroundColor(Color.rgb(3, 7, 17))
         }
-        val labels = listOf("⌖\nENQUÊTE", "↻\nHISTORIQUE", "▤\nDICTIONNAIRE", "⚙\nRÉGLAGES")
+        val labels = listOf("⌂\nACCUEIL", "◷\nHISTORIQUE", "+\nPERSONNALISÉ", "⚙\nPARAMÈTRES")
         labels.forEachIndexed { index, label ->
             val item = TextView(this).apply {
                 text = label
                 gravity = Gravity.CENTER
-                textSize = 10f
+                textSize = 9f
                 setLineSpacing(dp(2).toFloat(), 1f)
                 setTextColor(if (index == 0) accent else muted)
-                setPadding(0, dp(7), 0, dp(7))
+                setPadding(0, dp(8), 0, dp(8))
                 setOnClickListener {
-                    pages.forEachIndexed { i, p -> p.visibility = if (i == index) View.VISIBLE else View.GONE }
+                    pages.forEachIndexed { i, page -> page.visibility = if (i == index) View.VISIBLE else View.GONE }
                     for (child in 0 until nav.childCount) (nav.getChildAt(child) as? TextView)?.setTextColor(if (child == index) accent else muted)
+                    if (index == 1) refreshHistory()
+                    if (index == 2) refreshCustomWords()
                 }
             }
-            nav.addView(item, LinearLayout.LayoutParams(0, dp(54), 1f))
+            nav.addView(item, LinearLayout.LayoutParams(0, dp(58), 1f))
         }
         root.addView(nav)
         setContentView(root)
         updateSensitivityLabel()
         refreshHistory()
+        refreshCustomWords()
         refreshSensorStatus()
     }
 
@@ -957,6 +954,66 @@ class MainActivity : Activity(), SensorEventListener {
         render()
     }
 
+    private fun refreshCustomWords() {
+        if (!::customWordsContainer.isInitialized) return
+        customWordsContainer.removeAllViews()
+        if (customEntries.isEmpty()) {
+            val empty = card()
+            empty.addView(text("Aucun mot personnalisé pour le moment.\nAppuie sur + pour ajouter ton premier mot.", 13, muted))
+            customWordsContainer.addView(empty)
+            return
+        }
+        customEntries.forEachIndexed { index, entry ->
+            val row = card()
+            val line = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL; gravity = Gravity.CENTER_VERTICAL }
+            val info = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
+            info.addView(text(entry.text, 15, white, true))
+            info.addView(text(entry.category, 10, muted))
+            line.addView(info, LinearLayout.LayoutParams(0, -2, 1f))
+            val edit = TextView(this).apply {
+                text = "✎"
+                textSize = 20f
+                setTextColor(accent)
+                setPadding(dp(12), dp(8), dp(12), dp(8))
+                setOnClickListener { editCustomWord(index) }
+            }
+            val delete = TextView(this).apply {
+                text = "×"
+                textSize = 24f
+                setTextColor(red)
+                setPadding(dp(10), dp(6), dp(6), dp(6))
+                setOnClickListener {
+                    AlertDialog.Builder(this@MainActivity).setMessage("Supprimer « ${entry.text} » ?")
+                        .setNegativeButton("Annuler", null)
+                        .setPositiveButton("Supprimer") { _, _ ->
+                            customEntries.removeAt(index)
+                            saveCustomDictionary()
+                            refreshCustomWords()
+                        }.show()
+                }
+            }
+            line.addView(edit); line.addView(delete)
+            row.addView(line)
+            customWordsContainer.addView(row)
+            customWordsContainer.addView(space(7))
+        }
+    }
+
+    private fun editCustomWord(index: Int) {
+        val entry = customEntries.getOrNull(index) ?: return
+        val input = EditText(this).apply { setText(entry.text); setTextColor(white); setSingleLine(true) }
+        AlertDialog.Builder(this).setTitle("Modifier le mot").setView(input)
+            .setNegativeButton("Annuler", null)
+            .setPositiveButton("Enregistrer") { _, _ ->
+                val value = input.text.toString().trim().uppercase(Locale.FRANCE)
+                if (value.isNotBlank() && value.length <= 80) {
+                    customEntries[index] = entry.copy(text = value)
+                    saveCustomDictionary()
+                    refreshCustomWords()
+                }
+            }.show()
+    }
+
     private fun manageCustomDictionary() {
         val options = arrayOf("Ajouter une catégorie", "Ajouter un mot ou une phrase", "Consulter / supprimer mes mots")
         AlertDialog.Builder(this).setTitle("Dictionnaire personnel")
@@ -1054,7 +1111,6 @@ class MainActivity : Activity(), SensorEventListener {
     private fun addHistory(message: String) {
         val stamp = SimpleDateFormat("dd/MM HH:mm:ss", Locale.FRANCE).format(Date())
         history.add(0, "$stamp · $message")
-        while (history.size > 60) history.removeAt(history.lastIndex)
         persistHistory()
         refreshHistory()
     }
@@ -1065,8 +1121,16 @@ class MainActivity : Activity(), SensorEventListener {
     }
 
     private fun refreshHistory() {
-        if (::historyView.isInitialized) historyView.text =
-            if (history.isEmpty()) "Aucun mot détecté." else history.take(12).joinToString("\n\n")
+        if (::historyView.isInitialized) {
+            val grouped = history.groupBy { it.substringBefore(" · ") }
+            historyView.text = if (history.isEmpty()) "Aucun mot détecté." else grouped.entries.joinToString("\n\n") { (date, entries) ->
+                "▰  $date\n" + entries.joinToString("\n") { "• " + it.substringAfter(" · ") }
+            }
+        }
+        if (::recentWordsView.isInitialized) {
+            recentWordsView.text = if (history.isEmpty()) "Aucun mot détecté pour le moment."
+            else history.take(5).joinToString("\n") { "• " + it.substringAfter(" · ").substringBefore(" · ") }
+        }
     }
 
     override fun onDestroy() {
