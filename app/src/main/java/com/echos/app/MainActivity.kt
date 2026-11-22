@@ -470,7 +470,8 @@ class MainActivity : Activity(), SensorEventListener {
         return digits.take(20)
     }
 
-    @Synchronized\n    private fun processMagneticSignature(x: Double, y: Double, z: Double, magnitude: Double) {
+    @Synchronized
+    private fun processMagneticSignature(x: Double, y: Double, z: Double, magnitude: Double) {
         val now = System.currentTimeMillis()
         if (now - nextWordAt < 1_000L) return
         val pool = activeWordPool()
@@ -500,7 +501,8 @@ class MainActivity : Activity(), SensorEventListener {
         }
     }
 
-    @Synchronized\n    private fun processMotionSignature(x: Double, y: Double, z: Double, source: String) {
+    @Synchronized
+    private fun processMotionSignature(x: Double, y: Double, z: Double, source: String) {
         val now = System.currentTimeMillis()
         if (now - nextWordAt < 1_000L) return
         val pool = activeWordPool()
