@@ -314,12 +314,13 @@ class MainActivity : Activity(), SensorEventListener {
                 val preciseAcceleration = sqrt(v[0].toDouble()*v[0] + v[1].toDouble()*v[1] + v[2].toDouble()*v[2])
                 accelerationMagnitude = preciseAcceleration.toFloat()
                 if (calibrating && magnetic == null && magneticUncalibrated == null) collectCalibration(accelerationMagnitude)
-                else if (sessionActive && magnetic == null && magneticUncalibrated == null) processMotionSignature(preciseAcceleration)
+                else if (sessionActive) processMotionSignature(preciseAcceleration)
             }
             Sensor.TYPE_GYROSCOPE -> {
                 val preciseRotation = sqrt(v[0].toDouble()*v[0] + v[1].toDouble()*v[1] + v[2].toDouble()*v[2])
                 rotationMagnitude = preciseRotation.toFloat()
-                if (sessionActive && magnetic == null && magneticUncalibrated == null) processMotionSignature(preciseRotation)
+                if (calibrating && magnetic == null && magneticUncalibrated == null) collectCalibration(rotationMagnitude)
+                else if (sessionActive) processMotionSignature(preciseRotation)
             }
         }
     }
