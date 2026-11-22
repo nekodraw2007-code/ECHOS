@@ -10,14 +10,18 @@ import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
-import android.os.Build
 import android.os.Bundle
 import android.os.VibrationEffect
 import android.os.Vibrator
-import android.text.InputType
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.Gravity
 import android.view.View
 import android.widget.*
+import org.json.JSONArray
+import org.json.JSONObject
+import java.math.BigDecimal
+import java.math.BigInteger
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -25,351 +29,254 @@ import kotlin.math.abs
 import kotlin.math.sqrt
 import kotlin.random.Random
 
-class MainActivity : Activity(), SensorEventListener {
-    private val bg = Color.rgb(7, 10, 18)
-    private val panel = Color.rgb(17, 25, 39)
-    private val panel2 = Color.rgb(25, 37, 54)
-    private val cyan = Color.rgb(98, 221, 234)
-    private val white = Color.rgb(241, 246, 252)
-    private val muted = Color.rgb(145, 161, 182)
-    private val green = Color.rgb(89, 220, 164)
-    private val amber = Color.rgb(255, 185, 105)
+private data class WordEntry(val category: String, val text: String, val weight: Int = 1, val custom: Boolean = false)
 
-    private lateinit var sensorManager: SensorManager
-    private var magnetometer: Sensor? = null
+class MainActivity : Activity(), SensorEventListener {
+    private val bg = Color.rgb(7, 10, 16)
+    private val panel = Color.rgb(17, 24, 35)
+    private val panel2 = Color.rgb(25, 35, 49)
+    private val accent = Color.rgb(88, 211, 190)
+    private val white = Color.rgb(241, 246, 250)
+    private val muted = Color.rgb(143, 158, 177)
+    private val orange = Color.rgb(245, 174, 91)
+    private val red = Color.rgb(240, 111, 111)
+
+    private lateinit var sensors: SensorManager
+    private var magnetic: Sensor? = null
+    private var magneticUncalibrated: Sensor? = null
     private var accelerometer: Sensor? = null
     private var gyroscope: Sensor? = null
-    private var linearAcceleration: Sensor? = null
 
-    private var mode = 0
+    private val baseEntries = mutableListOf<WordEntry>()
+    private val customEntries = mutableListOf<WordEntry>()
+    private val customCategories = mutableSetOf<String>()
+    private val activeCategories = mutableSetOf<String>()
+    private val history = mutableListOf<String>()
+    private val calibrationValues = mutableListOf<Float>()
+
+    private var sensitivity = 0.82f
     private var sessionActive = false
     private var calibrating = false
     private var calibrated = false
-    private var calibrationStart = 0L
-    private var calibrationCount = 0
-    private var calibrationTotal = 0.0
+    private var baseline = 0f
+    private var noiseFloor = 0.08f
     private var magneticMagnitude = 0f
-    private var magneticX = 0f
-    private var magneticY = 0f
-    private var magneticZ = 0f
+    private var magneticDelta = 0f
     private var accelerationMagnitude = 0f
     private var rotationMagnitude = 0f
-    private var motionMagnitude = 0f
-    private var magneticBaseline = 0f
-    private var motionBaseline = 0f
-    private var smoothedVariation = 0f
-    private var threshold = 2.0f
-    private var cooldownSeconds = 9
+    private var lastSignatureAt = 0L
+    private var nextWordAt = 0L
     private var lastWord = ""
-    private var lastWordAt = 0L
-    private var consecutiveSamples = 0
+    private var currentMode = "MAGNÉTIQUE"
 
-    private val history = mutableListOf<String>()
-    private val customWords = mutableListOf<String>()
-    private val activeCategories = mutableSetOf<String>()
-
-    private lateinit var statusText: TextView
-    private lateinit var readingText: TextView
-    private lateinit var readingDetail: TextView
-    private lateinit var currentWord: TextView
-    private lateinit var sensorDetails: TextView
-    private lateinit var historyDetails: TextView
+    private lateinit var statusView: TextView
+    private lateinit var fieldView: TextView
+    private lateinit var deltaView: TextView
+    private lateinit var wordView: TextView
     private lateinit var sessionButton: Button
-    private lateinit var modeButton: Button
+    private lateinit var sensitivityLabel: TextView
+    private lateinit var sensorLabel: TextView
+    private lateinit var historyView: TextView
     private lateinit var categoriesButton: Button
-    private lateinit var sensitivityText: TextView
-    private lateinit var cooldownText: TextView
-
-    private val dictionary = linkedMapOf(
-        "Réponses" to listOf("OUI","NON","PEUT-ÊTRE","JE NE SAIS PAS","POURQUOI","COMMENT","QUI","QUAND","OÙ","MERCI","PARDON","ÉCOUTE","PARLE","RÉPÈTE","ATTENDS","STOP","JE SUIS LÀ","JE NE PEUX PAS","JE T'ENTENDS","JE ME SOUVIENS","JE VEUX PARLER","PAS MAINTENANT","PLUS TARD","C'EST BIEN","C'EST FAUX","AIDE-MOI","OÙ ES-TU","ES-TU SEUL","ES-TU PLUSIEURS","JE COMPRENDS","JE NE COMPRENDS PAS","CONTINUE","SILENCE","JE PARS","JE RESTE","RECOMMENCE","C'EST FINI","C'EST IMPORTANT"),
-        "Personnes" to listOf("MÈRE","PÈRE","ENFANT","FAMILLE","AMI","SŒUR","FRÈRE","FEMME","HOMME","GRAND-MÈRE","GRAND-PÈRE","INCONNU","VISITEUR","PRÉNOM","NOM","VOISIN","PROCHE","ONCLE","TANTE","COUSIN","COUSINE","PETIT-FILS","PETITE-FILLE","BÉBÉ","ADOLESCENT","PARENT","ÉPOUX","ÉPOUSE","PARTENAIRE","COLLÈGUE","INCONNU","PASSANT","GROUPE","FILS","FILLE","JUMEAU","ANCIEN AMI"),
-        "Émotions" to listOf("AMOUR","PEUR","JOIE","TRISTESSE","COLÈRE","CALME","SOLITUDE","PARDON","REGRET","BONHEUR","INQUIÉTUDE","CONFIANCE","DOULEUR","PAIX","MANQUE","ESPOIR","TRAHISON","NOSTALGIE","CULPABILITÉ","HONTE","SURPRISE","CURIOSITÉ","DÉCEPTION","SOULAGEMENT","JALOUSIE","COURAGE","TENDRESSE","FRUSTRATION","FATIGUE","DÉSIR","DOUTE","SÉRÉNITÉ","PANIQUE","MÉLANCOLIE","GRATITUDE","AFFECTION"),
-        "Lieux" to listOf("MAISON","CHAMBRE","CUISINE","JARDIN","PORTE","FENÊTRE","GRENIER","CAVE","DEHORS","DEDANS","ICI","LÀ-BAS","PRÈS","LOIN","ÉCOLE","ÉGLISE","FORÊT","EAU","HÔPITAL","CIMETIÈRE","GARE","ROUTE","PONT","RIVIÈRE","LAC","MER","MONTAGNE","VILLAGE","VILLE","APPARTEMENT","COULOIR","ESCALIER","BALCON","GRENIER","SOUS-SOL","GARAGE","GRENIER","BORD DE MER","CAMPAGNE"),
-        "Temps et souvenirs" to listOf("HIER","AUJOURD'HUI","DEMAIN","AVANT","APRÈS","MAINTENANT","BIENTÔT","LONGTEMPS","ENFANCE","SOUVENIR","DATE","ANNÉE","MATIN","SOIR","NUIT","JOUR","ÉTÉ","HIVER","PRINTEMPS","AUTOMNE","MINUIT","MIDI","AUBE","CRÉPUSCULE","SEMAINE","MOIS","LUNDI","MARDI","MERCREDI","JEUDI","VENDREDI","SAMEDI","DIMANCHE","PASSÉ","FUTUR","EN CE MOMENT","IL Y A LONGTEMPS","DERNIÈRE FOIS","PREMIÈRE FOIS","ANNIVERSAIRE","NAISSANCE","DÉPART","RETOUR"),
-        "Objets" to listOf("PHOTO","LIVRE","TABLE","CHAISE","LIT","MONTRE","BIJOU","CLÉ","TÉLÉPHONE","MIROIR","LAMPE","BOÎTE","LETTRE","VÊTEMENT","JOUET","MUSIQUE","SAC","PORTEFEUILLE","BAGUE","COLLIER","BRACELET","BOUCLE","CHAUSSURE","MANTEAU","CHAPEAU","VALISE","PENDULE","HORLOGE","RADIO","TÉLÉVISION","ORDINATEUR","CLAVIER","STYLO","PAPIER","ENVELOPPE","TASSE","VERRE","ASSIETTE","FOURCHETTE","COUTEAU","PHOTO DE FAMILLE","MÉDAILLE","CROIX"),
-        "Sensations" to listOf("FROID","CHAUD","LUMIÈRE","OMBRE","BRUIT","SILENCE","ODEUR","VENT","PRESSION","MOUVEMENT","VIBRATION","PROCHE","DERRIÈRE","DEVANT","TOUCHE","SOUFFLE","FRISSON","PICOTEMENT","CHALEUR","FRAÎCHEUR","PESANTEUR","LÉGÈRETÉ","VERTIGE","ÉTOURDISSEMENT","ÉCHO","RÉSONANCE","CLAQUEMENT","PAS","GRINCEMENT","PARFUM","FUMÉE","OBSCURITÉ","CLARTÉ","ÉBLOUISSEMENT","FOURMILLEMENT","PRESSION SUR L'ÉPAULE","CONTACT"),
-        "Actions" to listOf("VIENS","RESTE","PARTIR","REVIENS","AIDE","SUIVRE","OUVRIR","FERMER","MONTRER","ATTENDRE","AVANCER","RECULER","REGARDER","ENTENDRE","DORMIR","RÉVEILLER","CHERCHER","TROUVER","CACHER","SE CACHER","SE RAPPELER","OUBLIER","PROTÉGER","PRÉVENIR","APPELER","RÉPONDRE","TOUCHER","SENTIR","SOURIRE","PLEURER","RIRE","CHANTER","ÉCRIRE","LIRE","VENIR","S'ÉLOIGNER","S'APPROCHER","MONTER","DESCENDRE","ATTENDRE ICI"),
-        "Nombres" to listOf("UN","DEUX","TROIS","QUATRE","CINQ","SIX","SEPT","HUIT","NEUF","DIX","BEAUCOUP","PEU","PREMIER","DERNIER","ZÉRO","CENT","ONZE","DOUZE","TREIZE","QUATORZE","QUINZE","VINGT","TRENTE","QUARANTE","CINQUANTE","SOIXANTE","SOIXANTE-DIX","QUATRE-VINGTS","QUATRE-VINGT-DIX","MILLE","BEAUCOUP","PLUS","MOINS","MOITIÉ","DOUBLE","PREMIER","DEUXIÈME","TROISIÈME")
-    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
-        magnetometer = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD)
-        accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
-        gyroscope = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE)
-        linearAcceleration = sensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION)
-        val prefs = getSharedPreferences("echos_preferences", MODE_PRIVATE)
-        threshold = prefs.getFloat("threshold", 2f)
-        cooldownSeconds = prefs.getInt("cooldown", 9)
-        mode = prefs.getInt("mode", MODE_AUTO).coerceIn(MODE_AUTO, MODE_MAGNETIC)
-        customWords.addAll(prefs.getString("custom_words", "")!!.split("\n").filter { it.isNotBlank() })
-        history.addAll(prefs.getString("history", "")!!.split("\n").filter { it.isNotBlank() }.take(60))
-        val savedCategories = prefs.getString("active_categories", "")!!.split("\n").filter { it.isNotBlank() }
-        activeCategories.addAll(if (savedCategories.isEmpty()) dictionary.keys else savedCategories.filter { it in dictionary.keys })
-        if (activeCategories.isEmpty()) activeCategories.addAll(dictionary.keys)
+        sensors = getSystemService(Context.SENSOR_SERVICE) as SensorManager
+        magnetic = sensors.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD)
+        magneticUncalibrated = sensors.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD_UNCALIBRATED)
+        accelerometer = sensors.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
+        gyroscope = sensors.getDefaultSensor(Sensor.TYPE_GYROSCOPE)
+        loadDictionary()
+        loadPreferences()
         buildInterface()
-        refreshSensorInfo()
-        refreshHistory()
+        refreshSensorStatus()
+    }
+
+    private fun loadDictionary() {
+        try {
+            val json = assets.open("dictionary_fr.json").bufferedReader().use { it.readText() }
+            val root = JSONObject(json)
+            val array = root.getJSONArray("entries")
+            for (i in 0 until array.length()) {
+                val item = array.getJSONObject(i)
+                baseEntries.add(WordEntry(item.getString("category"), item.getString("text"), item.optInt("weight", 1)))
+            }
+        } catch (e: Exception) {
+            baseEntries.clear()
+            baseEntries.addAll(listOf(
+                WordEntry("Réponses", "OUI"), WordEntry("Réponses", "NON"),
+                WordEntry("Émotions", "PEUR"), WordEntry("Lieux", "MAISON")
+            ))
+        }
+    }
+
+    private fun loadPreferences() {
+        val p = getSharedPreferences("echos_preferences", MODE_PRIVATE)
+        sensitivity = p.getFloat("sensitivity", 0.82f).coerceIn(0f, 1f)
+        baseline = p.getFloat("baseline", 0f)
+        noiseFloor = p.getFloat("noise_floor", 0.08f)
+        calibrated = p.getBoolean("calibrated", false)
+        val cats = p.getString("active_categories", "")!!.split("\n").filter { it.isNotBlank() }
+        if (cats.isEmpty()) activeCategories.addAll(baseEntries.map { it.category }.distinct())
+        else activeCategories.addAll(cats)
+        val savedCats = p.getString("custom_categories", "")!!.split("\n").filter { it.isNotBlank() }
+        customCategories.addAll(savedCats)
+        try {
+            val arr = JSONArray(p.getString("custom_entries", "[]"))
+            for (i in 0 until arr.length()) {
+                val o = arr.getJSONObject(i)
+                customEntries.add(WordEntry(o.getString("category"), o.getString("text"), 1, true))
+            }
+        } catch (_: Exception) {}
+        history.addAll(p.getString("history", "")!!.split("\n").filter { it.isNotBlank() }.take(60))
     }
 
     private fun buildInterface() {
         val scroll = ScrollView(this).apply { setBackgroundColor(bg) }
         val page = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
-            setPadding(dp(20), dp(24), dp(20), dp(30))
+            setPadding(dp(18), dp(22), dp(18), dp(28))
         }
         scroll.addView(page)
-        page.addView(label("E C H O S", 29, white, true))
-        page.addView(label("EXPÉRIENCE SENSORIELLE", 11, cyan, true))
-        page.addView(label("MESURES LOCALES · FONCTIONNE HORS LIGNE", 10, muted))
-        page.addView(gap(18))
+        page.addView(text("E C H O S", 28, white, true))
+        page.addView(text("DICTIONNAIRE SENSORIEL", 11, accent, true))
+        page.addView(text("MESURES PHYSIQUES EN TEMPS RÉEL · HORS LIGNE", 9, muted))
+        page.addView(space(18))
+
+        val wordCard = card()
+        wordCard.addView(text("DERNIER MOT DÉTECTÉ", 10, accent, true))
+        wordView = text("—", 38, white, true).apply {
+            gravity = Gravity.CENTER
+            minHeight = dp(112)
+            setPadding(dp(6), dp(16), dp(6), dp(16))
+        }
+        wordCard.addView(wordView, match())
+        wordCard.addView(text("Les mots proviennent des signatures des capteurs. Leur origine n'est pas vérifiable.", 10, muted).apply { gravity = Gravity.CENTER })
+        page.addView(wordCard)
+        page.addView(space(10))
 
         val meter = card()
-        meter.addView(label("LECTURE DES CAPTEURS", 11, cyan, true))
-        readingText = label("EN ATTENTE", 31, white, true).apply {
-            gravity = Gravity.CENTER
-            setPadding(0, dp(16), 0, dp(6))
+        meter.addView(text("CHAMP MAGNÉTIQUE", 10, accent, true))
+        fieldView = text("— µT", 30, white, true)
+        meter.addView(fieldView)
+        deltaView = text("Variation : —", 12, muted)
+        meter.addView(deltaView)
+        val meterBar = ProgressBar(this, null, android.R.attr.progressBarStyleHorizontal).apply {
+            max = 100
+            progress = 0
+            progressTintList = android.content.res.ColorStateList.valueOf(accent)
+            progressBackgroundTintList = android.content.res.ColorStateList.valueOf(panel2)
         }
-        meter.addView(readingText)
-        readingDetail = label("Les mesures apparaîtront ici.", 12, muted).apply { gravity = Gravity.CENTER }
-        meter.addView(readingDetail)
+        meter.addView(meterBar, LinearLayout.LayoutParams(-1, dp(7)).apply { topMargin = dp(10) })
         page.addView(meter)
-        page.addView(gap(10))
+        page.addView(space(10))
 
-        statusText = label("Initialisation…", 12, amber, true).apply {
+        statusView = text("Initialisation des capteurs…", 11, orange, true).apply {
             gravity = Gravity.CENTER
             background = rounded(panel2, 12)
             setPadding(dp(12), dp(12), dp(12), dp(12))
         }
-        page.addView(statusText, fullWidth())
-        page.addView(gap(10))
+        page.addView(statusView, match())
+        page.addView(space(10))
 
-        val communication = card()
-        communication.addView(label("SESSION", 12, cyan, true))
-        currentWord = label("—", 42, white, true).apply {
-            gravity = Gravity.CENTER
-            setPadding(0, dp(22), 0, dp(22))
-        }
-        communication.addView(currentWord)
-        communication.addView(label("Les mots sont sélectionnés par un algorithme après une variation mesurée. Leur origine n'est pas vérifiable.", 12, muted))
-        sessionButton = actionButton("DÉMARRER LA SESSION") { toggleSession() }
-        communication.addView(sessionButton, fullWidth())
-        page.addView(communication)
-        page.addView(gap(10))
-
-        val calibration = card()
-        calibration.addView(label("CALIBRATION", 12, cyan, true))
-        calibration.addView(label("Pose le téléphone sur une surface stable et lance la calibration pour établir une référence de mesure.", 12, muted))
-        calibration.addView(actionButton("CALIBRER LES CAPTEURS") { startCalibration() }, fullWidth())
-        page.addView(calibration)
-        page.addView(gap(10))
+        val controls = card()
+        controls.addView(text("SESSION", 11, accent, true))
+        sessionButton = button("DÉMARRER LA SESSION") { toggleSession() }
+        controls.addView(sessionButton, match())
+        controls.addView(button("CALIBRER LES CAPTEURS") { startCalibration() }, match())
+        page.addView(controls)
+        page.addView(space(10))
 
         val settings = card()
-        settings.addView(label("RÉGLAGES DE L'EXPÉRIENCE", 12, cyan, true))
-        modeButton = actionButton(modeLabel()) { chooseMode() }
-        settings.addView(modeButton, fullWidth())
-        categoriesButton = actionButton("Toutes les catégories") { chooseCategories() }
-        settings.addView(categoriesButton, fullWidth())
-        settings.addView(actionButton("AJOUTER UN MOT PERSONNALISÉ") { addCustomWord() }, fullWidth())
-        sensitivityText = label("", 12, white)
-        settings.addView(sensitivityText)
+        settings.addView(text("SENSIBILITÉ DU DICTIONNAIRE", 11, accent, true))
+        sensitivityLabel = text("", 12, white)
+        settings.addView(sensitivityLabel)
         settings.addView(SeekBar(this).apply {
-            max = 98
-            progress = ((threshold - 0.2f) * 10).toInt().coerceIn(0, 98)
+            max = 100
+            progress = (sensitivity * 100).toInt()
+            progressTintList = android.content.res.ColorStateList.valueOf(accent)
+            thumbTintList = android.content.res.ColorStateList.valueOf(accent)
             setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-                override fun onProgressChanged(bar: SeekBar?, value: Int, fromUser: Boolean) {
-                    threshold = 0.2f + value / 10f
-                    sensitivityText.text = "Seuil de déclenchement : %.1f".format(Locale.FRANCE, threshold)
-                    saveSettings()
+                override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                    sensitivity = progress / 100f
+                    updateSensitivityLabel()
+                    savePreferences()
                 }
-                override fun onStartTrackingTouch(bar: SeekBar?) {}
-                override fun onStopTrackingTouch(bar: SeekBar?) {}
+                override fun onStartTrackingTouch(seekBar: SeekBar?) {}
+                override fun onStopTrackingTouch(seekBar: SeekBar?) {}
             })
         })
-        cooldownText = label("", 12, white)
-        settings.addView(cooldownText)
-        settings.addView(SeekBar(this).apply {
-            max = 29
-            progress = (cooldownSeconds - 1).coerceIn(0, 29)
-            setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-                override fun onProgressChanged(bar: SeekBar?, value: Int, fromUser: Boolean) {
-                    cooldownSeconds = value + 1
-                    cooldownText.text = "Délai anti-répétition : " + cooldownSeconds + " s"
-                    saveSettings()
-                }
-                override fun onStartTrackingTouch(bar: SeekBar?) {}
-                override fun onStopTrackingTouch(bar: SeekBar?) {}
-            })
-        })
-        sensitivityText.text = "Seuil de déclenchement : %.1f".format(Locale.FRANCE, threshold)
-        cooldownText.text = "Délai anti-répétition : " + cooldownSeconds + " s"
+        categoriesButton = button("CATÉGORIES ACTIVES") { chooseCategories() }
+        settings.addView(categoriesButton, match())
+        settings.addView(button("CONSULTER LES 1 000 MOTS") { showDictionary() }, match())
+        settings.addView(button("MON DICTIONNAIRE PERSONNEL") { manageCustomDictionary() }, match())
         page.addView(settings)
-        page.addView(gap(10))
+        page.addView(space(10))
 
-        val hardware = card()
-        hardware.addView(label("CAPTEURS DE L'APPAREIL", 12, cyan, true))
-        sensorDetails = label("", 12, muted)
-        hardware.addView(sensorDetails)
-        page.addView(hardware)
-        page.addView(gap(10))
+        val sensorsCard = card()
+        sensorsCard.addView(text("CAPTEURS DE L'APPAREIL", 11, accent, true))
+        sensorLabel = text("", 12, muted)
+        sensorsCard.addView(sensorLabel)
+        page.addView(sensorsCard)
+        page.addView(space(10))
 
-        val journal = card()
-        journal.addView(label("JOURNAL DE SESSION", 12, cyan, true))
-        historyDetails = label("Aucun événement.", 12, muted)
-        journal.addView(historyDetails)
-        journal.addView(actionButton("EFFACER L'HISTORIQUE") {
+        val historyCard = card()
+        historyCard.addView(text("HISTORIQUE DES MOTS", 11, accent, true))
+        historyView = text("Aucun mot détecté.", 12, muted)
+        historyCard.addView(historyView)
+        historyCard.addView(button("EFFACER L'HISTORIQUE") {
             history.clear()
-            saveHistory()
+            persistHistory()
             refreshHistory()
-        }, fullWidth())
-        page.addView(journal)
-        page.addView(gap(14))
-        page.addView(label("ECHOS est une expérience ludique et expérimentale. Les capteurs mesurent des phénomènes physiques ordinaires ; les mots sont générés par le logiciel et ne démontrent pas une communication avec l'invisible.", 11, muted))
+        }, match())
+        page.addView(historyCard)
+        page.addView(space(14))
+        page.addView(text("ECHOS est un outil expérimental. Les capteurs mesurent des phénomènes physiques ordinaires ; les mots affichés ne démontrent pas une communication avec l'invisible.", 10, muted))
         setContentView(scroll)
+        updateSensitivityLabel()
+        refreshHistory()
     }
 
-    private fun modeLabel(): String = when (mode) {
-        1 -> "Mode mouvement (accéléromètre + gyroscope)"
-        2 -> "Mode magnétomètre uniquement"
-        else -> "Mode automatique (magnétomètre si présent)"
-    }
-
-    private fun activeMode(): Int = when (mode) {
-        1 -> 1
-        2 -> 2
-        else -> if (magnetometer != null) 2 else 1
-    }
-
-    private fun sensorAvailable(): Boolean = if (activeMode() == 2) {
-        magnetometer != null
-    } else {
-        accelerometer != null || gyroscope != null || linearAcceleration != null
-    }
-
-    private fun chooseMode() {
-        val options = arrayOf("Automatique — magnétomètre si présent", "Mouvement — accéléromètre et gyroscope", "Magnétomètre uniquement")
-        AlertDialog.Builder(this).setTitle("Mode de détection")
-            .setSingleChoiceItems(options, mode) { dialog, which ->
-                mode = which
-                calibrated = false
-                sessionActive = false
-                getSharedPreferences("echos_preferences", MODE_PRIVATE).edit().putInt("mode", mode).apply()
-                sessionButton.text = "DÉMARRER LA SESSION"
-                modeButton.text = modeLabel()
-                refreshSensorInfo()
-                dialog.dismiss()
-            }.setNegativeButton("Annuler", null).show()
-    }
-
-    private fun chooseCategories() {
-        val checks = dictionary.keys.map { name ->
-            CheckBox(this).apply {
-                text = name
-                setTextColor(white)
-                isChecked = name in activeCategories
-                setPadding(dp(16), dp(7), dp(16), dp(7))
-            }
+    private fun updateSensitivityLabel() {
+        val percent = (sensitivity * 100).toInt()
+        val level = when {
+            percent < 25 -> "Faible"
+            percent < 55 -> "Modérée"
+            percent < 80 -> "Élevée"
+            else -> "Très élevée"
         }
-        val list = LinearLayout(this).apply {
-            orientation = LinearLayout.VERTICAL
-            checks.forEach { addView(it) }
-        }
-        AlertDialog.Builder(this).setTitle("Catégories du dictionnaire")
-            .setView(ScrollView(this).apply { addView(list) })
-            .setPositiveButton("Appliquer") { _, _ ->
-                activeCategories.clear()
-                checks.filter { it.isChecked }.forEach { activeCategories.add(it.text.toString()) }
-                if (activeCategories.isEmpty()) {
-                    activeCategories.addAll(dictionary.keys)
-                    Toast.makeText(this, "Active au moins une catégorie.", Toast.LENGTH_SHORT).show()
-                }
-                categoriesButton.text = if (activeCategories.size == dictionary.size) "Toutes les catégories" else activeCategories.size.toString() + " catégories actives"
-            }.setNegativeButton("Annuler", null).show()
+        sensitivityLabel.text = "$percent % · $level"
     }
 
-    private fun addCustomWord() {
-        val input = EditText(this).apply {
-            hint = "Ex. : SOUVENIR"
-            inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_CAP_SENTENCES
-            setSingleLine(true)
+    private fun refreshSensorStatus() {
+        if (!::sensorLabel.isInitialized) return
+        val hasMag = magnetic != null || magneticUncalibrated != null
+        sensorLabel.text = "Magnétomètre : " + if (hasMag) "disponible" else "absent"
+        sensorLabel.append("\nAccéléromètre : " + if (accelerometer != null) "disponible" else "absent")
+        sensorLabel.append("\nGyroscope : " + if (gyroscope != null) "disponible" else "absent")
+        currentMode = if (hasMag) "MAGNÉTIQUE" else "MOUVEMENT"
+        statusView.text = when {
+            !hasMag && accelerometer == null && gyroscope == null -> "Aucun capteur compatible détecté"
+            calibrated -> "Capteurs prêts · calibration enregistrée"
+            else -> "Calibration nécessaire · pose le téléphone sur une surface stable"
         }
-        AlertDialog.Builder(this).setTitle("Ajouter un mot")
-            .setView(input)
-            .setPositiveButton("Ajouter") { _, _ ->
-                val value = input.text.toString().trim().uppercase(Locale.FRANCE)
-                if (value.isNotBlank() && value.length <= 32 && value !in customWords) {
-                    customWords.add(value)
-                    getSharedPreferences("echos_preferences", MODE_PRIVATE).edit()
-                        .putString("custom_words", customWords.joinToString("\n")).apply()
-                    Toast.makeText(this, "Mot ajouté.", Toast.LENGTH_SHORT).show()
-                }
-            }.setNegativeButton("Annuler", null).show()
-    }
-
-    private fun startCalibration() {
-        if (!sensorAvailable()) {
-            Toast.makeText(this, "Aucun capteur compatible avec ce mode.", Toast.LENGTH_LONG).show()
-            return
-        }
-        sessionActive = false
-        sessionButton.text = "DÉMARRER LA SESSION"
-        calibrating = true
-        calibrated = false
-        calibrationStart = System.currentTimeMillis()
-        calibrationCount = 0
-        calibrationTotal = 0.0
-        smoothedVariation = 0f
-        consecutiveSamples = 0
-        statusText.text = "Calibration en cours · garde le téléphone immobile"
-        statusText.setTextColor(amber)
-    }
-
-    private fun toggleSession() {
-        if (sessionActive) {
-            sessionActive = false
-            sessionButton.text = "DÉMARRER LA SESSION"
-            statusText.text = "Session arrêtée"
-            statusText.setTextColor(muted)
-            addHistory("Session arrêtée")
-            return
-        }
-        if (!sensorAvailable()) {
-            Toast.makeText(this, "Aucun capteur compatible avec ce mode.", Toast.LENGTH_LONG).show()
-            return
-        }
-        if (!calibrated) {
-            Toast.makeText(this, "Effectue d'abord une calibration.", Toast.LENGTH_SHORT).show()
-            return
-        }
-        sessionActive = true
-        lastWordAt = System.currentTimeMillis()
-        consecutiveSamples = 0
-        sessionButton.text = "ARRÊTER LA SESSION"
-        statusText.text = "SESSION ACTIVE · analyse des variations"
-        statusText.setTextColor(green)
-        addHistory("Session démarrée · " + modeLabel())
+        statusView.setTextColor(if (hasMag || accelerometer != null || gyroscope != null) orange else red)
+        fieldView.text = if (hasMag) "%.1f µT".format(Locale.FRANCE, magneticMagnitude) else "INDISPONIBLE"
     }
 
     override fun onResume() {
         super.onResume()
-        listOfNotNull(magnetometer, accelerometer, gyroscope, linearAcceleration)
-            .distinctBy { it.type }
-            .forEach { sensorManager.registerListener(this, it, SensorManager.SENSOR_DELAY_GAME) }
-        refreshSensorInfo()
+        val magSensor = magnetic ?: magneticUncalibrated
+        if (magSensor != null) sensors.registerListener(this, magSensor, SensorManager.SENSOR_DELAY_GAME)
+        accelerometer?.let { sensors.registerListener(this, it, SensorManager.SENSOR_DELAY_GAME) }
+        gyroscope?.let { sensors.registerListener(this, it, SensorManager.SENSOR_DELAY_GAME) }
     }
 
     override fun onPause() {
+        sensors.unregisterListener(this)
+        sessionActive = false
+        if (::sessionButton.isInitialized) sessionButton.text = "DÉMARRER LA SESSION"
         super.onPause()
-        sensorManager.unregisterListener(this)
-        if (sessionActive) {
-            sessionActive = false
-            if (::sessionButton.isInitialized) sessionButton.text = "DÉMARRER LA SESSION"
-            if (::statusText.isInitialized) {
-                statusText.text = "Session mise en pause"
-                statusText.setTextColor(muted)
-            }
-        }
     }
 
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
@@ -377,184 +284,392 @@ class MainActivity : Activity(), SensorEventListener {
     override fun onSensorChanged(event: SensorEvent) {
         val v = event.values
         when (event.sensor.type) {
-            Sensor.TYPE_MAGNETIC_FIELD -> {
-                magneticX = v[0]
-                magneticY = v[1]
-                magneticZ = v[2]
-                magneticMagnitude = sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2])
-                if (activeMode() == 2) processSample(abs(magneticMagnitude - magneticBaseline), magneticMagnitude)
+            Sensor.TYPE_MAGNETIC_FIELD, Sensor.TYPE_MAGNETIC_FIELD_UNCALIBRATED -> {
+                val x = v[0]; val y = v[1]; val z = v[2]
+                magneticMagnitude = sqrt(x*x + y*y + z*z)
+                magneticDelta = abs(magneticMagnitude - baseline)
+                if (calibrating) collectCalibration(magneticMagnitude)
+                else if (sessionActive) processMagneticSignature(magneticMagnitude, magneticDelta)
+                if (::fieldView.isInitialized) {
+                    fieldView.text = "%.1f µT".format(Locale.FRANCE, magneticMagnitude)
+                    deltaView.text = "Variation depuis calibration : %.2f µT".format(Locale.FRANCE, magneticDelta)
+                }
             }
-            Sensor.TYPE_LINEAR_ACCELERATION -> {
-                accelerationMagnitude = sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2])
-                if (activeMode() == 1) processMotion()
-            }
-            Sensor.TYPE_ACCELEROMETER -> if (linearAcceleration == null) {
-                accelerationMagnitude = abs(sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]) - SensorManager.GRAVITY_EARTH)
-                if (activeMode() == 1) processMotion()
+            Sensor.TYPE_ACCELEROMETER -> {
+                accelerationMagnitude = sqrt(v[0]*v[0] + v[1]*v[1] + v[2]*v[2])
+                if (calibrating && magnetic == null && magneticUncalibrated == null) collectCalibration(accelerationMagnitude)
+                else if (sessionActive && magnetic == null && magneticUncalibrated == null) processMotionSignature(accelerationMagnitude)
             }
             Sensor.TYPE_GYROSCOPE -> {
-                rotationMagnitude = sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2])
-                if (activeMode() == 1) processMotion()
+                rotationMagnitude = sqrt(v[0]*v[0] + v[1]*v[1] + v[2]*v[2])
+                if (sessionActive && magnetic == null && magneticUncalibrated == null) processMotionSignature(rotationMagnitude)
             }
         }
-        updateReading()
     }
 
-    private fun processMotion() {
-        motionMagnitude = accelerationMagnitude * 0.65f + rotationMagnitude * 1.8f
-        processSample(abs(motionMagnitude - motionBaseline), motionMagnitude)
-    }
-
-    private fun processSample(variation: Float, rawValue: Float) {
-        if (!variation.isFinite() || !rawValue.isFinite()) return
-        if (calibrating) {
-            calibrationTotal += rawValue.toDouble()
-            calibrationCount++
-            if (calibrationCount >= 45 || System.currentTimeMillis() - calibrationStart >= 5000L) {
-                calibrating = false
-                if (calibrationCount >= 10) {
-                    val reference = (calibrationTotal / calibrationCount).toFloat()
-                    if (activeMode() == 2) magneticBaseline = reference else motionBaseline = reference
-                    calibrated = true
-                    statusText.text = "Calibration terminée · " + calibrationCount + " mesures"
-                    statusText.setTextColor(green)
-                    addHistory("Calibration terminée")
-                } else {
-                    statusText.text = "Mesures insuffisantes · recommence"
-                    statusText.setTextColor(amber)
-                }
-            } else {
-                statusText.text = "Calibration · " + calibrationCount + " mesures"
-            }
+    private fun startCalibration() {
+        if (magnetic == null && magneticUncalibrated == null && accelerometer == null && gyroscope == null) {
+            toast("Aucun capteur compatible sur cet appareil.")
             return
         }
-        if (!calibrated) return
-        smoothedVariation = if (smoothedVariation == 0f) variation else smoothedVariation * 0.78f + variation * 0.22f
-        if (!sessionActive) return
-        consecutiveSamples = if (smoothedVariation >= threshold) consecutiveSamples + 1 else 0
+        calibrationValues.clear()
+        calibrating = true
+        calibrated = false
+        sessionActive = false
+        sessionButton.text = "DÉMARRER LA SESSION"
+        statusView.text = "CALIBRATION EN COURS · GARDE LE TÉLÉPHONE IMMOBILE"
+        statusView.setTextColor(orange)
+        addHistory("Calibration démarrée")
+    }
+
+    private fun collectCalibration(value: Float) {
+        if (!value.isFinite()) return
+        calibrationValues.add(value)
+        if (calibrationValues.size >= 150) finishCalibration()
+        else if (calibrationValues.size % 25 == 0) statusView.text = "Calibration · ${calibrationValues.size}/150 mesures"
+    }
+
+    private fun finishCalibration() {
+        if (calibrationValues.size < 20) return
+        val sorted = calibrationValues.sorted()
+        baseline = sorted[sorted.size / 2]
+        val deviations = sorted.map { abs(it - baseline) }.sorted()
+        noiseFloor = (deviations[deviations.size / 2] * 1.4826f).coerceAtLeast(0.015f)
+        calibrated = true
+        calibrating = false
+        getSharedPreferences("echos_preferences", MODE_PRIVATE).edit()
+            .putFloat("baseline", baseline).putFloat("noise_floor", noiseFloor).putBoolean("calibrated", true).apply()
+        statusView.text = "CALIBRATION TERMINÉE · ${calibrationValues.size} MESURES"
+        statusView.setTextColor(accent)
+        addHistory("Calibration terminée · référence %.2f".format(Locale.FRANCE, baseline))
+    }
+
+    private fun toggleSession() {
+        if (sessionActive) {
+            sessionActive = false
+            sessionButton.text = "DÉMARRER LA SESSION"
+            statusView.text = "Session arrêtée"
+            statusView.setTextColor(muted)
+            addHistory("Session arrêtée")
+            return
+        }
+        if (!calibrated) {
+            toast("Effectue d'abord une calibration.")
+            return
+        }
+        if (baseEntries.isEmpty()) {
+            toast("Le dictionnaire n'a pas pu être chargé.")
+            return
+        }
+        sessionActive = true
+        nextWordAt = System.currentTimeMillis() + 8000L
+        lastSignatureAt = 0L
+        sessionButton.text = "ARRÊTER LA SESSION"
+        statusView.text = "SESSION ACTIVE · ANALYSE DES SIGNATURES"
+        statusView.setTextColor(accent)
+        addHistory("Session démarrée · mode $currentMode")
+    }
+
+    // Reproduit le principe visible dans GhostTube : une signature est construite à partir des décimales
+    // de la mesure, puis une plage de tolérance dépend de la sensibilité.
+    private fun processMagneticSignature(value: Float, delta: Float) {
         val now = System.currentTimeMillis()
-        if (consecutiveSamples >= 5 && now - lastWordAt >= cooldownSeconds * 1000L) {
-            consecutiveSamples = 0
-            lastWordAt = now
-            val selected = selectWord()
-            currentWord.text = selected
-            addHistory("Mot : " + selected + " · variation %.2f".format(Locale.FRANCE, smoothedVariation))
+        if (now - lastSignatureAt < 1000L || now < nextWordAt) return
+        lastSignatureAt = now
+        val pool = activeWordPool()
+        if (pool.isEmpty()) return
+        val digits = decimalSignature(value)
+        val signature = try { BigInteger(digits) } catch (_: Exception) { BigInteger.ZERO }
+        val range = BigInteger.valueOf(pool.sumOf { it.weight.coerceAtLeast(1) }.toLong() * 10000L)
+        val mapped = signature.mod(range)
+        val bucket = mapped.mod(BigInteger.valueOf(10000L)).toInt()
+        val tolerance = 10 + (sensitivity * 90f).toInt()
+        val physicalChangeThreshold = maxOf(0.18f, noiseFloor * (4.2f - sensitivity * 2.8f))
+        val signatureMatch = bucket <= tolerance
+        val physicalChange = delta >= physicalChangeThreshold
+        if (signatureMatch || physicalChange) {
+            val weightedIndex = mapped.divide(BigInteger.valueOf(10000L)).toInt()
+            emitWord(selectWeighted(pool, weightedIndex), "signature $bucket/$tolerance · Δ %.2f µT".format(Locale.FRANCE, delta))
+            val maxDelay = ((1f - sensitivity) * 120f + 70f).toInt().coerceAtLeast(10)
+            nextWordAt = now + Random.nextLong(10, maxDelay.toLong() + 1) * 1000L
+        }
+    }
+
+    private fun processMotionSignature(value: Float) {
+        val now = System.currentTimeMillis()
+        if (now - lastSignatureAt < 1000L || now < nextWordAt) return
+        lastSignatureAt = now
+        val pool = activeWordPool()
+        if (pool.isEmpty()) return
+        val digits = decimalSignature(value)
+        val rotated = digits.drop(3) + digits.take(3)
+        val bucket = rotated.take(4).toIntOrNull() ?: 9999
+        val tolerance = (sensitivity * 30f).toInt() + 1
+        if (bucket <= tolerance || bucket >= 10000 - tolerance) {
+            val indexDigits = rotated.drop(5).take(8).toIntOrNull() ?: 0
+            emitWord(pool[indexDigits % pool.size], "signature mouvement $bucket/$tolerance")
+            val maxDelay = ((1f - sensitivity) * 45f + 11f).toInt().coerceAtLeast(11)
+            nextWordAt = now + Random.nextLong(10, maxDelay.toLong() + 1) * 1000L
+        }
+    }
+
+    private fun decimalSignature(value: Float): String {
+        val decimal = BigDecimal(value.toString()).abs().stripTrailingZeros().toPlainString()
+        val fraction = decimal.substringAfter('.', "0").filter { it.isDigit() }.ifEmpty { "0" }
+        return (fraction + fraction + fraction + fraction).take(20).padEnd(20, '0')
+    }
+
+    private fun activeWordPool(): List<WordEntry> {
+        val all = baseEntries.filter { it.category in activeCategories } + customEntries.filter { it.category in activeCategories }
+        return all.filter { it.text.isNotBlank() }
+    }
+
+    private fun selectWeighted(pool: List<WordEntry>, rawIndex: Int): WordEntry {
+        val total = pool.sumOf { it.weight.coerceAtLeast(1) }
+        var target = rawIndex.coerceAtLeast(0) % total
+        for (entry in pool) {
+            target -= entry.weight.coerceAtLeast(1)
+            if (target < 0) {
+                if (entry.text == lastWord && pool.size > 1) return pool[(pool.indexOf(entry) + 1) % pool.size]
+                return entry
+            }
+        }
+        return pool.first()
+    }
+
+    private fun emitWord(entry: WordEntry, reason: String) {
+        if (entry.text == lastWord && activeWordPool().size > 1) return
+        lastWord = entry.text
+        runOnUiThread {
+            wordView.text = entry.text
+            addHistory("Mot : ${entry.text} · ${entry.category} · $reason")
             vibrate()
         }
     }
 
-    private fun selectWord(): String {
-        val words = dictionary.filterKeys { it in activeCategories }.values.flatten() + customWords
-        val candidates = words.filter { it != lastWord }
-        val source = if (candidates.isNotEmpty()) candidates else words
-        val selected = source[Random.nextInt(source.size)]
-        lastWord = selected
-        return selected
+    private fun chooseCategories() {
+        val names = (baseEntries.map { it.category }.distinct() + customCategories).distinct().sorted()
+        val checks = names.map { name ->
+            CheckBox(this).apply {
+                text = name
+                setTextColor(white)
+                isChecked = name in activeCategories
+                setPadding(dp(16), dp(7), dp(16), dp(7))
+            }
+        }
+        val list = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; checks.forEach { addView(it) } }
+        AlertDialog.Builder(this).setTitle("Catégories du dictionnaire")
+            .setView(ScrollView(this).apply { addView(list) })
+            .setPositiveButton("Appliquer") { _, _ ->
+                activeCategories.clear()
+                checks.filter { it.isChecked }.forEach { activeCategories.add(it.text.toString()) }
+                if (activeCategories.isEmpty()) {
+                    activeCategories.addAll(baseEntries.map { it.category }.distinct())
+                    toast("Au moins une catégorie doit rester active.")
+                }
+                savePreferences()
+                categoriesButton.text = "${activeCategories.size} catégories actives"
+            }.setNegativeButton("Annuler", null).show()
     }
 
-    private fun updateReading() {
-        if (!::readingText.isInitialized) return
-        if (activeMode() == 2) {
-            readingText.text = if (magnetometer == null) "INDISPONIBLE" else "%.1f µT".format(Locale.FRANCE, magneticMagnitude)
-            readingDetail.text = "X %.1f · Y %.1f · Z %.1f µT".format(Locale.FRANCE, magneticX, magneticY, magneticZ) +
-                if (calibrated) "  |  Δ %.2f µT".format(Locale.FRANCE, abs(magneticMagnitude - magneticBaseline)) else "  |  non calibré"
-        } else {
-            readingText.text = "MOUVEMENT"
-            readingDetail.text = "Accéléromètre : %.2f · Gyroscope : %.2f".format(Locale.FRANCE, accelerationMagnitude, rotationMagnitude)
+    private fun showDictionary() {
+        val dialog = AlertDialog.Builder(this).setTitle("Dictionnaire · ${baseEntries.size + customEntries.size} entrées").create()
+        val root = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(dp(14), dp(8), dp(14), dp(8))
+            setBackgroundColor(bg)
         }
+        val search = EditText(this).apply {
+            hint = "Rechercher un mot ou une phrase…"
+            setSingleLine(true)
+            setTextColor(white)
+            setHintTextColor(muted)
+            background = rounded(panel2, 10)
+            setPadding(dp(12), dp(10), dp(12), dp(10))
+        }
+        val spinner = Spinner(this)
+        val cats = listOf("Toutes les catégories") + (baseEntries.map { it.category }.distinct() + customCategories).distinct().sorted()
+        spinner.adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, cats)
+        val count = text("", 10, muted)
+        val list = TextView(this).apply {
+            setTextColor(white)
+            textSize = 13f
+            setPadding(dp(10), dp(8), dp(10), dp(8))
+        }
+        val scroller = ScrollView(this).apply { addView(list) }
+        fun render() {
+            val q = search.text.toString().trim().lowercase(Locale.FRANCE)
+            val cat = spinner.selectedItem?.toString() ?: cats[0]
+            val filtered = (baseEntries + customEntries).filter {
+                (cat == cats[0] || it.category == cat) && (q.isEmpty() || it.text.lowercase(Locale.FRANCE).contains(q))
+            }
+            count.text = "${filtered.size} entrée(s) affichée(s)"
+            list.text = filtered.joinToString("\n") { "• ${it.text}   —   ${it.category}" }
+        }
+        search.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, countOld: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, countNew: Int) { render() }
+            override fun afterTextChanged(s: Editable?) {}
+        })
+        spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onNothingSelected(parent: AdapterView<*>?) {}
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) { render() }
+        }
+        root.addView(search, match())
+        root.addView(spinner, match())
+        root.addView(count)
+        root.addView(scroller, LinearLayout.LayoutParams(-1, dp(390)))
+        dialog.setView(root)
+        dialog.setButton(AlertDialog.BUTTON_POSITIVE, "Fermer") { _, _ -> dialog.dismiss() }
+        dialog.show()
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE)?.setTextColor(accent)
+        render()
     }
 
-    private fun refreshSensorInfo() {
-        if (!::sensorDetails.isInitialized) return
-        sensorDetails.text = "Magnétomètre : " + if (magnetometer != null) "disponible" else "absent"
-        sensorDetails.append("\nAccéléromètre : " + if (accelerometer != null || linearAcceleration != null) "disponible" else "absent")
-        sensorDetails.append("\nGyroscope : " + if (gyroscope != null) "disponible" else "absent")
-        sensorDetails.append("\nMode actif : " + modeLabel())
-        statusText.text = when {
-            !sensorAvailable() -> "Aucun capteur compatible avec le mode choisi"
-            calibrated -> "Capteurs prêts · calibration effectuée"
-            activeMode() == 1 -> "Mode mouvement disponible · calibration nécessaire"
-            else -> "Magnétomètre disponible · calibration nécessaire"
+    private fun manageCustomDictionary() {
+        val options = arrayOf("Ajouter une catégorie", "Ajouter un mot ou une phrase", "Consulter / supprimer mes mots")
+        AlertDialog.Builder(this).setTitle("Dictionnaire personnel")
+            .setItems(options) { _, which ->
+                when (which) {
+                    0 -> promptText("Nouvelle catégorie", "Ex. : Famille") { value ->
+                        val name = value.trim()
+                        if (name.isNotEmpty() && name !in baseEntries.map { it.category } && name !in customCategories) {
+                            customCategories.add(name)
+                            activeCategories.add(name)
+                            saveCustomDictionary()
+                            savePreferences()
+                            categoriesButton.text = "${activeCategories.size} catégories actives"
+                        } else toast("Cette catégorie existe déjà.")
+                    }
+                    1 -> addCustomWord()
+                    2 -> listCustomWords()
+                }
+            }.show()
+    }
+
+    private fun addCustomWord() {
+        if (customCategories.isEmpty()) {
+            AlertDialog.Builder(this).setTitle("Catégorie nécessaire")
+                .setMessage("Crée d'abord une catégorie personnelle.")
+                .setPositiveButton("Créer") { _, _ -> manageCustomDictionary() }
+                .setNegativeButton("Annuler", null).show()
+            return
         }
-        statusText.setTextColor(if (sensorAvailable()) amber else Color.RED)
+        val input = EditText(this).apply { hint = "Mot ou phrase"; setTextColor(white) }
+        val spinner = Spinner(this)
+        spinner.adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, customCategories.toList().sorted())
+        val box = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(dp(16), dp(8), dp(16), dp(8))
+            addView(input)
+            addView(spinner)
+        }
+        AlertDialog.Builder(this).setTitle("Ajouter au dictionnaire personnel").setView(box)
+            .setPositiveButton("Enregistrer") { _, _ ->
+                val value = input.text.toString().trim().uppercase(Locale.FRANCE)
+                val category = spinner.selectedItem?.toString() ?: return@setPositiveButton
+                if (value.isNotBlank() && value.length <= 80 && customEntries.none { it.text.equals(value, true) }) {
+                    customEntries.add(WordEntry(category, value, 1, true))
+                    activeCategories.add(category)
+                    saveCustomDictionary()
+                    savePreferences()
+                    toast("Entrée ajoutée.")
+                } else toast("Entrée vide, trop longue ou déjà présente.")
+            }.setNegativeButton("Annuler", null).show()
+    }
+
+    private fun listCustomWords() {
+        if (customEntries.isEmpty()) {
+            toast("Ton dictionnaire personnel est vide.")
+            return
+        }
+        val labels = customEntries.map { "${it.text}  ·  ${it.category}" }.toTypedArray()
+        AlertDialog.Builder(this).setTitle("Mes entrées · toucher pour supprimer")
+            .setItems(labels) { _, which ->
+                val removed = customEntries.removeAt(which)
+                saveCustomDictionary()
+                toast("« ${removed.text} » supprimé.")
+            }.setNegativeButton("Fermer", null).show()
+    }
+
+    private fun promptText(title: String, hintText: String, onSave: (String) -> Unit) {
+        val input = EditText(this).apply { hint = hintText; setSingleLine(true); setTextColor(white) }
+        AlertDialog.Builder(this).setTitle(title).setView(input)
+            .setPositiveButton("Créer") { _, _ -> onSave(input.text.toString()) }
+            .setNegativeButton("Annuler", null).show()
+    }
+
+    private fun saveCustomDictionary() {
+        val arr = JSONArray()
+        customEntries.forEach {
+            arr.put(JSONObject().put("category", it.category).put("text", it.text))
+        }
+        getSharedPreferences("echos_preferences", MODE_PRIVATE).edit()
+            .putString("custom_entries", arr.toString())
+            .putString("custom_categories", customCategories.joinToString("\n"))
+            .apply()
+    }
+
+    private fun savePreferences() {
+        getSharedPreferences("echos_preferences", MODE_PRIVATE).edit()
+            .putFloat("sensitivity", sensitivity)
+            .putFloat("baseline", baseline)
+            .putFloat("noise_floor", noiseFloor)
+            .putBoolean("calibrated", calibrated)
+            .putString("active_categories", activeCategories.joinToString("\n"))
+            .apply()
     }
 
     private fun addHistory(message: String) {
-        val stamp = SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.FRANCE).format(Date())
-        history.add(0, stamp + " · " + message)
+        val stamp = SimpleDateFormat("dd/MM HH:mm:ss", Locale.FRANCE).format(Date())
+        history.add(0, "$stamp · $message")
         while (history.size > 60) history.removeAt(history.lastIndex)
-        saveHistory()
+        persistHistory()
         refreshHistory()
     }
 
-    private fun refreshHistory() {
-        if (::historyDetails.isInitialized) {
-            historyDetails.text = if (history.isEmpty()) "Aucun événement pour le moment." else history.take(15).joinToString("\n\n")
-        }
-    }
-
-    private fun saveHistory() {
+    private fun persistHistory() {
         getSharedPreferences("echos_preferences", MODE_PRIVATE).edit()
             .putString("history", history.joinToString("\n")).apply()
     }
 
-    private fun saveSettings() {
-        getSharedPreferences("echos_preferences", MODE_PRIVATE).edit()
-            .putFloat("threshold", threshold)
-            .putInt("cooldown", cooldownSeconds)
-            .apply()
+    private fun refreshHistory() {
+        if (::historyView.isInitialized) historyView.text =
+            if (history.isEmpty()) "Aucun mot détecté." else history.take(12).joinToString("\n\n")
     }
 
     private fun vibrate() {
         try {
-            val vibrator = getSystemService(VIBRATOR_SERVICE) as Vibrator
-            if (vibrator.hasVibrator()) {
-                if (Build.VERSION.SDK_INT >= 26) vibrator.vibrate(VibrationEffect.createOneShot(110, VibrationEffect.DEFAULT_AMPLITUDE))
-                else {
-                    @Suppress("DEPRECATION")
-                    vibrator.vibrate(110)
-                }
+            val v = getSystemService(VIBRATOR_SERVICE) as Vibrator
+            if (v.hasVibrator()) {
+                if (android.os.Build.VERSION.SDK_INT >= 26) v.vibrate(VibrationEffect.createOneShot(100, VibrationEffect.DEFAULT_AMPLITUDE))
+                else @Suppress("DEPRECATION") v.vibrate(100)
             }
         } catch (_: Exception) {}
     }
 
+    private fun toast(message: String) = Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     private fun card() = LinearLayout(this).apply {
         orientation = LinearLayout.VERTICAL
-        setPadding(dp(16), dp(15), dp(16), dp(15))
-        background = rounded(panel, 18)
+        setPadding(dp(16), dp(14), dp(16), dp(14))
+        background = rounded(panel, 16)
         elevation = dp(2).toFloat()
     }
-
-    private fun label(value: String, size: Int, color: Int, bold: Boolean = false) = TextView(this).apply {
-        text = value
-        textSize = size.toFloat()
-        setTextColor(color)
+    private fun text(value: String, size: Int, color: Int, bold: Boolean = false) = TextView(this).apply {
+        text = value; textSize = size.toFloat(); setTextColor(color)
         if (bold) typeface = Typeface.DEFAULT_BOLD
-        setPadding(0, dp(3), 0, dp(4))
+        setPadding(0, dp(3), 0, dp(5))
     }
-
-    private fun actionButton(value: String, action: () -> Unit) = Button(this).apply {
-        text = value
-        textSize = 12f
-        isAllCaps = false
-        setTextColor(white)
-        background = rounded(Color.rgb(28, 65, 82), 12)
+    private fun button(value: String, action: () -> Unit) = Button(this).apply {
+        text = value; textSize = 11f; isAllCaps = false; setTextColor(white)
+        background = rounded(Color.rgb(29, 65, 72), 11)
         setOnClickListener { action() }
-        layoutParams = LinearLayout.LayoutParams(-1, dp(48)).apply { topMargin = dp(8) }
+        layoutParams = LinearLayout.LayoutParams(-1, dp(46)).apply { topMargin = dp(7) }
     }
-
     private fun rounded(color: Int, radius: Int) = GradientDrawable().apply {
-        setColor(color)
-        cornerRadius = dp(radius).toFloat()
+        setColor(color); cornerRadius = dp(radius).toFloat()
     }
-
-    private fun gap(height: Int) = View(this).apply { layoutParams = LinearLayout.LayoutParams(1, dp(height)) }
-    private fun fullWidth() = LinearLayout.LayoutParams(-1, -2)
+    private fun space(height: Int) = View(this).apply { layoutParams = LinearLayout.LayoutParams(1, dp(height)) }
+    private fun match() = LinearLayout.LayoutParams(-1, -2)
     private fun dp(value: Int) = (value * resources.displayMetrics.density).toInt()
-
-    companion object {
-        private const val MODE_AUTO = 0
-        private const val MODE_MOTION = 1
-        private const val MODE_MAGNETIC = 2
-    }
 }
