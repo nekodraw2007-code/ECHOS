@@ -465,21 +465,32 @@ class MainActivity : Activity(), SensorEventListener {
         addHistory("Calibration démarrée")
     }
 
+    // Les callbacks des capteurs peuvent arriver depuis plusieurs HandlerThreads.
+    // L'accès à la liste est synchronisé et toute mise à jour UI passe par le thread principal.
+    @Synchronized
     private fun collectCalibration(value: Float) {
-        if (!value.isFinite()) return
+        if (!calibrating || !value.isFinite()) return
         calibrationValues.add(value)
-        if (calibrationValues.size >= 150) finishCalibration()
-        else if (calibrationValues.size % 25 == 0) statusView.text = "Calibration · ${calibrationValues.size}/150 mesures"
+        val count = calibrationValues.size
+        if (count >= 150) {
+            // Verrouille immédiatement la collecte pour éviter plusieurs fins simultanées.
+            calibrating = false
+            runOnUiThread { finishCalibration() }
+        } else if (count % 25 == 0) {
+            runOnUiThread {
+                if (calibrating) statusView.text = "Calibration · $count/150 mesures"
+            }
+        }
     }
 
+    // Appelée exclusivement sur le thread UI.
     private fun finishCalibration() {
-        if (calibrationValues.size < 20) return
+        if (calibrationValues.size < 150 || calibrated) return
         val sorted = calibrationValues.sorted()
         baseline = sorted[sorted.size / 2]
         val deviations = sorted.map { abs(it - baseline) }.sorted()
         noiseFloor = (deviations[deviations.size / 2] * 1.4826f).coerceAtLeast(0.015f)
         calibrated = true
-        calibrating = false
         stopGhostTubeSensorListeners()
         getSharedPreferences("echos_preferences", MODE_PRIVATE).edit()
             .putFloat("baseline", baseline).putFloat("noise_floor", noiseFloor).putBoolean("calibrated", true).apply()
