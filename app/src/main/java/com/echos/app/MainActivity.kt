@@ -564,41 +564,38 @@ class MainActivity : Activity(), SensorEventListener {
     @Synchronized
     private fun processMagneticSignature(x: Double, y: Double, z: Double, magnitude: Double) {
         val now = System.currentTimeMillis()
-        // La calibration est facultative : GhostTube peut exploiter les signatures
-        // brutes dès le démarrage. Exiger calibrated ici bloquait TOUS les mots
-        // lorsqu'aucune calibration valide n'avait été enregistrée.
-        if (now < nextWordAt) return
+        if (!magnitude.isFinite() || magnitude <= 0.0 || now < nextWordAt) return
+
         val pool = activeWordPool()
         if (pool.isEmpty()) return
         ensureSensorOrder(pool.size)
 
-        // Ne pas imposer de seuil de variation par rapport à la baseline :
-        // ce filtre cumulait un second verrou avec la tolérance de signature et
-        // rendait les déclenchements quasiment impossibles sur certains téléphones.
-        // Le magnétomètre seul reste la source des mots (pas le mouvement brut).
-
-        // GhostTube calcule sqrt(x² + y² + z²), puis ignore les trois premières décimales.
-        val norm = sqrt(x * x + y * y + z * z)
-        val fraction = sensorFraction(norm)
-        if (fraction.length <= 3) return
-        val digits = repeatDigitsTo20(fraction.drop(3), inclusive = true)
-        if (digits.length < 20) return
-
-        val prefixLength = (pool.size * 10_000).toString().length - 1
-        val raw = digits.take(prefixLength).toIntOrNull() ?: return
-        val remainder = raw % 10_000
-        val tolerance = 10 + (sensitivity * 90f).toInt()
-        if (remainder != 0 && remainder > tolerance) return
-
-        val index = (raw - remainder) / 10_000
-        if (index in 1..pool.size && digits != lastMagneticSignature) {
-            val entry = orderedEntry(pool, index) ?: return
-            lastMagneticSignature = digits
-            emitWord(entry, "signature magnétique · variation %.2f µT".format(Locale.FRANCE, abs(magnitude - baseline)), digits)
-            // Délai progressif : réduit à sensibilité élevée, sans rafale.
-            val cooldownSeconds = 10 + ((1f - sensitivity) * 35f).toInt()
-            nextWordAt = now + cooldownSeconds * 1_000L
+        // Empreinte calculée uniquement à partir des mesures du magnétomètre.
+        // On ne demande plus qu'une combinaison décimale très rare apparaisse :
+        // ce filtre pouvait empêcher tout mot de sortir pendant une session entière.
+        val rawFingerprint = listOf(x, y, z, magnitude).joinToString("|") {
+            BigDecimal(it).stripTrailingZeros().toPlainString()
         }
+        val fingerprint = rawFingerprint
+            .filter { it.isDigit() }
+            .take(20)
+            .padEnd(20, '0')
+
+        // Une fenêtre temporelle évite les déclenchements en rafale :
+        // le mot est choisi à partir de l'empreinte magnétique observée dans cette fenêtre.
+        val cooldownSeconds = 10 + ((1f - sensitivity) * 35f).toInt()
+        val timeSlot = now / (cooldownSeconds * 1_000L)
+        val seed = (fingerprint + timeSlot.toString()).hashCode()
+        val index = Math.floorMod(seed, pool.size)
+        val entry = pool.getOrNull(index) ?: return
+
+        lastMagneticSignature = fingerprint
+        emitWord(
+            entry,
+            "empreinte magnétique · champ %.2f µT".format(Locale.FRANCE, magnitude),
+            fingerprint
+        )
+        nextWordAt = now + cooldownSeconds * 1_000L
     }
 
     @Synchronized
