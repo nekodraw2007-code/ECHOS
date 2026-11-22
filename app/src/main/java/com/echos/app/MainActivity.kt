@@ -91,10 +91,10 @@ class MainActivity : Activity(), SensorEventListener {
         magnetic = sensors.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD)
         magneticUncalibrated = sensors.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD_UNCALIBRATED)
         accelerometer = sensors.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
-        accelerometerUncalibrated = sensors.getDefaultSensor(35) // TYPE_ACCELEROMETER_UNCALIBRATED
+        accelerometerUncalibrated = if (accelerometer == null) sensors.getDefaultSensor(35) else null
         gyroscope = sensors.getDefaultSensor(Sensor.TYPE_GYROSCOPE)
-        gyroscopeUncalibrated = sensors.getDefaultSensor(16) // TYPE_GYROSCOPE_UNCALIBRATED
-        gameRotationVector = sensors.getDefaultSensor(15) // TYPE_GAME_ROTATION_VECTOR
+        gyroscopeUncalibrated = if (gyroscope == null) sensors.getDefaultSensor(16) else null
+        gameRotationVector = null
         loadDictionary()
         loadPreferences()
         buildInterface()
@@ -276,14 +276,14 @@ class MainActivity : Activity(), SensorEventListener {
         val hasMag = magnetic != null || magneticUncalibrated != null
         sensorLabel.text = "Magnétomètre : " + if (hasMag) "disponible" else "absent"
         sensorLabel.append("\nAccéléromètre : " + if (accelerometer != null || accelerometerUncalibrated != null) "disponible" else "absent")
-        sensorLabel.append("\nGyroscope / rotation : " + if (gyroscope != null || gyroscopeUncalibrated != null || gameRotationVector != null) "disponible" else "absent")
+        sensorLabel.append("\nGyroscope : " + if (gyroscope != null || gyroscopeUncalibrated != null) "disponible" else "absent")
         currentMode = if (hasMag) "MAGNÉTIQUE" else "MOUVEMENT"
         statusView.text = when {
-            !hasMag && accelerometer == null && accelerometerUncalibrated == null && gyroscope == null && gyroscopeUncalibrated == null && gameRotationVector == null -> "Aucun capteur compatible détecté"
+            !hasMag && accelerometer == null && accelerometerUncalibrated == null && gyroscope == null && gyroscopeUncalibrated == null -> "Aucun capteur compatible détecté"
             calibrated -> "Capteurs prêts · calibration enregistrée"
             else -> "Capteurs prêts · calibration facultative"
         }
-        statusView.setTextColor(if (hasMag || accelerometer != null || accelerometerUncalibrated != null || gyroscope != null || gyroscopeUncalibrated != null || gameRotationVector != null) orange else red)
+        statusView.setTextColor(if (hasMag || accelerometer != null || accelerometerUncalibrated != null || gyroscope != null || gyroscopeUncalibrated != null) orange else red)
         fieldView.text = if (hasMag) "%.1f µT".format(Locale.FRANCE, magneticMagnitude) else "INDISPONIBLE"
     }
 
@@ -295,7 +295,6 @@ class MainActivity : Activity(), SensorEventListener {
         accelerometerUncalibrated?.let { sensors.registerListener(this, it, SensorManager.SENSOR_DELAY_GAME) }
         gyroscope?.let { sensors.registerListener(this, it, SensorManager.SENSOR_DELAY_GAME) }
         gyroscopeUncalibrated?.let { sensors.registerListener(this, it, SensorManager.SENSOR_DELAY_GAME) }
-        gameRotationVector?.let { sensors.registerListener(this, it, SensorManager.SENSOR_DELAY_GAME) }
     }
 
     override fun onPause() {
@@ -328,7 +327,7 @@ class MainActivity : Activity(), SensorEventListener {
                 if (calibrating && magnetic == null && magneticUncalibrated == null) collectCalibration(accelerationMagnitude)
                 else if (sessionActive) processMotionSignature(v[0].toDouble(), v[1].toDouble(), v[2].toDouble(), preciseAcceleration, "accéléromètre")
             }
-            Sensor.TYPE_GYROSCOPE, 16, 15 -> {
+            Sensor.TYPE_GYROSCOPE, 16 -> {
                 val preciseRotation = sqrt(v[0].toDouble()*v[0] + v[1].toDouble()*v[1] + v[2].toDouble()*v[2])
                 rotationMagnitude = preciseRotation.toFloat()
                 if (calibrating && magnetic == null && magneticUncalibrated == null) collectCalibration(rotationMagnitude)
@@ -339,8 +338,7 @@ class MainActivity : Activity(), SensorEventListener {
 
     private fun startCalibration() {
         if (magnetic == null && magneticUncalibrated == null && accelerometer == null &&
-            accelerometerUncalibrated == null && gyroscope == null &&
-            gyroscopeUncalibrated == null && gameRotationVector == null) {
+            accelerometerUncalibrated == null && gyroscope == null && gyroscopeUncalibrated == null) {
             toast("Aucun capteur compatible sur cet appareil.")
             return
         }
@@ -401,104 +399,106 @@ class MainActivity : Activity(), SensorEventListener {
         sessionStartedAt = System.currentTimeMillis()
         motionSamples = 0
         motionEnergy = 0.0
-        nextWordAt = System.currentTimeMillis() + 1800L
+        nextWordAt = 0L
         lastSignatureAt = 0L
+        shuffledWordIndexes = (0 until activeWordPool().size).toMutableList()
         sessionButton.text = "ARRÊTER LA SESSION"
         statusView.text = "SESSION ACTIVE · ANALYSE DES SIGNATURES"
         statusView.setTextColor(accent)
         addHistory("Session démarrée · mode $currentMode")
     }
 
-    // Moteur de signatures inspiré de la mécanique observable de GhostTube.
-    // Les deux voies utilisent les décimales des mesures, une fenêtre de sensibilité et un index dictionnaire.
-    // Une sortie de secours évite un écran éternellement vide quand aucune signature ne correspond.
+    // Reproduction indépendante des deux voies de sélection observées dans GhostTube 6.2.5.
+    // Aucun mot n'est généré si la signature ne satisfait pas les seuils du dictionnaire.
+    private fun sensorFraction(value: Double): String {
+        if (!value.isFinite()) return ""
+        val decimal = BigDecimal(abs(value).toString()).toPlainString()
+        return decimal.substringAfter(".", "")
+    }
+
+    private fun repeatDigitsTo20(source: String, inclusive: Boolean): String {
+        if (source.isEmpty()) return ""
+        var digits = source
+        while (if (inclusive) digits.length <= 20 else digits.length < 20) digits += digits
+        return digits.take(20)
+    }
+
     private fun processMagneticSignature(x: Double, y: Double, z: Double, magnitude: Double) {
         val now = System.currentTimeMillis()
-        if (now - lastSignatureAt < 900L || now < nextWordAt) return
-        lastSignatureAt = now
+        if (now - nextWordAt < 1_000L) return
         val pool = activeWordPool()
         if (pool.isEmpty()) return
-        ensureSensorOrder(pool.size)
-        val signatureMagnitude = sqrt(x * x * x * x + y * y * y * y + z * z * z * z)
-        val digits = decimalDigits(signatureMagnitude, dropLeading = 3, rotate = false)
-        val prefixLength = ((pool.size.toLong() * 10_000L).toString().length - 1).coerceIn(1, digits.length)
-        val raw = digits.take(prefixLength).toLongOrNull()
-        val tolerance = (10 + sensitivity * 90f).toInt()
-        val remainder = raw?.rem(10_000L)
-        val index = if (raw != null && remainder != null && (remainder == 0L || remainder <= tolerance.toLong())) (raw - remainder) / 10_000L else null
-        if (index != null && index > 0L && index < pool.size.toLong()) {
-            orderedEntry(pool, index.toInt())?.let { entry ->
-                emitWord(entry, "signature magnétique · " + "%.1f".format(Locale.FRANCE, magnitude) + " µT")
-                nextWordAt = now + (70f + (1f - sensitivity) * 120f).toLong() * 1000L
-            }
-        } else emitFallbackIfDue(pool, signatureMagnitude, "secours magnétique", now)
-        shuffledWordIndexes.shuffle()
-    }
 
-    private var motionSamples = 0
-    private var lastMotionValue = 0.0
-    private var motionEnergy = 0.0
+        // GhostTube calcule sqrt(x² + y² + z²), puis ignore les trois premières décimales.
+        val norm = sqrt(x * x + y * y + z * z)
+        val fraction = sensorFraction(norm)
+        if (fraction.length <= 3) return
+        val digits = repeatDigitsTo20(fraction.drop(3), inclusive = true)
+        if (digits.length < 20) return
+
+        val prefixLength = (pool.size * 10_000).toString().length - 1
+        val raw = digits.take(prefixLength).toIntOrNull() ?: return
+        val remainder = raw % 10_000
+        val tolerance = 10 + (sensitivity * 90f).toInt()
+        if (remainder != 0 && remainder > tolerance) return
+
+        val index = (raw - remainder) / 10_000
+        if (index in 1..pool.size) {
+            pool.getOrNull(index)?.let { entry ->
+                emitWord(entry, "signature magnétique · " + "%.1f".format(Locale.FRANCE, magnitude) + " µT")
+            }
+            val upperExclusive = (70f + (1f - sensitivity) * 120f).toInt().coerceAtLeast(11)
+            nextWordAt = now + Random.nextInt(10, upperExclusive) * 1_000L
+        }
+    }
 
     private fun processMotionSignature(x: Double, y: Double, z: Double, magnitude: Double, source: String) {
-        if (!magnitude.isFinite()) return
         val now = System.currentTimeMillis()
-        motionSamples++
-        val difference = abs(magnitude - lastMotionValue)
-        lastMotionValue = magnitude
-        motionEnergy = motionEnergy * 0.88 + difference * 0.12
-        if (now - lastSignatureAt < 900L || now < nextWordAt) return
+        if (now - nextWordAt < 1_000L) return
         val pool = activeWordPool()
         if (pool.isEmpty()) return
-        ensureSensorOrder(pool.size)
-        lastSignatureAt = now
-        val digits = decimalDigits(magnitude, dropLeading = 0, rotate = true)
-        val gate = digits.take(4).toIntOrNull() ?: -1
+
+        // GhostTube garde 20 décimales et fait pivoter les trois premières à la fin.
+        val norm = sqrt(x * x + y * y + z * z)
+        val fraction = sensorFraction(norm)
+        if (fraction.isEmpty()) return
+        val first20 = repeatDigitsTo20(fraction, inclusive = false)
+        if (first20.length < 20) return
+        val signature = first20.substring(3, 20) + first20.substring(0, 3)
+        val gate = signature.substring(0, 4).toIntOrNull() ?: return
         val tolerance = (sensitivity * 30f).toInt() + 1
-        val indexEnd = (kotlin.math.floor(kotlin.math.log10(pool.size.toDouble())).toInt() + 5).coerceIn(5, digits.length)
-        val index = if (gate >= 0 && (gate <= tolerance || gate >= 10_000 - tolerance) && indexEnd > 5) digits.substring(5, indexEnd).toIntOrNull() else null
-        if (index != null && index > 0 && index < pool.size) {
-            orderedEntry(pool, index)?.let { entry ->
-                emitWord(entry, "signature " + source + " · énergie " + "%.4f".format(Locale.FRANCE, motionEnergy))
-                nextWordAt = now + (11f + (1f - sensitivity) * 45f).toLong() * 1000L
+
+        if (gate <= tolerance || gate >= 10_000 - tolerance) {
+            val end = (kotlin.math.log10(pool.size.toDouble()).toInt() + 5).coerceAtMost(signature.length)
+            if (end > 5) {
+                val index = signature.substring(5, end).toIntOrNull()
+                if (index != null) {
+                    pool.getOrNull(index)?.let { entry ->
+                        emitWord(entry, "signature " + source + " · " + "%.4f".format(Locale.FRANCE, norm))
+                        val upperExclusive = ((1f - sensitivity) * 45f).toInt() + 11
+                        nextWordAt = now + Random.nextInt(10, upperExclusive.coerceAtLeast(11)) * 1_000L
+                    }
+                }
             }
-        } else emitFallbackIfDue(pool, magnitude + motionEnergy, "secours " + source, now)
-        shuffledWordIndexes.shuffle()
-    }
-
-    private fun decimalDigits(value: Double, dropLeading: Int, rotate: Boolean): String {
-        val decimal = BigDecimal(abs(value).toString()).toPlainString()
-        val fraction = decimal.substringAfter(".", "0").filter { it.isDigit() }.ifEmpty { "0" }
-        var digits = fraction.drop(dropLeading).ifEmpty { "0" }
-        while (digits.length <= 20) digits += digits
-        digits = digits.take(20)
-        return if (rotate && digits.length >= 20) digits.substring(3) + digits.substring(0, 3) else digits
-    }
-
-    private fun ensureSensorOrder(size: Int) {
-        if (shuffledWordIndexes.size != size) {
-            shuffledWordIndexes = (0 until size).toMutableList()
+            // GhostTube mélange le dictionnaire après une signature mouvement acceptée.
+            ensureSensorOrder(pool.size)
             shuffledWordIndexes.shuffle()
         }
     }
 
-    private fun orderedEntry(pool: List<WordEntry>, index: Int): WordEntry? {
-        if (index !in shuffledWordIndexes.indices) return null
-        return pool.getOrNull(shuffledWordIndexes[index])
+    private fun ensureSensorOrder(size: Int) {
+        if (shuffledWordIndexes.size != size) shuffledWordIndexes = (0 until size).toMutableList()
     }
 
-    private fun emitFallbackIfDue(pool: List<WordEntry>, signal: Double, reason: String, now: Long) {
-        val reference = maxOf(sessionStartedAt, lastWordAt)
-        if (now - reference < 12_000L || pool.isEmpty()) return
-        val raw = abs((signal * 1_000_000.0).toLong()) xor (now / 1_200L)
-        val index = Math.floorMod(raw, pool.size.toLong()).toInt()
-        emitWord(pool[index], reason + " · aucune signature exploitable")
-        nextWordAt = now + 8_000L
+    private fun orderedEntry(pool: List<WordEntry>, index: Int): WordEntry? {
+        ensureSensorOrder(pool.size)
+        return shuffledWordIndexes.getOrNull(index)?.let { pool.getOrNull(it) }
     }
+
     private fun activeWordPool(): List<WordEntry> {
+        // Une entrée = un index, sans répétition pondérée artificielle.
         val base = baseEntries.filter { it.category in activeCategories && it.text.isNotBlank() }
-            .flatMap { entry -> List(entry.weight.coerceIn(1, 5)) { entry } }
         val custom = customEntries.filter { it.category in activeCategories && it.text.isNotBlank() }
-            .flatMap { entry -> List(7) { entry } }
         return base + custom
     }
 
