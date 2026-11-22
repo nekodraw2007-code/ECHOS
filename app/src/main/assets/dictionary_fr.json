@@ -284,16 +284,6 @@
     },
     {
       "category": "Réponses",
-      "text": "Je confirme",
-      "weight": 1
-    },
-    {
-      "category": "Réponses",
-      "text": "Je refuse",
-      "weight": 1
-    },
-    {
-      "category": "Réponses",
       "text": "Je demande de l'aide",
       "weight": 1
     },
@@ -1039,11 +1029,6 @@
     },
     {
       "category": "Émotions",
-      "text": "PARDON",
-      "weight": 1
-    },
-    {
-      "category": "Émotions",
       "text": "REGRET",
       "weight": 1
     },
@@ -1335,11 +1320,6 @@
     {
       "category": "Émotions",
       "text": "Je pense à solitude",
-      "weight": 1
-    },
-    {
-      "category": "Émotions",
-      "text": "Je pense à pardon",
       "weight": 1
     },
     {
@@ -2729,11 +2709,6 @@
     },
     {
       "category": "Objets",
-      "text": "PORTE",
-      "weight": 1
-    },
-    {
-      "category": "Objets",
       "text": "TIROIR",
       "weight": 1
     },
@@ -3029,11 +3004,6 @@
     },
     {
       "category": "Sensations et corps",
-      "text": "SILENCE",
-      "weight": 1
-    },
-    {
-      "category": "Sensations et corps",
       "text": "ODEUR",
       "weight": 1
     },
@@ -3055,11 +3025,6 @@
     {
       "category": "Sensations et corps",
       "text": "VIBRATION",
-      "weight": 1
-    },
-    {
-      "category": "Sensations et corps",
-      "text": "PROCHE",
       "weight": 1
     },
     {
@@ -3329,11 +3294,6 @@
     },
     {
       "category": "Sensations et corps",
-      "text": "Je pense à silence",
-      "weight": 1
-    },
-    {
-      "category": "Sensations et corps",
       "text": "Je pense à odeur",
       "weight": 1
     },
@@ -3355,11 +3315,6 @@
     {
       "category": "Sensations et corps",
       "text": "Je pense à vibration",
-      "weight": 1
-    },
-    {
-      "category": "Sensations et corps",
-      "text": "Je pense à proche",
       "weight": 1
     },
     {
@@ -3545,11 +3500,6 @@
     {
       "category": "Actions",
       "text": "MONTRER",
-      "weight": 1
-    },
-    {
-      "category": "Actions",
-      "text": "ATTENDRE",
       "weight": 1
     },
     {
@@ -4004,11 +3954,6 @@
     },
     {
       "category": "Nature et environnement",
-      "text": "EAU",
-      "weight": 1
-    },
-    {
-      "category": "Nature et environnement",
       "text": "FEU",
       "weight": 1
     },
@@ -4020,11 +3965,6 @@
     {
       "category": "Nature et environnement",
       "text": "AIR",
-      "weight": 1
-    },
-    {
-      "category": "Nature et environnement",
-      "text": "VENT",
       "weight": 1
     },
     {
@@ -4109,22 +4049,7 @@
     },
     {
       "category": "Nature et environnement",
-      "text": "FORÊT",
-      "weight": 1
-    },
-    {
-      "category": "Nature et environnement",
-      "text": "RIVIÈRE",
-      "weight": 1
-    },
-    {
-      "category": "Nature et environnement",
       "text": "OCÉAN",
-      "weight": 1
-    },
-    {
-      "category": "Nature et environnement",
-      "text": "LAC",
       "weight": 1
     },
     {
@@ -4150,11 +4075,6 @@
     {
       "category": "Nature et environnement",
       "text": "CENDRE",
-      "weight": 1
-    },
-    {
-      "category": "Nature et environnement",
-      "text": "FUMÉE",
       "weight": 1
     },
     {
@@ -4239,11 +4159,6 @@
     },
     {
       "category": "Nature et environnement",
-      "text": "MONTAGNE",
-      "weight": 1
-    },
-    {
-      "category": "Nature et environnement",
       "text": "VALLÉE",
       "weight": 1
     },
@@ -4304,11 +4219,6 @@
     },
     {
       "category": "Nature et environnement",
-      "text": "Je pense à eau",
-      "weight": 1
-    },
-    {
-      "category": "Nature et environnement",
       "text": "Je pense à feu",
       "weight": 1
     },
@@ -4320,11 +4230,6 @@
     {
       "category": "Nature et environnement",
       "text": "Je pense à air",
-      "weight": 1
-    },
-    {
-      "category": "Nature et environnement",
-      "text": "Je pense à vent",
       "weight": 1
     },
     {
@@ -4409,22 +4314,7 @@
     },
     {
       "category": "Nature et environnement",
-      "text": "Je pense à forêt",
-      "weight": 1
-    },
-    {
-      "category": "Nature et environnement",
-      "text": "Je pense à rivière",
-      "weight": 1
-    },
-    {
-      "category": "Nature et environnement",
       "text": "Je pense à océan",
-      "weight": 1
-    },
-    {
-      "category": "Nature et environnement",
-      "text": "Je pense à lac",
       "weight": 1
     },
     {
@@ -4450,11 +4340,6 @@
     {
       "category": "Nature et environnement",
       "text": "Je pense à cendre",
-      "weight": 1
-    },
-    {
-      "category": "Nature et environnement",
-      "text": "Je pense à fumée",
       "weight": 1
     },
     {
@@ -4509,17 +4394,7 @@
     },
     {
       "category": "Symboles et mystère",
-      "text": "OMBRE",
-      "weight": 1
-    },
-    {
-      "category": "Symboles et mystère",
       "text": "ÂME",
-      "weight": 1
-    },
-    {
-      "category": "Symboles et mystère",
-      "text": "SOUVENIR",
       "weight": 1
     },
     {
@@ -4559,11 +4434,6 @@
     },
     {
       "category": "Symboles et mystère",
-      "text": "VOIX",
-      "weight": 1
-    },
-    {
-      "category": "Symboles et mystère",
       "text": "MESSAGE",
       "weight": 1
     },
@@ -4584,16 +4454,6 @@
     },
     {
       "category": "Symboles et mystère",
-      "text": "CROIX",
-      "weight": 1
-    },
-    {
-      "category": "Symboles et mystère",
-      "text": "LUMIÈRE",
-      "weight": 1
-    },
-    {
-      "category": "Symboles et mystère",
       "text": "PORTAIL",
       "weight": 1
     },
@@ -4605,11 +4465,6 @@
     {
       "category": "Symboles et mystère",
       "text": "SEUIL",
-      "weight": 1
-    },
-    {
-      "category": "Symboles et mystère",
-      "text": "MIROIR",
       "weight": 1
     },
     {
@@ -4699,11 +4554,6 @@
     },
     {
       "category": "Symboles et mystère",
-      "text": "BOUGIE",
-      "weight": 1
-    },
-    {
-      "category": "Symboles et mystère",
       "text": "ENCENS",
       "weight": 1
     },
@@ -4715,11 +4565,6 @@
     {
       "category": "Symboles et mystère",
       "text": "AMULETTE",
-      "weight": 1
-    },
-    {
-      "category": "Symboles et mystère",
-      "text": "PENDULE",
       "weight": 1
     },
     {
@@ -4740,16 +4585,6 @@
     {
       "category": "Symboles et mystère",
       "text": "INVISIBLE",
-      "weight": 1
-    },
-    {
-      "category": "Symboles et mystère",
-      "text": "INCONNU",
-      "weight": 1
-    },
-    {
-      "category": "Symboles et mystère",
-      "text": "ÉCHO",
       "weight": 1
     },
     {
@@ -4809,17 +4644,7 @@
     },
     {
       "category": "Symboles et mystère",
-      "text": "Je pense à ombre",
-      "weight": 1
-    },
-    {
-      "category": "Symboles et mystère",
       "text": "Je pense à âme",
-      "weight": 1
-    },
-    {
-      "category": "Symboles et mystère",
-      "text": "Je pense à souvenir",
       "weight": 1
     },
     {
@@ -4889,11 +4714,6 @@
     },
     {
       "category": "Symboles et mystère",
-      "text": "Je pense à lumière",
-      "weight": 1
-    },
-    {
-      "category": "Symboles et mystère",
       "text": "Je pense à portail",
       "weight": 1
     },
@@ -4905,11 +4725,6 @@
     {
       "category": "Symboles et mystère",
       "text": "Je pense à seuil",
-      "weight": 1
-    },
-    {
-      "category": "Symboles et mystère",
-      "text": "Je pense à miroir",
       "weight": 1
     },
     {
@@ -5000,6 +4815,191 @@
     {
       "category": "Symboles et mystère",
       "text": "Je pense à bougie",
+      "weight": 1
+    },
+    {
+      "category": "Réponses",
+      "text": "ATTENDS ENCORE",
+      "weight": 1
+    },
+    {
+      "category": "Réponses",
+      "text": "JE REVIENDRAI",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "UN PROCHE",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "UN VOISIN",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "UNE SŒUR",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "UN FRÈRE",
+      "weight": 1
+    },
+    {
+      "category": "Émotions",
+      "text": "REGRET PROFOND",
+      "weight": 1
+    },
+    {
+      "category": "Émotions",
+      "text": "COLÈRE FROIDE",
+      "weight": 1
+    },
+    {
+      "category": "Émotions",
+      "text": "ESPOIR FRAGILE",
+      "weight": 1
+    },
+    {
+      "category": "Émotions",
+      "text": "GRANDE TRISTESSE",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "PRÈS DE LA FENÊTRE",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "AU BORD DE L'EAU",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "DANS LA CAVE",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "LA PIÈCE DU FOND",
+      "weight": 1
+    },
+    {
+      "category": "Temps et souvenirs",
+      "text": "À MINUIT",
+      "weight": 1
+    },
+    {
+      "category": "Temps et souvenirs",
+      "text": "AVANT L'AUBE",
+      "weight": 1
+    },
+    {
+      "category": "Temps et souvenirs",
+      "text": "AU CRÉPUSCULE",
+      "weight": 1
+    },
+    {
+      "category": "Temps et souvenirs",
+      "text": "L'ANNÉE DERNIÈRE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "UN MIROIR BRISÉ",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "UNE LAMPE ÉTEINTE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "UN VIEUX JOURNAL",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "UNE BAGUE PERDUE",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "MAINS ENGOURDIES",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "DOULEUR SOURDE",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "CHALEUR SOUDAINE",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "UNE PRÉSENCE PROCHE",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "FAIS UN SIGNE",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "RETOURNE-TOI",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "DIS MON NOM",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "PLUIE SUR LE TOIT",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "BRUME ÉPAISSE",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "FEUILLES QUI CRAQUENT",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "EAU QUI FRÉMIT",
+      "weight": 1
+    },
+    {
+      "category": "Symboles et mystère",
+      "text": "UN NOM OUBLIÉ",
+      "weight": 1
+    },
+    {
+      "category": "Symboles et mystère",
+      "text": "UNE PROMESSE BRISÉE",
+      "weight": 1
+    },
+    {
+      "category": "Symboles et mystère",
+      "text": "UN MESSAGE CACHÉ",
+      "weight": 1
+    },
+    {
+      "category": "Symboles et mystère",
+      "text": "LE DERNIER AVERTISSEMENT",
       "weight": 1
     }
   ]
