@@ -803,20 +803,27 @@ class MainActivity : Activity(), SensorEventListener {
         return repeatDigitsTo20(raw, inclusive = true)
     }
 
-    // Associe directement l'empreinte numérique à une entrée stable du dictionnaire.
-    // L'entrelacement des catégories évite qu'une catégorie volumineuse monopolise les sorties.
+    // Sélection équilibrée en deux étapes : d'abord une catégorie, puis une entrée
+    // de cette catégorie. Le nombre d'entrées d'une catégorie ne lui donne donc
+    // aucun avantage : 465 prénoms ne doivent pas écraser les autres thèmes.
+    // La signature issue du capteur reste la seule source de sélection.
     private fun selectSignatureEntry(pool: List<WordEntry>, signature: String): WordEntry? {
         if (pool.isEmpty() || signature.isEmpty()) return null
         val groups = pool.groupBy { it.category }.toSortedMap()
-        val ordered = mutableListOf<WordEntry>()
-        val maxSize = groups.values.maxOfOrNull { it.size } ?: 0
-        for (row in 0 until maxSize) {
-            groups.values.forEach { group -> group.getOrNull(row)?.let { ordered.add(it) } }
-        }
-        if (ordered.isEmpty()) return null
+        if (groups.isEmpty()) return null
         val numeric = runCatching { java.math.BigInteger(signature) }.getOrDefault(java.math.BigInteger.ZERO)
-        val index = numeric.mod(java.math.BigInteger.valueOf(ordered.size.toLong())).toInt()
-        return ordered[index]
+        val categoryIndex = numeric.mod(java.math.BigInteger.valueOf(groups.size.toLong())).toInt()
+        val selected = groups.values.elementAtOrNull(categoryIndex) ?: return null
+        if (selected.isEmpty()) return null
+        val entrySeed = runCatching { java.math.BigInteger(signature.reversed()) }
+            .getOrDefault(numeric)
+        val totalWeight = selected.sumOf { it.weight.coerceAtLeast(1) }
+        var target = entrySeed.mod(java.math.BigInteger.valueOf(totalWeight.toLong())).toInt()
+        for (entry in selected) {
+            target -= entry.weight.coerceAtLeast(1)
+            if (target < 0) return entry
+        }
+        return selected.lastOrNull()
     }
 
     private fun cooldownForSignature(signature: String): Long {
