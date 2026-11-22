@@ -12,6 +12,8 @@ jobs:
   build:
     name: Build and verify Android APK
     runs-on: ubuntu-latest
+    env:
+      HAS_RELEASE_SIGNING: ${{ secrets.ECHOS_KEYSTORE_BASE64 != '' && secrets.ECHOS_KEYSTORE_PASSWORD != '' && secrets.ECHOS_KEY_ALIAS != '' && secrets.ECHOS_KEY_PASSWORD != '' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -45,27 +47,27 @@ jobs:
           if-no-files-found: error
           retention-days: 14
       - name: Prepare permanent release signing key
-        if: ${{ secrets.ECHOS_KEYSTORE_BASE64 != '' && secrets.ECHOS_KEYSTORE_PASSWORD != '' && secrets.ECHOS_KEY_ALIAS != '' && secrets.ECHOS_KEY_PASSWORD != '' }}
+        if: ${{ env.HAS_RELEASE_SIGNING == 'true' }}
         env:
           ECHOS_KEYSTORE_BASE64: ${{ secrets.ECHOS_KEYSTORE_BASE64 }}
         run: |
           echo "$ECHOS_KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/echos-release.jks"
           echo "ECHOS_KEYSTORE_PATH=$RUNNER_TEMP/echos-release.jks" >> "$GITHUB_ENV"
       - name: Build permanent-key release APK
-        if: ${{ secrets.ECHOS_KEYSTORE_BASE64 != '' && secrets.ECHOS_KEYSTORE_PASSWORD != '' && secrets.ECHOS_KEY_ALIAS != '' && secrets.ECHOS_KEY_PASSWORD != '' }}
+        if: ${{ env.HAS_RELEASE_SIGNING == 'true' }}
         env:
           ECHOS_KEYSTORE_PASSWORD: ${{ secrets.ECHOS_KEYSTORE_PASSWORD }}
           ECHOS_KEY_ALIAS: ${{ secrets.ECHOS_KEY_ALIAS }}
           ECHOS_KEY_PASSWORD: ${{ secrets.ECHOS_KEY_PASSWORD }}
         run: gradle --no-daemon :app:assembleRelease
       - name: Verify permanent-key release APK
-        if: ${{ secrets.ECHOS_KEYSTORE_BASE64 != '' && secrets.ECHOS_KEYSTORE_PASSWORD != '' && secrets.ECHOS_KEY_ALIAS != '' && secrets.ECHOS_KEY_PASSWORD != '' }}
+        if: ${{ env.HAS_RELEASE_SIGNING == 'true' }}
         run: |
           APK="app/build/outputs/apk/release/app-release.apk"
           "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose --print-certs "$APK"
           "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$APK" | grep "package: name='com.echos.app'"
       - name: Upload permanent-key release APK
-        if: ${{ secrets.ECHOS_KEYSTORE_BASE64 != '' && secrets.ECHOS_KEYSTORE_PASSWORD != '' && secrets.ECHOS_KEY_ALIAS != '' && secrets.ECHOS_KEY_PASSWORD != '' }}
+        if: ${{ env.HAS_RELEASE_SIGNING == 'true' }}
         uses: actions/upload-artifact@v4
         with:
           name: ECHOS-APK-RELEASE-SIGNED
