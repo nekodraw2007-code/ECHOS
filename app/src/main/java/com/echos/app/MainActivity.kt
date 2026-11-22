@@ -423,7 +423,10 @@ class MainActivity : Activity(), SensorEventListener {
             isChecked = dynamicVoicesEnabled
             setOnCheckedChangeListener { _, enabled ->
                 dynamicVoicesEnabled = enabled
-                getSharedPreferences("echos_preferences", MODE_PRIVATE).edit().putBoolean("dynamic_voices_enabled", enabled).apply()
+                getSharedPreferences("echos_preferences", MODE_PRIVATE).edit()
+                    .putBoolean("dynamic_voices_enabled", enabled)
+                    .putLong("preferences_updated_at", System.currentTimeMillis()).apply()
+                syncPreferencesToCloud()
                 if (!enabled) speechEngine?.stop()
             }
         }, match())
@@ -1201,7 +1204,6 @@ class MainActivity : Activity(), SensorEventListener {
                     syncStatusMessage = "Connexion au cloud…"
                     attachCloudListeners(user.uid)
                     syncHistoryToCloud()
-                    syncPreferencesToCloud()
                 }
             }
         } catch (e: Exception) {
@@ -1530,7 +1532,7 @@ class MainActivity : Activity(), SensorEventListener {
         runOnUiThread {
             val user = firebaseAuth?.currentUser
             if (::accountStatusView.isInitialized && user != null) {
-                accountStatusView.text = "Connecté : ${user.displayName ?: user.email ?: "Compte Google"}\\n$message"
+                accountStatusView.text = "Connecté : ${user.displayName ?: user.email ?: "Compte Google"}\n$message"
             }
         }
     }
