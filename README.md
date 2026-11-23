@@ -37,3 +37,6 @@ Les capteurs mesurent des phénomènes physiques ordinaires. Les mots sont chois
 - Min SDK 23
 - Compile/Target SDK 35
 - Java 17, Gradle 8.9, Android Gradle Plugin 8.7.3
+
+
+Version 1.4.0 : détection des variations des capteurs inertiels avec référence adaptative, y compris sans magnétomètre.
