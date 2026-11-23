@@ -1061,12 +1061,28 @@ class MainActivity : Activity(), SensorEventListener {
             return
         }
         val deviation = abs(norm - reference)
+
+        // Bruit propre à chaque capteur : une fenêtre glissante et la MAD
+        // (médiane des écarts absolus) évitent qu'un capteur bruyant déclenche
+        // autant qu'un capteur stable. La médiane résiste aux pics isolés.
+        val samples = motionSamples.getOrPut(source) { mutableListOf() }
+        samples.add(norm)
+        while (samples.size > 31) samples.removeAt(0)
+        val sortedSamples = samples.sorted()
+        val median = sortedSamples[sortedSamples.size / 2]
+        val absoluteDeviations = sortedSamples.map { abs(it - median) }.sorted()
+        val adaptiveNoise = absoluteDeviations[absoluteDeviations.size / 2] * 1.4826 * 3.0
+
         val threshold = when (source) {
             "gyroscope" -> 0.12 + (1.0 - sensitivity.toDouble()) * 0.18
             "accéléromètre linéaire" -> 0.35 + (1.0 - sensitivity.toDouble()) * 0.45
             else -> 0.35 + (1.0 - sensitivity.toDouble()) * 0.45
         }
-        val effectiveThreshold = maxOf(threshold, if (calibrated) noiseFloor.toDouble() * 2.5 else 0.0)
+        val effectiveThreshold = maxOf(
+            threshold,
+            adaptiveNoise,
+            if (calibrated) noiseFloor.toDouble() * 2.5 else 0.0
+        )
         val wasActive = motionTriggerActive[source] == true
 
         // Mise à jour lente de la référence uniquement lorsque le capteur est calme.
