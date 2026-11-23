@@ -64,8 +64,18 @@ jobs:
           path: ${{ runner.temp }}/android-build-tools-35.0.0.tar.gz
           if-no-files-found: error
           retention-days: 7
+      - name: Check permanent signing secret
+        id: signing-check
+        env:
+          KEY_PASSWORD: ${{ secrets.ECHOS_KEY_ENCRYPTION_PASSWORD }}
+        run: |
+          if [ -n "$KEY_PASSWORD" ]; then
+            echo "available=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "available=false" >> "$GITHUB_OUTPUT"
+          fi
       - name: Restore permanent release signing key
-        if: ${{ secrets.ECHOS_KEY_ENCRYPTION_PASSWORD != '' }}
+        if: ${{ steps.signing-check.outputs.available == 'true' }}
         env:
           GH_TOKEN: ${{ github.token }}
           KEY_PASSWORD: ${{ secrets.ECHOS_KEY_ENCRYPTION_PASSWORD }}
@@ -79,10 +89,10 @@ jobs:
           echo "ECHOS_KEY_ALIAS=echos-upload" >> "$GITHUB_ENV"
           echo "ECHOS_KEY_PASSWORD=$KEY_PASSWORD" >> "$GITHUB_ENV"
       - name: Build permanent-key release APK
-        if: ${{ secrets.ECHOS_KEY_ENCRYPTION_PASSWORD != '' }}
+        if: ${{ steps.signing-check.outputs.available == 'true' }}
         run: gradle --no-daemon :app:assembleRelease
       - name: Verify permanent-key release APK matches permanent keystore
-        if: ${{ secrets.ECHOS_KEY_ENCRYPTION_PASSWORD != '' }}
+        if: ${{ steps.signing-check.outputs.available == 'true' }}
         env:
           KEY_PASSWORD: ${{ secrets.ECHOS_KEY_ENCRYPTION_PASSWORD }}
         run: |
@@ -96,7 +106,7 @@ jobs:
           test -n "$EXPECTED" && test "$EXPECTED" = "$ACTUAL" || { echo "ERROR: APK signature differs from permanent keystore."; exit 1; }
           echo "Permanent SHA-1: $ACTUAL"
       - name: Upload permanent-key release APK
-        if: ${{ secrets.ECHOS_KEY_ENCRYPTION_PASSWORD != '' }}
+        if: ${{ steps.signing-check.outputs.available == 'true' }}
         uses: actions/upload-artifact@v4
         with:
           name: ECHOS-APK-RELEASE-SIGNED
