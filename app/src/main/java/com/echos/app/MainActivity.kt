@@ -96,6 +96,11 @@ class MainActivity : Activity(), SensorEventListener {
     private val customCategories = mutableSetOf<String>()
     private val activeCategories = mutableSetOf<String>()
     private val history = mutableListOf<String>()
+    // Évite les répétitions immédiates même lorsque deux événements capteurs
+    // produisent exactement la même signature. Accès synchronisé car les
+    // capteurs peuvent être servis par des HandlerThreads distincts.
+    private val recentSelectionLock = Any()
+    private val recentSelectedTexts = java.util.ArrayDeque<String>()
     private val calibrationValues = mutableListOf<Float>()
 
     private var sensitivity = 0.5f
@@ -925,21 +930,53 @@ class MainActivity : Activity(), SensorEventListener {
     // La signature issue du capteur reste la seule source de sélection.
     private fun selectSignatureEntry(pool: List<WordEntry>, signature: String): WordEntry? {
         if (pool.isEmpty() || signature.isEmpty()) return null
-        val groups = pool.groupBy { it.category }.toSortedMap()
+        val groups = pool.groupBy { it.category }.toSortedMap().values.toList()
         if (groups.isEmpty()) return null
-        val numeric = runCatching { java.math.BigInteger(signature) }.getOrDefault(java.math.BigInteger.ZERO)
-        val categoryIndex = numeric.mod(java.math.BigInteger.valueOf(groups.size.toLong())).toInt()
-        val selected = groups.values.elementAtOrNull(categoryIndex) ?: return null
-        if (selected.isEmpty()) return null
+
+        val numeric = runCatching { java.math.BigInteger(signature) }
+            .getOrDefault(java.math.BigInteger.ZERO)
+        val categoryStart = numeric.mod(java.math.BigInteger.valueOf(groups.size.toLong())).toInt()
         val entrySeed = runCatching { java.math.BigInteger(signature.reversed()) }
             .getOrDefault(numeric)
-        val totalWeight = selected.sumOf { it.weight.coerceAtLeast(1) }
-        var target = entrySeed.mod(java.math.BigInteger.valueOf(totalWeight.toLong())).toInt()
-        for (entry in selected) {
-            target -= entry.weight.coerceAtLeast(1)
-            if (target < 0) return entry
+
+        // La signature conserve son rôle de source de sélection, mais une
+        // répétition immédiate ne doit pas renvoyer le même mot si des
+        // alternatives existent dans le dictionnaire.
+        synchronized(recentSelectionLock) {
+            val recent = recentSelectedTexts.toSet()
+            for (offset in groups.indices) {
+                val category = groups[(categoryStart + offset) % groups.size]
+                val candidates = category.filter { it.text !in recent }.ifEmpty {
+                    // Si toutes les entrées de cette catégorie sont récentes,
+                    // on essaie les catégories suivantes avant de répéter.
+                    emptyList()
+                }
+                if (candidates.isEmpty()) continue
+
+                val totalWeight = candidates.sumOf { it.weight.coerceAtLeast(1).toLong() }
+                if (totalWeight <= 0L) continue
+                var target = entrySeed.mod(java.math.BigInteger.valueOf(totalWeight)).toLong()
+                for (entry in candidates) {
+                    target -= entry.weight.coerceAtLeast(1).toLong()
+                    if (target < 0L) {
+                        recentSelectedTexts.addLast(entry.text)
+                        while (recentSelectedTexts.size > 8) recentSelectedTexts.removeFirst()
+                        return entry
+                    }
+                }
+                val fallback = candidates.last()
+                recentSelectedTexts.addLast(fallback.text)
+                while (recentSelectedTexts.size > 8) recentSelectedTexts.removeFirst()
+                return fallback
+            }
+
+            // Un dictionnaire très réduit peut ne contenir que des mots
+            // présents dans l'historique récent : on garantit alors un résultat.
+            val fallback = groups[categoryStart].firstOrNull() ?: return null
+            recentSelectedTexts.addLast(fallback.text)
+            while (recentSelectedTexts.size > 8) recentSelectedTexts.removeFirst()
+            return fallback
         }
-        return selected.lastOrNull()
     }
 
     private fun cooldownForSignature(signature: String): Long {
