@@ -86,6 +86,8 @@ class MainActivity : Activity(), SensorEventListener {
     private var speechReady = false
     private var dynamicVoicesEnabled = true
     private var dynamicVoices: List<Voice> = emptyList()
+    private var defaultFrenchVoice: Voice? = null
+    private lateinit var voiceInfoView: TextView
     private val motionSamples = mutableMapOf<String, MutableList<Double>>()
     private val motionStableSince = mutableMapOf<String, Long>()
 
@@ -417,7 +419,10 @@ class MainActivity : Activity(), SensorEventListener {
         settingsPage.addView(sensorsCard)
         settingsPage.addView(space(12))
         val voiceCard = card()
-        voiceCard.addView(text("VOIX", 10, accent, true))
+        voiceCard.addView(text("VOIX FRANÇAISES", 10, accent, true))
+        voiceInfoView = text("Recherche des voix françaises installées…", 11, muted)
+        voiceCard.addView(voiceInfoView)
+        voiceCard.addView(button("ÉCOUTER ET CHOISIR UNE VOIX") { showFrenchVoicePicker() }, match())
         voiceCard.addView(Switch(this).apply {
             text = "Voix dynamiques"
             setTextColor(white)
@@ -498,30 +503,124 @@ class MainActivity : Activity(), SensorEventListener {
     private fun initializeSpeech() {
         speechEngine = TextToSpeech(this) { status ->
             speechReady = status == TextToSpeech.SUCCESS
-            if (speechReady) {
-                val engine = speechEngine ?: return@TextToSpeech
-                val french = if (Locale.getDefault().language == "fr") Locale.getDefault() else Locale.FRANCE
+            if (!speechReady) {
+                runOnUiThread {
+                    if (::voiceInfoView.isInitialized) voiceInfoView.text = "Synthèse vocale indisponible. Vérifie le moteur de synthèse Android."
+                }
+                return@TextToSpeech
+            }
+            val engine = speechEngine ?: return@TextToSpeech
+            try {
+                val french = Locale.FRANCE
                 if (engine.isLanguageAvailable(french) >= TextToSpeech.LANG_AVAILABLE) engine.language = french
                 val voices = engine.voices ?: emptySet()
-                dynamicVoices = voices.filter { it.locale.language == french.language && !it.isNetworkConnectionRequired }.sortedBy { it.name }
-                    .ifEmpty { voices.filter { !it.isNetworkConnectionRequired }.sortedBy { it.name } }
+                // Garder toutes les voix françaises, y compris celles nécessitant le réseau.
+                // Les voix locales sont privilégiées pour rester utilisables hors ligne.
+                dynamicVoices = voices
+                    .filter { it.locale.language.equals("fr", ignoreCase = true) }
+                    .sortedWith(
+                        compareBy<Voice> { it.isNetworkConnectionRequired }
+                            .thenBy { !it.locale.country.equals("FR", ignoreCase = true) }
+                            .thenBy { it.name.lowercase(Locale.ROOT) }
+                    )
+                defaultFrenchVoice = dynamicVoices.firstOrNull { !it.isNetworkConnectionRequired }
+                    ?: dynamicVoices.firstOrNull()
+                defaultFrenchVoice?.let { engine.voice = it }
+                engine.setPitch(1.0f)
+                engine.setSpeechRate(0.92f)
+                runOnUiThread {
+                    if (::voiceInfoView.isInitialized) {
+                        val localCount = dynamicVoices.count { !it.isNetworkConnectionRequired }
+                        val networkCount = dynamicVoices.size - localCount
+                        voiceInfoView.text = if (dynamicVoices.isEmpty()) {
+                            "Aucune voix française détectée. Installe une voix française dans les paramètres de synthèse vocale Android."
+                        } else {
+                            "${dynamicVoices.size} voix françaises détectées · $localCount hors ligne · $networkCount en ligne"
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e("ECHOS_TTS", "Initialisation des voix françaises impossible", e)
             }
         }
     }
 
-    private fun speakWithSensorVoice(text: String, fingerprint: String) {
-        if (!dynamicVoicesEnabled || !speechReady || fingerprint.length < 8) return
+    private fun showFrenchVoicePicker() {
+        if (!speechReady) {
+            toast("La synthèse vocale n'est pas encore prête.")
+            return
+        }
+        if (dynamicVoices.isEmpty()) {
+            toast("Aucune voix française installée dans le moteur Android.")
+            return
+        }
+        val labels = dynamicVoices.map { voice ->
+            val connection = if (voice.isNetworkConnectionRequired) "En ligne" else "Hors ligne"
+            "${voice.name} · ${voice.locale.displayName} · $connection"
+        }.toTypedArray()
+        AlertDialog.Builder(this)
+            .setTitle("Tester les voix françaises")
+            .setItems(labels) { _, which ->
+                val selected = dynamicVoices[which]
+                try {
+                    speechEngine?.voice = selected
+                    speechEngine?.setPitch(1.0f)
+                    speechEngine?.setSpeechRate(0.92f)
+                    val sample = "Bonjour. Ceci est un test de la voix française d'ECHOS."
+                    speechEngine?.speak(sample, TextToSpeech.QUEUE_FLUSH, Bundle(), "echos-voice-test-${System.nanoTime()}")
+                    toast("Voix sélectionnée : ${selected.name}")
+                } catch (e: Exception) {
+                    Log.e("ECHOS_TTS", "Test de voix impossible", e)
+                    toast("Cette voix n'a pas pu être lancée.")
+                }
+            }
+            .setNegativeButton("Fermer", null)
+            .show()
+    }
+
+    private fun prepareFrenchSpeech(rawText: String): String {
+        return rawText.trim()
+            .replace("&", " et ")
+            .replace("/", ", ")
+            .replace(Regex("[_•…]+"), " ")
+            .replace(Regex("[–—-]+"), ", ")
+            .replace(Regex("\\s+"), " ")
+            .lowercase(Locale.FRANCE)
+    }
+
+    private fun fingerprintHexValue(fingerprint: String, index: Int, fallback: Int): Int {
+        if (fingerprint.isEmpty()) return fallback
+        return Character.digit(fingerprint[Math.floorMod(index, fingerprint.length)], 16)
+            .takeIf { it >= 0 } ?: fallback
+    }
+
+    private fun speakWithSensorVoice(rawText: String, fingerprint: String) {
+        if (!speechReady) return
         val engine = speechEngine ?: return
+        val spokenText = prepareFrenchSpeech(rawText)
+        if (spokenText.isBlank()) return
         try {
-            val voiceDigit = fingerprint[5].digitToIntOrNull() ?: 0
-            val pitchDigit = fingerprint[6].digitToIntOrNull() ?: 5
-            val rateDigit = fingerprint[7].digitToIntOrNull() ?: 5
-            if (dynamicVoices.isNotEmpty()) engine.voice = dynamicVoices[voiceDigit % dynamicVoices.size]
-            engine.setPitch(0.82f + (pitchDigit / 9f) * 0.38f)
-            engine.setSpeechRate(0.82f + (rateDigit / 9f) * 0.34f)
-            val params = Bundle().apply { putFloat("volume", 0.85f) }
-            engine.speak(text, TextToSpeech.QUEUE_FLUSH, params, "echos-${System.nanoTime()}")
-        } catch (_: Exception) { }
+            if (dynamicVoicesEnabled && dynamicVoices.isNotEmpty()) {
+                // Les chiffres hexadécimaux de la signature pilotent le profil vocal.
+                val voiceSeed = fingerprintHexValue(fingerprint, 4, 0) * 16 +
+                    fingerprintHexValue(fingerprint, 5, 0)
+                val pitchSeed = fingerprintHexValue(fingerprint, 6, 8)
+                val rateSeed = fingerprintHexValue(fingerprint, 7, 8)
+                val chosenVoice = dynamicVoices[voiceSeed % dynamicVoices.size]
+                engine.voice = chosenVoice
+                // Variations modérées pour conserver une diction compréhensible.
+                engine.setPitch(0.94f + (pitchSeed / 15f) * 0.12f)
+                engine.setSpeechRate(0.90f + (rateSeed / 15f) * 0.16f)
+            } else {
+                defaultFrenchVoice?.let { engine.voice = it }
+                engine.setPitch(1.0f)
+                engine.setSpeechRate(0.92f)
+            }
+            val params = Bundle().apply { putFloat("volume", 1.0f) }
+            engine.speak(spokenText, TextToSpeech.QUEUE_FLUSH, params, "echos-${System.nanoTime()}")
+        } catch (e: Exception) {
+            Log.e("ECHOS_TTS", "Lecture du mot impossible : $rawText", e)
+        }
     }
 
     private fun refreshSensorStatus() {
