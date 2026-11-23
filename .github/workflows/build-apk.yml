@@ -37,7 +37,7 @@ jobs:
       - name: Verify debug APK
         run: |
           APK="app/build/outputs/apk/debug/app-debug.apk"
-          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose --print-certs "$APK"
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose --print-certs "$APK" | tee debug-certificate.txt
           "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$APK" | tee apk-metadata.txt
           grep -q "package: name='com.echos.app'" apk-metadata.txt
           unzip -t "$APK" | tail -n 2
@@ -48,6 +48,15 @@ jobs:
           path: app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 14
+      - name: Publish OAuth certificate diagnostic
+        uses: actions/upload-artifact@v4
+        with:
+          name: ECHOS-OAUTH-CERTIFICATE-DIAGNOSTIC
+          path: |
+            debug-certificate.txt
+            apk-metadata.txt
+          if-no-files-found: error
+          retention-days: 30
       - name: Package official Android signing tools
         run: tar -czf "$RUNNER_TEMP/android-build-tools-35.0.0.tar.gz" -C "$ANDROID_HOME/build-tools" 35.0.0
       - name: Upload official Android signing tools
