@@ -658,7 +658,7 @@ class MainActivity : Activity(), SensorEventListener {
         val magSensor = magnetic ?: magneticUncalibrated
         if (magSensor != null) {
             magneticThread = HandlerThread("MagnetometerSensorThread").apply { start() }
-            if (sensors.registerListener(this, magSensor, 2, Handler(magneticThread!!.looper))) {
+            if (sensors.registerListener(this, magSensor, SensorManager.SENSOR_DELAY_GAME, Handler(magneticThread!!.looper))) {
                 registeredSensorTypes.add(magSensor.type)
             } else {
                 magneticThread?.quitSafely()
@@ -669,10 +669,10 @@ class MainActivity : Activity(), SensorEventListener {
         if (accelSensor != null || linearAccelerometer != null) {
             accelerometerThread = HandlerThread("AccelerometerThread").apply { start() }
             val handler = Handler(accelerometerThread!!.looper)
-            if (accelSensor != null && sensors.registerListener(this, accelSensor, 2, handler)) {
+            if (accelSensor != null && sensors.registerListener(this, accelSensor, SensorManager.SENSOR_DELAY_GAME, handler)) {
                 registeredSensorTypes.add(accelSensor.type)
             }
-            if (linearAccelerometer != null && sensors.registerListener(this, linearAccelerometer, 2, handler)) {
+            if (linearAccelerometer != null && sensors.registerListener(this, linearAccelerometer, SensorManager.SENSOR_DELAY_GAME, handler)) {
                 registeredSensorTypes.add(linearAccelerometer!!.type)
             }
             if (accelSensor == null && linearAccelerometer == null ||
@@ -687,7 +687,7 @@ class MainActivity : Activity(), SensorEventListener {
         val gyroSensor = gyroscope ?: gyroscopeUncalibrated
         if (gyroSensor != null) {
             gyroscopeThread = HandlerThread("GyroscopeThread").apply { start() }
-            if (sensors.registerListener(this, gyroSensor, 2, Handler(gyroscopeThread!!.looper))) {
+            if (sensors.registerListener(this, gyroSensor, SensorManager.SENSOR_DELAY_GAME, Handler(gyroscopeThread!!.looper))) {
                 registeredSensorTypes.add(gyroSensor.type)
             } else {
                 gyroscopeThread?.quitSafely()
@@ -696,7 +696,7 @@ class MainActivity : Activity(), SensorEventListener {
         }
         if (proximity != null) {
             proximityThread = HandlerThread("ProximitySensorThread").apply { start() }
-            if (sensors.registerListener(this, proximity, 2, Handler(proximityThread!!.looper))) {
+            if (sensors.registerListener(this, proximity, SensorManager.SENSOR_DELAY_GAME, Handler(proximityThread!!.looper))) {
                 registeredSensorTypes.add(proximity!!.type)
             } else {
                 proximityThread?.quitSafely()
@@ -737,7 +737,14 @@ class MainActivity : Activity(), SensorEventListener {
         val v = event.values
         when (event.sensor.type) {
             Sensor.TYPE_MAGNETIC_FIELD, Sensor.TYPE_MAGNETIC_FIELD_UNCALIBRATED -> {
-                val x = v[0]; val y = v[1]; val z = v[2]
+                // Les capteurs non calibrés Android exposent le biais estimé dans v[3..5].
+                // Le retirer évite d'intégrer un décalage électronique dans la signature.
+                val biasX = if (event.sensor.type == Sensor.TYPE_MAGNETIC_FIELD_UNCALIBRATED && v.size >= 6) v[3] else 0f
+                val biasY = if (event.sensor.type == Sensor.TYPE_MAGNETIC_FIELD_UNCALIBRATED && v.size >= 6) v[4] else 0f
+                val biasZ = if (event.sensor.type == Sensor.TYPE_MAGNETIC_FIELD_UNCALIBRATED && v.size >= 6) v[5] else 0f
+                val x = v[0] - biasX
+                val y = v[1] - biasY
+                val z = v[2] - biasZ
                 val preciseMagnitude = sqrt(x.toDouble()*x + y.toDouble()*y + z.toDouble()*z)
                 magneticMagnitude = preciseMagnitude.toFloat()
                 magneticDelta = if (baseline > 0f) abs(preciseMagnitude - baseline.toDouble()).toFloat() else 0f
@@ -781,8 +788,17 @@ class MainActivity : Activity(), SensorEventListener {
             Sensor.TYPE_GYROSCOPE, 15, 16 -> {
                 val preciseRotation = sqrt(v[0].toDouble()*v[0] + v[1].toDouble()*v[1] + v[2].toDouble()*v[2])
                 rotationMagnitude = preciseRotation.toFloat()
+                // Le gyroscope non calibré fournit également un biais estimé dans v[3..5].
+                val biasX = if ((event.sensor.type == 15 || event.sensor.type == 16) && v.size >= 6) v[3] else 0f
+                val biasY = if ((event.sensor.type == 15 || event.sensor.type == 16) && v.size >= 6) v[4] else 0f
+                val biasZ = if ((event.sensor.type == 15 || event.sensor.type == 16) && v.size >= 6) v[5] else 0f
+                val correctedX = v[0] - biasX
+                val correctedY = v[1] - biasY
+                val correctedZ = v[2] - biasZ
+                val correctedRotation = sqrt(correctedX.toDouble()*correctedX + correctedY.toDouble()*correctedY + correctedZ.toDouble()*correctedZ)
+                rotationMagnitude = correctedRotation.toFloat()
                 if (calibrating && magnetic == null && magneticUncalibrated == null) collectCalibration(rotationMagnitude)
-                else if (sessionActive) processMotionSignature(v[0].toDouble(), v[1].toDouble(), v[2].toDouble(), "gyroscope")
+                else if (sessionActive) processMotionSignature(correctedX.toDouble(), correctedY.toDouble(), correctedZ.toDouble(), "gyroscope")
             }
             Sensor.TYPE_PROXIMITY -> {
                 if (!sessionActive || v.isEmpty()) return
@@ -1017,7 +1033,7 @@ class MainActivity : Activity(), SensorEventListener {
         magneticReferenceVector = doubleArrayOf(x, y, z)
         lastMagneticSignature = signature
         nextWordAt = now + cooldownForSignature(signature)
-        emitWord(entry, "signature magnétique · Δ %.2f µT".format(Locale.FRANCE, magnitudeDelta), signature)
+        emitWord(entry, "magnétomètre · Δ %.2f µT · B %.2f µT · xyz %.2f/%.2f/%.2f".format(Locale.FRANCE, magnitudeDelta, magnitude, x, y, z), signature)
     }
 
     @Synchronized
@@ -1062,7 +1078,7 @@ class MainActivity : Activity(), SensorEventListener {
         nextWordAt = now + cooldownForSignature(signature)
         emitWord(
             entry,
-            "variation environnementale · $source · Δ %.3f".format(Locale.FRANCE, deviation),
+            "variation capteur · $source · norme %.3f · Δ %.3f · xyz %.3f/%.3f/%.3f".format(Locale.FRANCE, norm, deviation, x, y, z),
             signature
         )
     }
