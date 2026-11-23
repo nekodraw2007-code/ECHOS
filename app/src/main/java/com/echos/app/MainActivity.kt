@@ -768,18 +768,28 @@ class MainActivity : Activity(), SensorEventListener {
                 else if (sessionActive && norm >= 0.025) processMotionSignature(v[0].toDouble(), v[1].toDouble(), v[2].toDouble(), "accéléromètre linéaire")
             }
             Sensor.TYPE_ACCELEROMETER, 35 -> {
-                val preciseAcceleration = sqrt(v[0].toDouble()*v[0] + v[1].toDouble()*v[1] + v[2].toDouble()*v[2])
+                // Compensation du biais si Android expose l'accéléromètre non calibré.
+                val biasX = if (event.sensor.type == 35 && v.size >= 6) v[3] else 0f
+                val biasY = if (event.sensor.type == 35 && v.size >= 6) v[4] else 0f
+                val biasZ = if (event.sensor.type == 35 && v.size >= 6) v[5] else 0f
+                val ax = v[0] - biasX
+                val ay = v[1] - biasY
+                val az = v[2] - biasZ
+                val preciseAcceleration = sqrt(ax.toDouble()*ax + ay.toDouble()*ay + az.toDouble()*az)
                 accelerationMagnitude = preciseAcceleration.toFloat()
                 // À défaut de capteur linéaire, on retire la gravité par filtre passe-haut.
                 // Cela évite qu'un téléphone simplement posé déclenche un mot à partir des 9,8 m/s².
                 val alpha = 0.88f
                 if (!gravityInitialized) {
-                    for (i in 0..2) gravityVector[i] = v[i]
+                    gravityVector[0] = ax
+                    gravityVector[1] = ay
+                    gravityVector[2] = az
                     gravityInitialized = true
                 }
+                val corrected = floatArrayOf(ax, ay, az)
                 val linear = DoubleArray(3) { i ->
-                    gravityVector[i] += alpha * (v[i] - gravityVector[i])
-                    (v[i] - gravityVector[i]).toDouble()
+                    gravityVector[i] += alpha * (corrected[i] - gravityVector[i])
+                    (corrected[i] - gravityVector[i]).toDouble()
                 }
                 val linearNorm = sqrt(linear[0]*linear[0] + linear[1]*linear[1] + linear[2]*linear[2])
                 if (calibrating && magnetic == null && magneticUncalibrated == null) collectCalibration(linearNorm.toFloat())
