@@ -14,11 +14,11 @@
       },
       "oauth_client": [
         {
-          "client_id": "26674230114-73k5tjfo76q20rgvdrjbq3qc089thgdi.apps.googleusercontent.com",
+          "client_id": "26674230114-9jvpgrt3vr0ii9jer0p4vlr2gucfjn7r.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.echos.app",
-            "certificate_hash": "2af17519c9ca7e36cc1469c23cb11e238853102b"
+            "certificate_hash": "5bbf2a6253032e0952e0c6728fd846bc81ac373a"
           }
         },
         {
@@ -28,7 +28,7 @@
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyBf-AwHoeT30b7N7OMx1-MyoAz_t9FxaoU"
+          "current_key": "AIzaSyBf-AwHoeT30b7N7OMx1-MyoAz_t9FxaoAz_t9FxaoU"
         }
       ],
       "services": {
