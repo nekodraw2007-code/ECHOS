@@ -40,3 +40,5 @@ Les capteurs mesurent des phénomènes physiques ordinaires. Les mots sont chois
 
 
 Version 1.4.0 : détection des variations des capteurs inertiels avec référence adaptative, y compris sans magnétomètre.
+
+Version 1.5.0 : diction de synthèse vocale française normalisée, découverte des voix françaises installées (locales et réseau), test individuel des voix et sélection dynamique pilotée par la signature des capteurs. Le mode dynamique désactivé conserve une lecture française standard.
