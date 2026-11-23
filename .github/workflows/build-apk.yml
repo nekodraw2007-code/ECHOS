@@ -71,12 +71,16 @@ jobs:
           ECHOS_KEY_ALIAS: ${{ secrets.ECHOS_KEY_ALIAS }}
           ECHOS_KEY_PASSWORD: ${{ secrets.ECHOS_KEY_PASSWORD }}
         run: gradle --no-daemon :app:assembleRelease
-      - name: Verify permanent-key release APK
+      - name: Verify permanent-key release APK matches Firebase certificate
         if: ${{ env.HAS_RELEASE_SIGNING == 'true' }}
         run: |
           APK="app/build/outputs/apk/release/app-release.apk"
-          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose --print-certs "$APK"
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose --print-certs "$APK" | tee release-certificate.txt
           "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$APK" | grep "package: name='com.echos.app'"
+          grep -Fqi "SHA-1 digest: 07:35:50:11:38:59:f4:87:75:3a:7f:b8:52:5a:0c:a0:96:0e:59:89" release-certificate.txt || {
+            echo "ERROR: APK certificate does not match the historical Firebase OAuth SHA-1. Release blocked."
+            exit 1
+          }
       - name: Upload permanent-key release APK
         if: ${{ env.HAS_RELEASE_SIGNING == 'true' }}
         uses: actions/upload-artifact@v4
