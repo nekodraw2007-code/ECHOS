@@ -1390,6 +1390,32 @@ class MainActivity : Activity(), SensorEventListener {
         }
     }
 
+    // SHA-1 du certificat réellement utilisé pour signer l'APK installé.
+    // Google Sign-In code 10 est généralement causé par une empreinte absente du client OAuth Android.
+    @Suppress("DEPRECATION")
+    private fun installedApkCertificateSha1(): String? {
+        return try {
+            val signatures = if (android.os.Build.VERSION.SDK_INT >= 28) {
+                packageManager.getPackageInfo(
+                    packageName,
+                    android.content.pm.PackageManager.GET_SIGNING_CERTIFICATES
+                ).signingInfo?.apkContentsSigners
+            } else {
+                packageManager.getPackageInfo(
+                    packageName,
+                    android.content.pm.PackageManager.GET_SIGNATURES
+                ).signatures
+            }
+            signatures?.firstOrNull()?.toByteArray()?.let { certificate ->
+                MessageDigest.getInstance("SHA-1").digest(certificate)
+                    .joinToString(":") { byte -> "%02X".format(byte) }
+            }
+        } catch (e: Exception) {
+            Log.e("ECHOS_SYNC", "Impossible de lire le certificat de l'APK", e)
+            null
+        }
+    }
+
     // Connexion Google via le sélecteur natif Google Play Services.
     // Ce flux ouvre explicitement l'écran de choix de compte, puis échange l'ID token avec Firebase.
     private fun startGoogleSignIn() {
@@ -1402,6 +1428,8 @@ class MainActivity : Activity(), SensorEventListener {
             toast("Identifiant OAuth Web introuvable dans google-services.json.")
             return
         }
+        val installedSha1 = installedApkCertificateSha1()
+        Log.i("ECHOS_SYNC", "Démarrage OAuth package=$packageName, APK SHA-1=${installedSha1 ?: "indisponible"}")
         googleSignInButton.isEnabled = false
         googleSignInButton.text = "OUVERTURE DE GOOGLE…"
         val options = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -1459,7 +1487,7 @@ class MainActivity : Activity(), SensorEventListener {
         } catch (e: ApiException) {
             Log.e("ECHOS_SYNC", "Google Sign-In statusCode=${e.statusCode}, resultCode=$resultCode", e)
             val detail = when (e.statusCode) {
-                10 -> "Configuration OAuth incorrecte : package ou SHA-1 de cet APK."
+                10 -> "OAuth refusé. Package=${packageName} · SHA-1=${installedSha1 ?: "indisponible"}. Ajoute cette empreinte au client Android Firebase puis récupère le nouveau google-services.json."
                 16 -> "Réauthentification refusée par Google. Vérifie la signature SHA-1 de l'APK et Google Play Services."
                 12501 -> "Sélection Google annulée par l'utilisateur."
                 else -> e.localizedMessage ?: "Erreur Google"
