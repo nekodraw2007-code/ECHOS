@@ -1,6 +1,6 @@
 {
   "language": "fr",
-  "version": 4,
+  "version": 5,
   "entries": [
     {
       "category": "Réponses",
@@ -9145,6 +9145,4851 @@
     {
       "category": "Émotions",
       "text": "INDIFFÉRENCE",
+      "weight": 1
+    },
+    {
+      "category": "Réponses",
+      "text": "D'ACCORD",
+      "weight": 1
+    },
+    {
+      "category": "Réponses",
+      "text": "C'EST IMPOSSIBLE",
+      "weight": 1
+    },
+    {
+      "category": "Réponses",
+      "text": "PEUT-ÊTRE PAS",
+      "weight": 1
+    },
+    {
+      "category": "Réponses",
+      "text": "CERTAINEMENT",
+      "weight": 1
+    },
+    {
+      "category": "Réponses",
+      "text": "MAINTENANT",
+      "weight": 1
+    },
+    {
+      "category": "Réponses",
+      "text": "BIENTÔT",
+      "weight": 1
+    },
+    {
+      "category": "Réponses",
+      "text": "PLUS TÔT",
+      "weight": 1
+    },
+    {
+      "category": "Réponses",
+      "text": "ICI",
+      "weight": 1
+    },
+    {
+      "category": "Réponses",
+      "text": "LÀ-BAS",
+      "weight": 1
+    },
+    {
+      "category": "Réponses",
+      "text": "À CÔTÉ",
+      "weight": 1
+    },
+    {
+      "category": "Réponses",
+      "text": "DERRIÈRE",
+      "weight": 1
+    },
+    {
+      "category": "Réponses",
+      "text": "DEVANT",
+      "weight": 1
+    },
+    {
+      "category": "Réponses",
+      "text": "AU-DESSUS",
+      "weight": 1
+    },
+    {
+      "category": "Réponses",
+      "text": "EN DESSOUS",
+      "weight": 1
+    },
+    {
+      "category": "Réponses",
+      "text": "À L'INTÉRIEUR",
+      "weight": 1
+    },
+    {
+      "category": "Réponses",
+      "text": "À L'EXTÉRIEUR",
+      "weight": 1
+    },
+    {
+      "category": "Réponses",
+      "text": "REVIENS",
+      "weight": 1
+    },
+    {
+      "category": "Réponses",
+      "text": "ARRÊTE",
+      "weight": 1
+    },
+    {
+      "category": "Réponses",
+      "text": "JE T'ATTENDS",
+      "weight": 1
+    },
+    {
+      "category": "Réponses",
+      "text": "JE TE VOIS",
+      "weight": 1
+    },
+    {
+      "category": "Réponses",
+      "text": "JE NE TE VOIS PAS",
+      "weight": 1
+    },
+    {
+      "category": "Réponses",
+      "text": "JE TE CONNAIS",
+      "weight": 1
+    },
+    {
+      "category": "Réponses",
+      "text": "JE NE TE CONNAIS PAS",
+      "weight": 1
+    },
+    {
+      "category": "Réponses",
+      "text": "C'EST TOI",
+      "weight": 1
+    },
+    {
+      "category": "Réponses",
+      "text": "CE N'EST PAS TOI",
+      "weight": 1
+    },
+    {
+      "category": "Réponses",
+      "text": "UN INSTANT",
+      "weight": 1
+    },
+    {
+      "category": "Réponses",
+      "text": "ENCORE",
+      "weight": 1
+    },
+    {
+      "category": "Réponses",
+      "text": "ASSEZ",
+      "weight": 1
+    },
+    {
+      "category": "Réponses",
+      "text": "DAVANTAGE",
+      "weight": 1
+    },
+    {
+      "category": "Réponses",
+      "text": "CHOISIS",
+      "weight": 1
+    },
+    {
+      "category": "Réponses",
+      "text": "FAIS UN SIGNE",
+      "weight": 1
+    },
+    {
+      "category": "Réponses",
+      "text": "CALME-TOI",
+      "weight": 1
+    },
+    {
+      "category": "Réponses",
+      "text": "N'AIE PAS PEUR",
+      "weight": 1
+    },
+    {
+      "category": "Réponses",
+      "text": "JE N'AI PAS PEUR",
+      "weight": 1
+    },
+    {
+      "category": "Réponses",
+      "text": "JE SUIS PERDU",
+      "weight": 1
+    },
+    {
+      "category": "Réponses",
+      "text": "JE SUIS PERDUE",
+      "weight": 1
+    },
+    {
+      "category": "Réponses",
+      "text": "JE SUIS SEUL",
+      "weight": 1
+    },
+    {
+      "category": "Réponses",
+      "text": "JE SUIS SEULE",
+      "weight": 1
+    },
+    {
+      "category": "Réponses",
+      "text": "NOUS SOMMES LÀ",
+      "weight": 1
+    },
+    {
+      "category": "Réponses",
+      "text": "AU REVOIR",
+      "weight": 1
+    },
+    {
+      "category": "Réponses",
+      "text": "BONJOUR",
+      "weight": 1
+    },
+    {
+      "category": "Réponses",
+      "text": "BONSOIR",
+      "weight": 1
+    },
+    {
+      "category": "Réponses",
+      "text": "BONNE NUIT",
+      "weight": 1
+    },
+    {
+      "category": "Réponses",
+      "text": "BIENVENUE",
+      "weight": 1
+    },
+    {
+      "category": "Réponses",
+      "text": "PARDONNE-MOI",
+      "weight": 1
+    },
+    {
+      "category": "Réponses",
+      "text": "JE REGRETTE",
+      "weight": 1
+    },
+    {
+      "category": "Réponses",
+      "text": "JE T'AIDE",
+      "weight": 1
+    },
+    {
+      "category": "Réponses",
+      "text": "PARLE PLUS FORT",
+      "weight": 1
+    },
+    {
+      "category": "Réponses",
+      "text": "JE N'ENTENDS PAS",
+      "weight": 1
+    },
+    {
+      "category": "Réponses",
+      "text": "J'AI COMPRIS",
+      "weight": 1
+    },
+    {
+      "category": "Réponses",
+      "text": "C'EST ASSEZ",
+      "weight": 1
+    },
+    {
+      "category": "Réponses",
+      "text": "CE N'EST PAS IMPORTANT",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "INCONNUE",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "ÉTRANGÈRE",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "VISITEUSE",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "VOISINE",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "AMIE",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "ENNEMI",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "ENNEMIE",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "ADOLESCENTE",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "PERSONNE",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "FEMMES",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "HOMMES",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "JUMELLE",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "MARI",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "COMPAGNON",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "COMPAGNE",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "FIANCÉ",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "FIANCÉE",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "PATRON",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "PATRONNE",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "MÉDECIN",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "INFIRMIER",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "INFIRMIÈRE",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "PROFESSEUR",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "ÉLÈVE",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "OFFICIER",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "POLICIER",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "POMPIER",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "ARTISTE",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "MUSICIEN",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "CHANTEUR",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "CHANTEUSE",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "DANSEUR",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "DANSEUSE",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "MESSAGER",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "MESSAGÈRE",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "TÉMOIN",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "PROTECTRICE",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "GUIDE",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "CHEF",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "ROI",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "REINE",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "PRINCE",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "PRINCESSE",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "SERVITEUR",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "SERVANTE",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "MAÎTRE",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "MAÎTRESSE",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "ORPHELIN",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "ORPHELINE",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "VEUF",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "VEUVE",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "DISPARU",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "DISPARUE",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "SURVIVANT",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "SURVIVANTE",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "PRISONNIER",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "PRISONNIÈRE",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "INVISIBLE",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "PRÉSENCE",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "OMBRE",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "SILHOUETTE",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "VISAGE",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "VOIX",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "ESPRIT",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "ÂME",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "IDENTITÉ",
+      "weight": 1
+    },
+    {
+      "category": "Personnes et identité",
+      "text": "SURNOM",
+      "weight": 1
+    },
+    {
+      "category": "Émotions",
+      "text": "FUREUR",
+      "weight": 1
+    },
+    {
+      "category": "Émotions",
+      "text": "STRESS",
+      "weight": 1
+    },
+    {
+      "category": "Émotions",
+      "text": "CONFUSION",
+      "weight": 1
+    },
+    {
+      "category": "Émotions",
+      "text": "HÉSITATION",
+      "weight": 1
+    },
+    {
+      "category": "Émotions",
+      "text": "PLAISIR",
+      "weight": 1
+    },
+    {
+      "category": "Émotions",
+      "text": "CHAGRIN",
+      "weight": 1
+    },
+    {
+      "category": "Émotions",
+      "text": "PASSION",
+      "weight": 1
+    },
+    {
+      "category": "Émotions",
+      "text": "RESPECT",
+      "weight": 1
+    },
+    {
+      "category": "Émotions",
+      "text": "PITIÉ",
+      "weight": 1
+    },
+    {
+      "category": "Émotions",
+      "text": "REMORDS",
+      "weight": 1
+    },
+    {
+      "category": "Émotions",
+      "text": "INJUSTICE",
+      "weight": 1
+    },
+    {
+      "category": "Émotions",
+      "text": "MENACE",
+      "weight": 1
+    },
+    {
+      "category": "Émotions",
+      "text": "DANGER",
+      "weight": 1
+    },
+    {
+      "category": "Émotions",
+      "text": "SÉCURITÉ",
+      "weight": 1
+    },
+    {
+      "category": "Émotions",
+      "text": "LIBERTÉ",
+      "weight": 1
+    },
+    {
+      "category": "Émotions",
+      "text": "CAPTIVITÉ",
+      "weight": 1
+    },
+    {
+      "category": "Émotions",
+      "text": "FRISSON",
+      "weight": 1
+    },
+    {
+      "category": "Émotions",
+      "text": "MALAISÉ",
+      "weight": 1
+    },
+    {
+      "category": "Émotions",
+      "text": "HOSTILITÉ",
+      "weight": 1
+    },
+    {
+      "category": "Émotions",
+      "text": "DÉCOURAGEMENT",
+      "weight": 1
+    },
+    {
+      "category": "Émotions",
+      "text": "AMUSEMENT",
+      "weight": 1
+    },
+    {
+      "category": "Émotions",
+      "text": "FROIDEUR",
+      "weight": 1
+    },
+    {
+      "category": "Émotions",
+      "text": "CHALEUR",
+      "weight": 1
+    },
+    {
+      "category": "Émotions",
+      "text": "BIEN-ÊTRE",
+      "weight": 1
+    },
+    {
+      "category": "Émotions",
+      "text": "MALHEUR",
+      "weight": 1
+    },
+    {
+      "category": "Émotions",
+      "text": "DÉSOLATION",
+      "weight": 1
+    },
+    {
+      "category": "Émotions",
+      "text": "REJET",
+      "weight": 1
+    },
+    {
+      "category": "Émotions",
+      "text": "RECONNAISSANCE",
+      "weight": 1
+    },
+    {
+      "category": "Émotions",
+      "text": "TIMIDITÉ",
+      "weight": 1
+    },
+    {
+      "category": "Émotions",
+      "text": "GÊNE",
+      "weight": 1
+    },
+    {
+      "category": "Émotions",
+      "text": "INCONFORT",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "SOUPENTE",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "PALIER",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "VESTIBULE",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "ENTRÉE",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "SORTIE",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "SALON",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "SALLE À MANGER",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "CHAMBRE D'ENFANT",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "SALLE DE BAIN",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "TOILETTES",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "BUANDERIE",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "ATELIER",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "BUREAU",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "BIBLIOTHÈQUE",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "VÉRANDA",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "TERRASSE",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "COUR",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "CRYPTE",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "CATACOMBES",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "MONASTÈRE",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "COUVENT",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "ABBAYE",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "PRESBYTÈRE",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "CLINIQUE",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "MATERNITÉ",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "COLLÈGE",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "LYCÉE",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "UNIVERSITÉ",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "INTERNAT",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "CASERNE",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "PRISON",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "CELLULE",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "TRIBUNAL",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "COMMISSARIAT",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "CASINO",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "THÉÂTRE",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "CINÉMA",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "OPÉRA",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "MUSÉE",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "MANOIR",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "PALAIS",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "FORTERESSE",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "TOUR",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "PHARE",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "QUAI",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "STATION",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "MÉTRO",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "CHEMIN",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "SENTIER",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "CARREFOUR",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "SQUARE",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "PARC",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "BOIS",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "CLAIRIÈRE",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "GROTTE",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "CAVERNE",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "MINE",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "PUITS",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "SOURCE",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "FLEUVE",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "ÉTANG",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "PLAGE",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "PORT",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "ÎLE",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "VALLÉE",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "FALAISE",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "CABANE",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "FERME",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "ÉTABLE",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "MOULIN",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "ENTREPÔT",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "HANGAR",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "CHANTIER",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "BUNKER",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "ABRI",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "REFUGE",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "CAMP",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "CAMPING",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "HÔTEL",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "AUBERGE",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "PENSION",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "RESTAURANT",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "CAFÉ",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "BAR",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "BOULANGERIE",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "ÉPICERIE",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "MARCHÉ",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "MAGASIN",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "CENTRE COMMERCIAL",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "AÉROPORT",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "AÉROGARE",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "CAMPUS",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "CITADELLE",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "DONJON",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "DOUVE",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "PASSAGE SECRET",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "PIÈCE FERMÉE",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "PIÈCE VIDE",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "GRENIER SOMBRE",
+      "weight": 1
+    },
+    {
+      "category": "Lieux",
+      "text": "SOUS L'ESCALIER",
+      "weight": 1
+    },
+    {
+      "category": "Temps et souvenirs",
+      "text": "AURORE",
+      "weight": 1
+    },
+    {
+      "category": "Temps et souvenirs",
+      "text": "APRÈS-MIDI",
+      "weight": 1
+    },
+    {
+      "category": "Temps et souvenirs",
+      "text": "PETIT MATIN",
+      "weight": 1
+    },
+    {
+      "category": "Temps et souvenirs",
+      "text": "AVANT-HIER",
+      "weight": 1
+    },
+    {
+      "category": "Temps et souvenirs",
+      "text": "APRÈS-DEMAIN",
+      "weight": 1
+    },
+    {
+      "category": "Temps et souvenirs",
+      "text": "ADOLESCENCE",
+      "weight": 1
+    },
+    {
+      "category": "Temps et souvenirs",
+      "text": "JEUNESSE",
+      "weight": 1
+    },
+    {
+      "category": "Temps et souvenirs",
+      "text": "VIEILLESSE",
+      "weight": 1
+    },
+    {
+      "category": "Temps et souvenirs",
+      "text": "PRÉSENT",
+      "weight": 1
+    },
+    {
+      "category": "Temps et souvenirs",
+      "text": "DÉCENNIE",
+      "weight": 1
+    },
+    {
+      "category": "Temps et souvenirs",
+      "text": "SIÈCLE",
+      "weight": 1
+    },
+    {
+      "category": "Temps et souvenirs",
+      "text": "ÉPOQUE",
+      "weight": 1
+    },
+    {
+      "category": "Temps et souvenirs",
+      "text": "SAISON",
+      "weight": 1
+    },
+    {
+      "category": "Temps et souvenirs",
+      "text": "JANVIER",
+      "weight": 1
+    },
+    {
+      "category": "Temps et souvenirs",
+      "text": "FÉVRIER",
+      "weight": 1
+    },
+    {
+      "category": "Temps et souvenirs",
+      "text": "MARS",
+      "weight": 1
+    },
+    {
+      "category": "Temps et souvenirs",
+      "text": "AVRIL",
+      "weight": 1
+    },
+    {
+      "category": "Temps et souvenirs",
+      "text": "MAI",
+      "weight": 1
+    },
+    {
+      "category": "Temps et souvenirs",
+      "text": "JUIN",
+      "weight": 1
+    },
+    {
+      "category": "Temps et souvenirs",
+      "text": "JUILLET",
+      "weight": 1
+    },
+    {
+      "category": "Temps et souvenirs",
+      "text": "AOÛT",
+      "weight": 1
+    },
+    {
+      "category": "Temps et souvenirs",
+      "text": "SEPTEMBRE",
+      "weight": 1
+    },
+    {
+      "category": "Temps et souvenirs",
+      "text": "OCTOBRE",
+      "weight": 1
+    },
+    {
+      "category": "Temps et souvenirs",
+      "text": "NOVEMBRE",
+      "weight": 1
+    },
+    {
+      "category": "Temps et souvenirs",
+      "text": "DÉCEMBRE",
+      "weight": 1
+    },
+    {
+      "category": "Temps et souvenirs",
+      "text": "NOËL",
+      "weight": 1
+    },
+    {
+      "category": "Temps et souvenirs",
+      "text": "PÂQUES",
+      "weight": 1
+    },
+    {
+      "category": "Temps et souvenirs",
+      "text": "FÊTE",
+      "weight": 1
+    },
+    {
+      "category": "Temps et souvenirs",
+      "text": "MARIAGE",
+      "weight": 1
+    },
+    {
+      "category": "Temps et souvenirs",
+      "text": "ARRIVÉE",
+      "weight": 1
+    },
+    {
+      "category": "Temps et souvenirs",
+      "text": "RENCONTRE",
+      "weight": 1
+    },
+    {
+      "category": "Temps et souvenirs",
+      "text": "SÉPARATION",
+      "weight": 1
+    },
+    {
+      "category": "Temps et souvenirs",
+      "text": "MÉMOIRE",
+      "weight": 1
+    },
+    {
+      "category": "Temps et souvenirs",
+      "text": "OUBLI",
+      "weight": 1
+    },
+    {
+      "category": "Temps et souvenirs",
+      "text": "RÊVE",
+      "weight": 1
+    },
+    {
+      "category": "Temps et souvenirs",
+      "text": "CAUCHEMAR",
+      "weight": 1
+    },
+    {
+      "category": "Temps et souvenirs",
+      "text": "VISION",
+      "weight": 1
+    },
+    {
+      "category": "Temps et souvenirs",
+      "text": "FLASH",
+      "weight": 1
+    },
+    {
+      "category": "Temps et souvenirs",
+      "text": "RÉMINISCENCE",
+      "weight": 1
+    },
+    {
+      "category": "Temps et souvenirs",
+      "text": "ENCORE HIER",
+      "weight": 1
+    },
+    {
+      "category": "Temps et souvenirs",
+      "text": "IL Y A PEU",
+      "weight": 1
+    },
+    {
+      "category": "Temps et souvenirs",
+      "text": "JADIS",
+      "weight": 1
+    },
+    {
+      "category": "Temps et souvenirs",
+      "text": "DEPUIS",
+      "weight": 1
+    },
+    {
+      "category": "Temps et souvenirs",
+      "text": "PENDANT",
+      "weight": 1
+    },
+    {
+      "category": "Temps et souvenirs",
+      "text": "TOUT À L'HEURE",
+      "weight": 1
+    },
+    {
+      "category": "Temps et souvenirs",
+      "text": "À L'INSTANT",
+      "weight": 1
+    },
+    {
+      "category": "Temps et souvenirs",
+      "text": "À JAMAIS",
+      "weight": 1
+    },
+    {
+      "category": "Temps et souvenirs",
+      "text": "POUR TOUJOURS",
+      "weight": 1
+    },
+    {
+      "category": "Temps et souvenirs",
+      "text": "AUTRE VIE",
+      "weight": 1
+    },
+    {
+      "category": "Temps et souvenirs",
+      "text": "VIE ANTÉRIEURE",
+      "weight": 1
+    },
+    {
+      "category": "Temps et souvenirs",
+      "text": "RECOMMENCEMENT",
+      "weight": 1
+    },
+    {
+      "category": "Temps et souvenirs",
+      "text": "FIN",
+      "weight": 1
+    },
+    {
+      "category": "Temps et souvenirs",
+      "text": "COMMENCEMENT",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "CHANDELIER",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "LANTERNE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "TORCHE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "AMPOULE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "CADRE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "TABLEAU",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "PORTRAIT",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "ALBUM",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "CAHIER",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "JOURNAL",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "CARTE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "POSTALE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "CRAYON",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "PLUME",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "ENCRE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "CARNET",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "AGENDA",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "SABLIER",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "CALENDRIER",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "CLOCHE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "CLOCHETTE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "SONNETTE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "SERRURE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "CADENAS",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "POIGNÉE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "PORTE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "FENÊTRE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "VOLET",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "RIDEAU",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "COUSSIN",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "COUVERTURE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "DRAP",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "OREILLER",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "MATELAS",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "BERCEAU",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "CANAPÉ",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "BUREAU",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "COMMODE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "ÉTAGÈRE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "COFFRE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "MALLE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "PANIER",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "CARTON",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "PAQUET",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "BOUTEILLE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "BOL",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "CUILLÈRE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "CASSEROLE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "POÊLE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "MARMITE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "PLAT",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "PLATEAU",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "CRUCHE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "CARAFE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "VASE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "POT",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "JARRE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "FLACON",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "PARFUM",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "SAVON",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "MIROIR DE POCHE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "PEIGNE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "BROSSE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "RASOIR",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "CISEAUX",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "AIGUILLE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "FIL",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "BOUTON",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "TISSU",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "ÉTOFFE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "VESTE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "ROBE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "CHEMISE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "PANTALON",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "BOTTE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "ÉCHARPE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "GANT",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "ALLIANCE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "BOUCLE D'OREILLE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "PENDENTIF",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "MONTRE À GOUSSET",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "PIÈCE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "BILLET",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "MONNAIE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "MÉDAILLON",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "STATUETTE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "FIGURINE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "POUPÉE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "PELUCHE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "BALLON",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "DÉS",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "JEU DE CARTES",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "DOMINO",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "ÉCHECS",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "BOUSSOLE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "CARTE ROUTIÈRE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "GLOBE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "JUMELLES",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "LOUPE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "MICROSCOPE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "TÉLESCOPE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "APPAREIL PHOTO",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "CAMÉRA",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "SOURIS",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "ÉCRAN",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "CASQUE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "ÉCOUTEURS",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "HAUT-PARLEUR",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "CÂBLE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "PRISE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "INTERRUPTEUR",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "BATTERIE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "PILE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "CHARGEUR",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "VENTILATEUR",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "RADIATEUR",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "THERMOMÈTRE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "BAROMÈTRE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "BALANCE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "MARTEAU",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "TOURNEVIS",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "PINCE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "SCIE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "HACHE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "PELLE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "BALAI",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "SEAU",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "SERPILLIÈRE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "ÉCHELLE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "CORDE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "CHAÎNE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "CROCHET",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "VIS",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "CLOU",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "BOULON",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "BOÎTE À MUSIQUE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "MÉCANISME",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "ENGRENAGE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "RESSORT",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "ROUE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "PENDULE CASSÉE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "COFFRET",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "ÉCRIN",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "BOÎTE À BIJOUX",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "FLACON VIDE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "VIEILLE CLÉ",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "CLÉ ROUILLÉE",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "OBJET CACHÉ",
+      "weight": 1
+    },
+    {
+      "category": "Objets",
+      "text": "OBJET PERDU",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "FRONT",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "TEMPE",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "ŒIL",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "REGARD",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "PAUPIÈRE",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "CIL",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "SOURCIL",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "NEZ",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "OREILLE",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "BOUCHE",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "LÈVRE",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "DENT",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "LANGUE",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "MÂCHOIRE",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "MENTON",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "JOUE",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "COU",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "NUQUE",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "COUDE",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "POIGNET",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "PAUME",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "DOIGT",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "ONGLE",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "POUCE",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "INDEX",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "POITRINE",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "VENTRE",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "NOMBRIL",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "TAILLE",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "HANCHE",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "GENOU",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "MOLLET",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "CHEVILLE",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "TALON",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "ORTEIL",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "PEAU",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "OS",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "SANG",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "POUMON",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "GORGE",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "PULSATION",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "BATTEMENT",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "TREMBLEMENT",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "ENGOURDISSEMENT",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "POIDS",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "BRÛLURE",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "GLACÉ",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "HUMIDE",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "SEC",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "MOUILLÉ",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "COLLANT",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "RUGUEUX",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "DOUX",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "LISSE",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "RÂPEUX",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "DUR",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "MOU",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "TENDU",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "RAIDE",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "LOURD",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "VIDE",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "PLEIN",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "NAUSÉE",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "FAIBLESSE",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "ÉNERGIE",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "BOURDONNEMENT",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "SIFFLEMENT",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "GRONDEMENT",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "CRAQUEMENT",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "CHUCHOTEMENT",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "MURMURE",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "SILENCE",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "CLIGNOTEMENT",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "GOÛT",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "SAVEUR",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "MÉTALLIQUE",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "AMER",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "SUCRÉ",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "ACIDE",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "SALÉ",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "RESPIRER",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "TOUCHER",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "ENTENDRE",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "VOIR",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "SENTIR",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "PERCEVOIR",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "FRÔLEMENT",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "MAIN FROIDE",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "MAIN CHAUDE",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "SOUFFLE FROID",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "SOUFFLE CHAUD",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "PRESSION SUR L'ÉPAULE",
+      "weight": 1
+    },
+    {
+      "category": "Sensations et corps",
+      "text": "PRESSION SUR LE DOS",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "SAUTER",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "GLISSER",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "RAMPER",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "S'ASSEOIR",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "S'ALLONGER",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "SE MONTRER",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "APPARAÎTRE",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "DISPARAÎTRE",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "RESTER",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "ATTENDRE",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "POURSUIVRE",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "FUIR",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "POUSSER",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "TIRER",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "PORTER",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "SOULEVER",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "LÂCHER",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "JETER",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "CASSER",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "BRISER",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "FRAPPER",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "TAPER",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "GRATTER",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "GRIFFONNER",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "DESSINER",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "COMPTER",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "DÉSIGNER",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "POINTER",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "PERDRE",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "PRENDRE",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "DONNER",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "RECEVOIR",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "ÉCHANGER",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "GARDER",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "VOLER",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "DÉROBER",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "DÉPOSER",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "POSER",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "RAMASSER",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "ATTRAPER",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "LANCER",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "TENIR",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "SERRER",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "LÂCHER PRISE",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "SOUFFLER",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "RESPIRER",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "SIFFLER",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "CRIER",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "HURLER",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "CHUCHOTER",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "SANGLOTER",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "GÉMIR",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "OBSERVER",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "SURVEILLER",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "GUETTER",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "VEILLER",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "RÊVER",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "SE RÉVEILLER",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "SE SOUVENIR",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "PENSER",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "IMAGINER",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "SE TAIRE",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "SE RETOURNER",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "S'ENFUIR",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "SE DÉPLACER",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "TREMBLER",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "FRISSONNER",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "VIBRER",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "BOUGER",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "S'AGITER",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "SE CALMER",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "SE FÂCHER",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "MENACER",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "AIDER",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "SAUVER",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "GUIDER",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "AVERTIR",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "INVITER",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "ACCUEILLIR",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "REJETER",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "REFUSER",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "ACCEPTER",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "CHOISIR",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "DÉCIDER",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "ATTIRER",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "REPOUSSER",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "TOQUER",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "SONNER",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "CLAQUER",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "GRINCER",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "TINTINNABULER",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "S'ÉTEINDRE",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "S'ALLUMER",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "BRILLER",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "CLIGNOTER",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "FLOTTER",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "TOMBER AU SOL",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "SE BALANCER",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "SE BALANCER LENTEMENT",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "SE RAPPROCHER",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "S'ÉVANOUIR",
+      "weight": 1
+    },
+    {
+      "category": "Actions",
+      "text": "SE MATÉRIALISER",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "AVERSE",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "ORAGE VIOLENT",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "GEL",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "GIVRE",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "VENT",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "BOURRASQUE",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "OURAGAN",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "TORNADE",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "CYCLONE",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "CIEL",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "CONSTELLATION",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "NOUVELLE LUNE",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "ÉCLIPSE",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "AUBE ROUGE",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "ARC-EN-CIEL",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "BRAISE",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "FUMÉE",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "CAILLOU",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "CRISTAL",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "QUARTZ",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "MINÉRAL",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "MÉTAL",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "FER",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "CUIVRE",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "ARGENT",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "OR",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "EAU",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "VAPEUR",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "COURANT",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "RIVIÈRE",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "LAC",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "MER",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "FONTAINE",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "PUITS",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "BRANCHE",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "ROSE",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "ÉPINE",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "MOUSSE",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "FOUGÈRE",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "CHAMPIGNON",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "LIERRE",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "RAMEAU",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "TRONC",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "SOUCHE",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "GRAINE",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "FRUIT",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "POMME",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "POIRE",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "NOIX",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "BAIE",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "RENARD",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "CERF",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "CHOUETTE",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "HIBOU",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "AIGLE",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "FAUCON",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "PIGEON",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "ARAIGNÉE",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "ABEILLE",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "MOUCHE",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "MOUSTIQUE",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "FOURMI",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "RAT",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "SOURIS",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "CHAUVE-SOURIS",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "GRENOUILLE",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "CRAPAUD",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "LÉZARD",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "LIMACE",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "ESCARGOT",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "MOUTON",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "CHÈVRE",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "VACHE",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "COCHON",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "POULE",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "COQ",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "PLUME",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "AILE",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "GRIFFE",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "EMPREINTE",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "TRACE",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "PISTE",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "ODEUR ANIMALE",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "NID",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "TANIÈRE",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "TROU",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "TERRIER",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "SILENCE DE LA FORÊT",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "BRUIT DU VENT",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "CRAQUEMENT DE BRANCHE",
+      "weight": 1
+    },
+    {
+      "category": "Nature et environnement",
+      "text": "CHANT D'OISEAU",
+      "weight": 1
+    },
+    {
+      "category": "Symboles et mystère",
+      "text": "SCEAU",
+      "weight": 1
+    },
+    {
+      "category": "Symboles et mystère",
+      "text": "RUNE",
+      "weight": 1
+    },
+    {
+      "category": "Symboles et mystère",
+      "text": "GLYPHE",
+      "weight": 1
+    },
+    {
+      "category": "Symboles et mystère",
+      "text": "PENTACLE",
+      "weight": 1
+    },
+    {
+      "category": "Symboles et mystère",
+      "text": "PENTAGRAMME",
+      "weight": 1
+    },
+    {
+      "category": "Symboles et mystère",
+      "text": "TRIANGLE",
+      "weight": 1
+    },
+    {
+      "category": "Symboles et mystère",
+      "text": "SPIRALE",
+      "weight": 1
+    },
+    {
+      "category": "Symboles et mystère",
+      "text": "CROIX",
+      "weight": 1
+    },
+    {
+      "category": "Symboles et mystère",
+      "text": "CERCLE DE PIERRES",
+      "weight": 1
+    },
+    {
+      "category": "Symboles et mystère",
+      "text": "AUTEL",
+      "weight": 1
+    },
+    {
+      "category": "Symboles et mystère",
+      "text": "OFFRANDE",
+      "weight": 1
+    },
+    {
+      "category": "Symboles et mystère",
+      "text": "CÉRÉMONIE",
+      "weight": 1
+    },
+    {
+      "category": "Symboles et mystère",
+      "text": "INCANTATION",
+      "weight": 1
+    },
+    {
+      "category": "Symboles et mystère",
+      "text": "FORMULE",
+      "weight": 1
+    },
+    {
+      "category": "Symboles et mystère",
+      "text": "SORT",
+      "weight": 1
+    },
+    {
+      "category": "Symboles et mystère",
+      "text": "MALÉDICTION",
+      "weight": 1
+    },
+    {
+      "category": "Symboles et mystère",
+      "text": "BÉNÉDICTION",
+      "weight": 1
+    },
+    {
+      "category": "Symboles et mystère",
+      "text": "RELIQUE",
+      "weight": 1
+    },
+    {
+      "category": "Symboles et mystère",
+      "text": "MÉDAILLON",
+      "weight": 1
+    },
+    {
+      "category": "Symboles et mystère",
+      "text": "TOTEM",
+      "weight": 1
+    },
+    {
+      "category": "Symboles et mystère",
+      "text": "STATUE",
+      "weight": 1
+    },
+    {
+      "category": "Symboles et mystère",
+      "text": "IDOLE",
+      "weight": 1
+    },
+    {
+      "category": "Symboles et mystère",
+      "text": "ICÔNE",
+      "weight": 1
+    },
+    {
+      "category": "Symboles et mystère",
+      "text": "MASQUE",
+      "weight": 1
+    },
+    {
+      "category": "Symboles et mystère",
+      "text": "VISAGE SANS TRAITS",
+      "weight": 1
+    },
+    {
+      "category": "Symboles et mystère",
+      "text": "OMBRE NOIRE",
+      "weight": 1
+    },
+    {
+      "category": "Symboles et mystère",
+      "text": "OMBRE BLANCHE",
+      "weight": 1
+    },
+    {
+      "category": "Symboles et mystère",
+      "text": "MANIFESTATION",
+      "weight": 1
+    },
+    {
+      "category": "Symboles et mystère",
+      "text": "AURA",
+      "weight": 1
+    },
+    {
+      "category": "Symboles et mystère",
+      "text": "FLUX",
+      "weight": 1
+    },
+    {
+      "category": "Symboles et mystère",
+      "text": "ONDE",
+      "weight": 1
+    },
+    {
+      "category": "Symboles et mystère",
+      "text": "FRÉQUENCE",
+      "weight": 1
+    },
+    {
+      "category": "Symboles et mystère",
+      "text": "RÉSONANCE",
+      "weight": 1
+    },
+    {
+      "category": "Symboles et mystère",
+      "text": "VIBRATION",
+      "weight": 1
+    },
+    {
+      "category": "Symboles et mystère",
+      "text": "VOILE",
+      "weight": 1
+    },
+    {
+      "category": "Symboles et mystère",
+      "text": "FRONTIÈRE",
+      "weight": 1
+    },
+    {
+      "category": "Symboles et mystère",
+      "text": "DIMENSION",
+      "weight": 1
+    },
+    {
+      "category": "Symboles et mystère",
+      "text": "AUTRE MONDE",
+      "weight": 1
+    },
+    {
+      "category": "Symboles et mystère",
+      "text": "LIMBES",
+      "weight": 1
+    },
+    {
+      "category": "Symboles et mystère",
+      "text": "PURGATOIRE",
+      "weight": 1
+    },
+    {
+      "category": "Symboles et mystère",
+      "text": "PARADIS",
+      "weight": 1
+    },
+    {
+      "category": "Symboles et mystère",
+      "text": "ENFER",
+      "weight": 1
+    },
+    {
+      "category": "Symboles et mystère",
+      "text": "ABÎME",
+      "weight": 1
+    },
+    {
+      "category": "Symboles et mystère",
+      "text": "VIDE",
+      "weight": 1
+    },
+    {
+      "category": "Symboles et mystère",
+      "text": "NÉANT",
+      "weight": 1
+    },
+    {
+      "category": "Symboles et mystère",
+      "text": "ÉTERNEL",
+      "weight": 1
+    },
+    {
+      "category": "Symboles et mystère",
+      "text": "INCONNU",
+      "weight": 1
+    },
+    {
+      "category": "Symboles et mystère",
+      "text": "ÉNIGME",
+      "weight": 1
+    },
+    {
+      "category": "Symboles et mystère",
+      "text": "CODE",
+      "weight": 1
+    },
+    {
+      "category": "Symboles et mystère",
+      "text": "INDICE",
+      "weight": 1
+    },
+    {
+      "category": "Symboles et mystère",
+      "text": "PREUVE",
+      "weight": 1
+    },
+    {
+      "category": "Symboles et mystère",
+      "text": "TRACE",
+      "weight": 1
+    },
+    {
+      "category": "Symboles et mystère",
+      "text": "EMPREINTE",
+      "weight": 1
+    },
+    {
+      "category": "Symboles et mystère",
+      "text": "SOUVENIR",
+      "weight": 1
+    },
+    {
+      "category": "Symboles et mystère",
+      "text": "RÉVEIL",
+      "weight": 1
+    },
+    {
+      "category": "Symboles et mystère",
+      "text": "ÉVEIL",
+      "weight": 1
+    },
+    {
+      "category": "Symboles et mystère",
+      "text": "TRANSITION",
+      "weight": 1
+    },
+    {
+      "category": "Symboles et mystère",
+      "text": "DÉPART",
+      "weight": 1
+    },
+    {
+      "category": "Symboles et mystère",
+      "text": "RETOUR",
+      "weight": 1
+    },
+    {
+      "category": "Symboles et mystère",
+      "text": "RENAISSANCE",
+      "weight": 1
+    },
+    {
+      "category": "Symboles et mystère",
+      "text": "TRANSFORMATION",
+      "weight": 1
+    },
+    {
+      "category": "Symboles et mystère",
+      "text": "MÉTAMORPHOSE",
+      "weight": 1
+    },
+    {
+      "category": "Symboles et mystère",
+      "text": "OMBRE PORTÉE",
+      "weight": 1
+    },
+    {
+      "category": "Symboles et mystère",
+      "text": "LUMIÈRE ÉTRANGE",
+      "weight": 1
+    },
+    {
+      "category": "Symboles et mystère",
+      "text": "LUEUR",
+      "weight": 1
+    },
+    {
+      "category": "Symboles et mystère",
+      "text": "ÉTINCELLE",
+      "weight": 1
+    },
+    {
+      "category": "Symboles et mystère",
+      "text": "HALO",
+      "weight": 1
+    },
+    {
+      "category": "Symboles et mystère",
+      "text": "ORB",
+      "weight": 1
+    },
+    {
+      "category": "Symboles et mystère",
+      "text": "ORBE",
+      "weight": 1
+    },
+    {
+      "category": "Symboles et mystère",
+      "text": "APPARITION FURTIVE",
+      "weight": 1
+    },
+    {
+      "category": "Symboles et mystère",
+      "text": "MANIFESTE",
+      "weight": 1
+    },
+    {
+      "category": "Symboles et mystère",
+      "text": "CONTACT",
+      "weight": 1
+    },
+    {
+      "category": "Symboles et mystère",
+      "text": "RÉPONSE",
+      "weight": 1
+    },
+    {
+      "category": "Symboles et mystère",
+      "text": "APPEL",
+      "weight": 1
+    },
+    {
+      "category": "Symboles et mystère",
+      "text": "SIGNAL",
+      "weight": 1
+    },
+    {
+      "category": "Symboles et mystère",
+      "text": "ÉCHO",
+      "weight": 1
+    },
+    {
+      "category": "Symboles et mystère",
+      "text": "RÉPÉTITION",
+      "weight": 1
+    },
+    {
+      "category": "Symboles et mystère",
+      "text": "RÉPONSE DIFFÉRÉE",
+      "weight": 1
+    },
+    {
+      "category": "Symboles et mystère",
+      "text": "SILENCE PROFOND",
+      "weight": 1
+    },
+    {
+      "category": "Symboles et mystère",
+      "text": "MURMURE LOINTAIN",
+      "weight": 1
+    },
+    {
+      "category": "Symboles et mystère",
+      "text": "VOIX ÉTOUFFÉE",
+      "weight": 1
+    },
+    {
+      "category": "Symboles et mystère",
+      "text": "BRUIT SOURD",
+      "weight": 1
+    },
+    {
+      "category": "Symboles et mystère",
+      "text": "COUP",
+      "weight": 1
+    },
+    {
+      "category": "Symboles et mystère",
+      "text": "TROIS COUPS",
+      "weight": 1
+    },
+    {
+      "category": "Symboles et mystère",
+      "text": "KNOCK",
+      "weight": 1
+    },
+    {
+      "category": "Symboles et mystère",
+      "text": "CODE MORSE",
+      "weight": 1
+    },
+    {
+      "category": "Symboles et mystère",
+      "text": "FRAPPE",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "BROSSE À DENTS",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "DENTIFRICE",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "GANT DE TOILETTE",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "PAPIER JOURNAL",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "MOUCHOIR",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "ESSUIE-TOUT",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "ÉPONGE",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "DÉTERGENT",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "LESSIVE",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "PINCE À LINGE",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "PANIER À LINGE",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "FER À REPASSER",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "PLANCHE À REPASSER",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "ASPIRATEUR",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "BALAI-BROSSE",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "PELLE À POUSSIÈRE",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "POUBELLE",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "SAC-POUBELLE",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "BOÎTE AUX LETTRES",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "CLÉ USB",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "TÉLÉCOMMANDE",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "ROUTEUR",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "MODEM",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "TABLETTE",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "SMARTPHONE",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "ÉTUI",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "COQUE",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "ÉCRAN TACTILE",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "CARNET DE NOTES",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "POST-IT",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "AGRAFEUSE",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "TROMBONE",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "RÈGLE",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "GOMME",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "TAILLE-CRAYON",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "FEUTRE",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "MARQUEUR",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "SURLIGNEUR",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "COLLE",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "RUBAN ADHÉSIF",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "SCOTCH",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "ENVELOPPE TIMBRÉE",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "TIMBRE",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "FACTURE",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "REÇU",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "CARTE BANCAIRE",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "CARTE D'IDENTITÉ",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "PERMIS",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "PORTE-CLÉS",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "LUNETTES DE SOLEIL",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "ÉTUI À LUNETTES",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "IMPERMÉABLE",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "SAC À DOS",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "SAC À MAIN",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "PORTE-MONNAIE",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "GOURDE",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "THERMOS",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "BOÎTE À REPAS",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "BOUTEILLE D'EAU",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "BOUCHON",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "OUVRE-BOUTEILLE",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "TIRE-BOUCHON",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "DÉCAPSULEUR",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "PLANCHE À DÉCOUPER",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "COUTEAU DE CUISINE",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "ÉPLUCHEUR",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "RÂPE",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "PASSOIRE",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "LOUCHE",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "SPATULE",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "FOUET",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "MIXEUR",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "BOUILLOIRE",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "CAFETIÈRE",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "GRILLE-PAIN",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "MICRO-ONDES",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "FOUR",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "RÉFRIGÉRATEUR",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "CONGÉLATEUR",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "LAVE-VAISSELLE",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "MACHINE À LAVER",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "SÈCHE-LINGE",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "PLAQUE DE CUISSON",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "HOTTE",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "MINUTEUR",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "MANIQUE",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "TABLIER",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "BOÎTE À SUCRE",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "POT À ÉPICES",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "SALADIER",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "PLAT À FOUR",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "MOULE",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "BOUGEOIR",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "ALLUME-GAZ",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "BOÎTE D'ALLUMETTES",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "PILE AA",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "PILE AAA",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "AMPOULE LED",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "MULTIPRISE",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "RALLONGE",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "ADAPTATEUR",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "CÂBLE USB",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "CÂBLE HDMI",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "CASQUE AUDIO",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "ENCEINTE BLUETOOTH",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "MANETTE",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "CONSOLE",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "JEU VIDÉO",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "TAPIS DE SOURIS",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "SUPPORT DE TÉLÉPHONE",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "TRÉPIED",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "CHARGEUR SANS FIL",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "RÉVEIL",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "RADIO-RÉVEIL",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "COUETTE",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "HOUSSE DE COUETTE",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "TAIE D'OREILLER",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "DESSUS-DE-LIT",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "PANTOUFLE",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "CHAUSSETTE",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "CEINTURE",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "PORTE-MANTEAU",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "CINTRE",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "PANIER",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "BOÎTE DE RANGEMENT",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "BOÎTE À OUTILS",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "TOURNEVIS PLAT",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "TOURNEVIS CRUCIFORME",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "MÈTRE RUBAN",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "NIVEAU",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "CUTTER",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "PINCE À ÉPILER",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "COUPE-ONGLES",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "SÈCHE-CHEVEUX",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "RASOIR ÉLECTRIQUE",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "DÉODORANT",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "CRÈME",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "FLACON DE SHAMPOOING",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "BOMBE AÉROSOL",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "BOÎTE DE MÉDICAMENTS",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "THERMOMÈTRE MÉDICAL",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "PANSEMENT",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "COMPRESSE",
+      "weight": 1
+    },
+    {
+      "category": "Objets du quotidien",
+      "text": "TROUSSE DE SECOURS",
       "weight": 1
     }
   ]
