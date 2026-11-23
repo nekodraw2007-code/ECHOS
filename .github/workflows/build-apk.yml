@@ -14,8 +14,6 @@ jobs:
   build:
     name: Build and verify Android APK
     runs-on: ubuntu-latest
-    env:
-      HAS_RELEASE_SIGNING: ${{ secrets.ECHOS_KEYSTORE_BASE64 != '' && secrets.ECHOS_KEYSTORE_PASSWORD != '' && secrets.ECHOS_KEY_ALIAS != '' && secrets.ECHOS_KEY_PASSWORD != '' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
