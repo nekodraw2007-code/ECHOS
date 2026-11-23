@@ -3,6 +3,8 @@ package com.echos.app
 import android.app.Activity
 import android.app.AlertDialog
 import android.content.Context
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.util.Log
 import android.graphics.Color
 import android.graphics.Typeface
@@ -96,6 +98,11 @@ class MainActivity : Activity(), SensorEventListener {
     private val customCategories = mutableSetOf<String>()
     private val activeCategories = mutableSetOf<String>()
     private val history = mutableListOf<String>()
+    // Évite les répétitions immédiates même lorsque deux événements capteurs
+    // produisent exactement la même signature. Accès synchronisé car les
+    // capteurs peuvent être servis par des HandlerThreads distincts.
+    private val recentSelectionLock = Any()
+    private val recentSelectedTexts = java.util.ArrayDeque<String>()
     private val calibrationValues = mutableListOf<Float>()
 
     private var sensitivity = 0.5f
@@ -128,6 +135,7 @@ class MainActivity : Activity(), SensorEventListener {
     private lateinit var googleSignInButton: Button
     private lateinit var signOutButton: Button
 
+    private var lastGoogleSignInSha1: String? = null
     private var firebaseAuth: FirebaseAuth? = null
     private var firestore: FirebaseFirestore? = null
     private var customSyncListener: ListenerRegistration? = null
@@ -650,7 +658,7 @@ class MainActivity : Activity(), SensorEventListener {
         val magSensor = magnetic ?: magneticUncalibrated
         if (magSensor != null) {
             magneticThread = HandlerThread("MagnetometerSensorThread").apply { start() }
-            if (sensors.registerListener(this, magSensor, 2, Handler(magneticThread!!.looper))) {
+            if (sensors.registerListener(this, magSensor, SensorManager.SENSOR_DELAY_GAME, Handler(magneticThread!!.looper))) {
                 registeredSensorTypes.add(magSensor.type)
             } else {
                 magneticThread?.quitSafely()
@@ -661,10 +669,10 @@ class MainActivity : Activity(), SensorEventListener {
         if (accelSensor != null || linearAccelerometer != null) {
             accelerometerThread = HandlerThread("AccelerometerThread").apply { start() }
             val handler = Handler(accelerometerThread!!.looper)
-            if (accelSensor != null && sensors.registerListener(this, accelSensor, 2, handler)) {
+            if (accelSensor != null && sensors.registerListener(this, accelSensor, SensorManager.SENSOR_DELAY_GAME, handler)) {
                 registeredSensorTypes.add(accelSensor.type)
             }
-            if (linearAccelerometer != null && sensors.registerListener(this, linearAccelerometer, 2, handler)) {
+            if (linearAccelerometer != null && sensors.registerListener(this, linearAccelerometer, SensorManager.SENSOR_DELAY_GAME, handler)) {
                 registeredSensorTypes.add(linearAccelerometer!!.type)
             }
             if (accelSensor == null && linearAccelerometer == null ||
@@ -679,7 +687,7 @@ class MainActivity : Activity(), SensorEventListener {
         val gyroSensor = gyroscope ?: gyroscopeUncalibrated
         if (gyroSensor != null) {
             gyroscopeThread = HandlerThread("GyroscopeThread").apply { start() }
-            if (sensors.registerListener(this, gyroSensor, 2, Handler(gyroscopeThread!!.looper))) {
+            if (sensors.registerListener(this, gyroSensor, SensorManager.SENSOR_DELAY_GAME, Handler(gyroscopeThread!!.looper))) {
                 registeredSensorTypes.add(gyroSensor.type)
             } else {
                 gyroscopeThread?.quitSafely()
@@ -688,7 +696,7 @@ class MainActivity : Activity(), SensorEventListener {
         }
         if (proximity != null) {
             proximityThread = HandlerThread("ProximitySensorThread").apply { start() }
-            if (sensors.registerListener(this, proximity, 2, Handler(proximityThread!!.looper))) {
+            if (sensors.registerListener(this, proximity, SensorManager.SENSOR_DELAY_GAME, Handler(proximityThread!!.looper))) {
                 registeredSensorTypes.add(proximity!!.type)
             } else {
                 proximityThread?.quitSafely()
@@ -729,7 +737,14 @@ class MainActivity : Activity(), SensorEventListener {
         val v = event.values
         when (event.sensor.type) {
             Sensor.TYPE_MAGNETIC_FIELD, Sensor.TYPE_MAGNETIC_FIELD_UNCALIBRATED -> {
-                val x = v[0]; val y = v[1]; val z = v[2]
+                // Les capteurs non calibrés Android exposent le biais estimé dans v[3..5].
+                // Le retirer évite d'intégrer un décalage électronique dans la signature.
+                val biasX = if (event.sensor.type == Sensor.TYPE_MAGNETIC_FIELD_UNCALIBRATED && v.size >= 6) v[3] else 0f
+                val biasY = if (event.sensor.type == Sensor.TYPE_MAGNETIC_FIELD_UNCALIBRATED && v.size >= 6) v[4] else 0f
+                val biasZ = if (event.sensor.type == Sensor.TYPE_MAGNETIC_FIELD_UNCALIBRATED && v.size >= 6) v[5] else 0f
+                val x = v[0] - biasX
+                val y = v[1] - biasY
+                val z = v[2] - biasZ
                 val preciseMagnitude = sqrt(x.toDouble()*x + y.toDouble()*y + z.toDouble()*z)
                 magneticMagnitude = preciseMagnitude.toFloat()
                 magneticDelta = if (baseline > 0f) abs(preciseMagnitude - baseline.toDouble()).toFloat() else 0f
@@ -753,18 +768,28 @@ class MainActivity : Activity(), SensorEventListener {
                 else if (sessionActive && norm >= 0.025) processMotionSignature(v[0].toDouble(), v[1].toDouble(), v[2].toDouble(), "accéléromètre linéaire")
             }
             Sensor.TYPE_ACCELEROMETER, 35 -> {
-                val preciseAcceleration = sqrt(v[0].toDouble()*v[0] + v[1].toDouble()*v[1] + v[2].toDouble()*v[2])
+                // Compensation du biais si Android expose l'accéléromètre non calibré.
+                val biasX = if (event.sensor.type == 35 && v.size >= 6) v[3] else 0f
+                val biasY = if (event.sensor.type == 35 && v.size >= 6) v[4] else 0f
+                val biasZ = if (event.sensor.type == 35 && v.size >= 6) v[5] else 0f
+                val ax = v[0] - biasX
+                val ay = v[1] - biasY
+                val az = v[2] - biasZ
+                val preciseAcceleration = sqrt(ax.toDouble()*ax + ay.toDouble()*ay + az.toDouble()*az)
                 accelerationMagnitude = preciseAcceleration.toFloat()
                 // À défaut de capteur linéaire, on retire la gravité par filtre passe-haut.
                 // Cela évite qu'un téléphone simplement posé déclenche un mot à partir des 9,8 m/s².
                 val alpha = 0.88f
                 if (!gravityInitialized) {
-                    for (i in 0..2) gravityVector[i] = v[i]
+                    gravityVector[0] = ax
+                    gravityVector[1] = ay
+                    gravityVector[2] = az
                     gravityInitialized = true
                 }
+                val corrected = floatArrayOf(ax, ay, az)
                 val linear = DoubleArray(3) { i ->
-                    gravityVector[i] += alpha * (v[i] - gravityVector[i])
-                    (v[i] - gravityVector[i]).toDouble()
+                    gravityVector[i] += alpha * (corrected[i] - gravityVector[i])
+                    (corrected[i] - gravityVector[i]).toDouble()
                 }
                 val linearNorm = sqrt(linear[0]*linear[0] + linear[1]*linear[1] + linear[2]*linear[2])
                 if (calibrating && magnetic == null && magneticUncalibrated == null) collectCalibration(linearNorm.toFloat())
@@ -773,8 +798,17 @@ class MainActivity : Activity(), SensorEventListener {
             Sensor.TYPE_GYROSCOPE, 15, 16 -> {
                 val preciseRotation = sqrt(v[0].toDouble()*v[0] + v[1].toDouble()*v[1] + v[2].toDouble()*v[2])
                 rotationMagnitude = preciseRotation.toFloat()
+                // Le gyroscope non calibré fournit également un biais estimé dans v[3..5].
+                val biasX = if ((event.sensor.type == 15 || event.sensor.type == 16) && v.size >= 6) v[3] else 0f
+                val biasY = if ((event.sensor.type == 15 || event.sensor.type == 16) && v.size >= 6) v[4] else 0f
+                val biasZ = if ((event.sensor.type == 15 || event.sensor.type == 16) && v.size >= 6) v[5] else 0f
+                val correctedX = v[0] - biasX
+                val correctedY = v[1] - biasY
+                val correctedZ = v[2] - biasZ
+                val correctedRotation = sqrt(correctedX.toDouble()*correctedX + correctedY.toDouble()*correctedY + correctedZ.toDouble()*correctedZ)
+                rotationMagnitude = correctedRotation.toFloat()
                 if (calibrating && magnetic == null && magneticUncalibrated == null) collectCalibration(rotationMagnitude)
-                else if (sessionActive) processMotionSignature(v[0].toDouble(), v[1].toDouble(), v[2].toDouble(), "gyroscope")
+                else if (sessionActive) processMotionSignature(correctedX.toDouble(), correctedY.toDouble(), correctedZ.toDouble(), "gyroscope")
             }
             Sensor.TYPE_PROXIMITY -> {
                 if (!sessionActive || v.isEmpty()) return
@@ -925,21 +959,53 @@ class MainActivity : Activity(), SensorEventListener {
     // La signature issue du capteur reste la seule source de sélection.
     private fun selectSignatureEntry(pool: List<WordEntry>, signature: String): WordEntry? {
         if (pool.isEmpty() || signature.isEmpty()) return null
-        val groups = pool.groupBy { it.category }.toSortedMap()
+        val groups = pool.groupBy { it.category }.toSortedMap().values.toList()
         if (groups.isEmpty()) return null
-        val numeric = runCatching { java.math.BigInteger(signature) }.getOrDefault(java.math.BigInteger.ZERO)
-        val categoryIndex = numeric.mod(java.math.BigInteger.valueOf(groups.size.toLong())).toInt()
-        val selected = groups.values.elementAtOrNull(categoryIndex) ?: return null
-        if (selected.isEmpty()) return null
+
+        val numeric = runCatching { java.math.BigInteger(signature) }
+            .getOrDefault(java.math.BigInteger.ZERO)
+        val categoryStart = numeric.mod(java.math.BigInteger.valueOf(groups.size.toLong())).toInt()
         val entrySeed = runCatching { java.math.BigInteger(signature.reversed()) }
             .getOrDefault(numeric)
-        val totalWeight = selected.sumOf { it.weight.coerceAtLeast(1) }
-        var target = entrySeed.mod(java.math.BigInteger.valueOf(totalWeight.toLong())).toInt()
-        for (entry in selected) {
-            target -= entry.weight.coerceAtLeast(1)
-            if (target < 0) return entry
+
+        // La signature conserve son rôle de source de sélection, mais une
+        // répétition immédiate ne doit pas renvoyer le même mot si des
+        // alternatives existent dans le dictionnaire.
+        synchronized(recentSelectionLock) {
+            val recent = recentSelectedTexts.toSet()
+            for (offset in groups.indices) {
+                val category = groups[(categoryStart + offset) % groups.size]
+                val candidates = category.filter { it.text !in recent }.ifEmpty {
+                    // Si toutes les entrées de cette catégorie sont récentes,
+                    // on essaie les catégories suivantes avant de répéter.
+                    emptyList()
+                }
+                if (candidates.isEmpty()) continue
+
+                val totalWeight = candidates.sumOf { it.weight.coerceAtLeast(1).toLong() }
+                if (totalWeight <= 0L) continue
+                var target = entrySeed.mod(java.math.BigInteger.valueOf(totalWeight)).toLong()
+                for (entry in candidates) {
+                    target -= entry.weight.coerceAtLeast(1).toLong()
+                    if (target < 0L) {
+                        recentSelectedTexts.addLast(entry.text)
+                        while (recentSelectedTexts.size > 8) recentSelectedTexts.removeFirst()
+                        return entry
+                    }
+                }
+                val fallback = candidates.last()
+                recentSelectedTexts.addLast(fallback.text)
+                while (recentSelectedTexts.size > 8) recentSelectedTexts.removeFirst()
+                return fallback
+            }
+
+            // Un dictionnaire très réduit peut ne contenir que des mots
+            // présents dans l'historique récent : on garantit alors un résultat.
+            val fallback = groups[categoryStart].firstOrNull() ?: return null
+            recentSelectedTexts.addLast(fallback.text)
+            while (recentSelectedTexts.size > 8) recentSelectedTexts.removeFirst()
+            return fallback
         }
-        return selected.lastOrNull()
     }
 
     private fun cooldownForSignature(signature: String): Long {
@@ -977,7 +1043,7 @@ class MainActivity : Activity(), SensorEventListener {
         magneticReferenceVector = doubleArrayOf(x, y, z)
         lastMagneticSignature = signature
         nextWordAt = now + cooldownForSignature(signature)
-        emitWord(entry, "signature magnétique · Δ %.2f µT".format(Locale.FRANCE, magnitudeDelta), signature)
+        emitWord(entry, "magnétomètre · Δ %.2f µT · B %.2f µT · xyz %.2f/%.2f/%.2f".format(Locale.FRANCE, magnitudeDelta, magnitude, x, y, z), signature)
     }
 
     @Synchronized
@@ -995,12 +1061,28 @@ class MainActivity : Activity(), SensorEventListener {
             return
         }
         val deviation = abs(norm - reference)
+
+        // Bruit propre à chaque capteur : une fenêtre glissante et la MAD
+        // (médiane des écarts absolus) évitent qu'un capteur bruyant déclenche
+        // autant qu'un capteur stable. La médiane résiste aux pics isolés.
+        val samples = motionSamples.getOrPut(source) { mutableListOf() }
+        samples.add(norm)
+        while (samples.size > 31) samples.removeAt(0)
+        val sortedSamples = samples.sorted()
+        val median = sortedSamples[sortedSamples.size / 2]
+        val absoluteDeviations = sortedSamples.map { abs(it - median) }.sorted()
+        val adaptiveNoise = absoluteDeviations[absoluteDeviations.size / 2] * 1.4826 * 3.0
+
         val threshold = when (source) {
             "gyroscope" -> 0.12 + (1.0 - sensitivity.toDouble()) * 0.18
             "accéléromètre linéaire" -> 0.35 + (1.0 - sensitivity.toDouble()) * 0.45
             else -> 0.35 + (1.0 - sensitivity.toDouble()) * 0.45
         }
-        val effectiveThreshold = maxOf(threshold, if (calibrated) noiseFloor.toDouble() * 2.5 else 0.0)
+        val effectiveThreshold = maxOf(
+            threshold,
+            adaptiveNoise,
+            if (calibrated) noiseFloor.toDouble() * 2.5 else 0.0
+        )
         val wasActive = motionTriggerActive[source] == true
 
         // Mise à jour lente de la référence uniquement lorsque le capteur est calme.
@@ -1022,7 +1104,7 @@ class MainActivity : Activity(), SensorEventListener {
         nextWordAt = now + cooldownForSignature(signature)
         emitWord(
             entry,
-            "variation environnementale · $source · Δ %.3f".format(Locale.FRANCE, deviation),
+            "variation capteur · $source · norme %.3f · Δ %.3f · xyz %.3f/%.3f/%.3f".format(Locale.FRANCE, norm, deviation, x, y, z),
             signature
         )
     }
@@ -1353,6 +1435,32 @@ class MainActivity : Activity(), SensorEventListener {
         }
     }
 
+    // SHA-1 du certificat réellement utilisé pour signer l'APK installé.
+    // Google Sign-In code 10 est généralement causé par une empreinte absente du client OAuth Android.
+    @Suppress("DEPRECATION")
+    private fun installedApkCertificateSha1(): String? {
+        return try {
+            val signatures = if (android.os.Build.VERSION.SDK_INT >= 28) {
+                packageManager.getPackageInfo(
+                    packageName,
+                    android.content.pm.PackageManager.GET_SIGNING_CERTIFICATES
+                ).signingInfo?.apkContentsSigners
+            } else {
+                packageManager.getPackageInfo(
+                    packageName,
+                    android.content.pm.PackageManager.GET_SIGNATURES
+                ).signatures
+            }
+            signatures?.firstOrNull()?.toByteArray()?.let { certificate ->
+                MessageDigest.getInstance("SHA-1").digest(certificate)
+                    .joinToString(":") { byte -> "%02X".format(byte) }
+            }
+        } catch (e: Exception) {
+            Log.e("ECHOS_SYNC", "Impossible de lire le certificat de l'APK", e)
+            null
+        }
+    }
+
     // Connexion Google via le sélecteur natif Google Play Services.
     // Ce flux ouvre explicitement l'écran de choix de compte, puis échange l'ID token avec Firebase.
     private fun startGoogleSignIn() {
@@ -1365,6 +1473,8 @@ class MainActivity : Activity(), SensorEventListener {
             toast("Identifiant OAuth Web introuvable dans google-services.json.")
             return
         }
+        lastGoogleSignInSha1 = installedApkCertificateSha1()
+        Log.i("ECHOS_SYNC", "Démarrage OAuth package=$packageName, APK SHA-1=${lastGoogleSignInSha1 ?: "indisponible"}")
         googleSignInButton.isEnabled = false
         googleSignInButton.text = "OUVERTURE DE GOOGLE…"
         val options = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -1422,12 +1532,27 @@ class MainActivity : Activity(), SensorEventListener {
         } catch (e: ApiException) {
             Log.e("ECHOS_SYNC", "Google Sign-In statusCode=${e.statusCode}, resultCode=$resultCode", e)
             val detail = when (e.statusCode) {
-                10 -> "Configuration OAuth incorrecte : package ou SHA-1 de cet APK."
+                10 -> "OAuth refusé. Package=${packageName} · SHA-1=${lastGoogleSignInSha1 ?: "indisponible"}. Ajoute cette empreinte au client Android Firebase puis récupère le nouveau google-services.json."
                 16 -> "Réauthentification refusée par Google. Vérifie la signature SHA-1 de l'APK et Google Play Services."
                 12501 -> "Sélection Google annulée par l'utilisateur."
                 else -> e.localizedMessage ?: "Erreur Google"
             }
-            toast("Échec Google [${e.statusCode}] : $detail")
+            if (e.statusCode == 10) {
+                val fingerprint = lastGoogleSignInSha1 ?: "indisponible"
+                val diagnostic = "Application : $packageName\nSHA-1 de cet APK : $fingerprint\n\nDans Firebase Console > Paramètres du projet > Vos applications Android, ajoute cette empreinte SHA-1 à l'application com.echos.app. Active aussi Google comme fournisseur dans Authentication > Sign-in method, puis télécharge le nouveau google-services.json et remplace app/google-services.json dans le dépôt GitHub. Une nouvelle compilation sera nécessaire."
+                AlertDialog.Builder(this)
+                    .setTitle("Configuration Google OAuth refusée (10)")
+                    .setMessage(diagnostic)
+                    .setPositiveButton("COPIER LE SHA-1") { _, _ ->
+                        val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                        clipboard.setPrimaryClip(ClipData.newPlainText("ECHOS SHA-1", fingerprint))
+                        toast("Empreinte SHA-1 copiée")
+                    }
+                    .setNegativeButton("FERMER", null)
+                    .show()
+            } else {
+                toast("Échec Google [${e.statusCode}] : $detail")
+            }
             refreshAccountUi()
         } catch (e: Exception) {
             Log.e("ECHOS_SYNC", "Erreur inattendue pendant la connexion Google", e)
