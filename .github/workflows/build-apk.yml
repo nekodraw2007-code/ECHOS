@@ -66,32 +66,39 @@ jobs:
           path: ${{ runner.temp }}/android-build-tools-35.0.0.tar.gz
           if-no-files-found: error
           retention-days: 7
-      - name: Prepare permanent release signing key
-        if: ${{ env.HAS_RELEASE_SIGNING == 'true' }}
+      - name: Restore permanent release signing key
+        if: ${{ secrets.ECHOS_KEY_ENCRYPTION_PASSWORD != '' }}
         env:
-          ECHOS_KEYSTORE_BASE64: ${{ secrets.ECHOS_KEYSTORE_BASE64 }}
+          GH_TOKEN: ${{ github.token }}
+          KEY_PASSWORD: ${{ secrets.ECHOS_KEY_ENCRYPTION_PASSWORD }}
         run: |
-          echo "$ECHOS_KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/echos-release.jks"
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/echos-signing"
+          gh release download echos-signing-key-v1 --repo "$GITHUB_REPOSITORY" --pattern echos-release.jks.enc --dir "$RUNNER_TEMP/echos-signing"
+          openssl enc -d -aes-256-cbc -pbkdf2 -iter 600000 -in "$RUNNER_TEMP/echos-signing/echos-release.jks.enc" -out "$RUNNER_TEMP/echos-release.jks" -pass env:KEY_PASSWORD
           echo "ECHOS_KEYSTORE_PATH=$RUNNER_TEMP/echos-release.jks" >> "$GITHUB_ENV"
+          echo "ECHOS_KEYSTORE_PASSWORD=$KEY_PASSWORD" >> "$GITHUB_ENV"
+          echo "ECHOS_KEY_ALIAS=echos-upload" >> "$GITHUB_ENV"
+          echo "ECHOS_KEY_PASSWORD=$KEY_PASSWORD" >> "$GITHUB_ENV"
       - name: Build permanent-key release APK
-        if: ${{ env.HAS_RELEASE_SIGNING == 'true' }}
-        env:
-          ECHOS_KEYSTORE_PASSWORD: ${{ secrets.ECHOS_KEYSTORE_PASSWORD }}
-          ECHOS_KEY_ALIAS: ${{ secrets.ECHOS_KEY_ALIAS }}
-          ECHOS_KEY_PASSWORD: ${{ secrets.ECHOS_KEY_PASSWORD }}
+        if: ${{ secrets.ECHOS_KEY_ENCRYPTION_PASSWORD != '' }}
         run: gradle --no-daemon :app:assembleRelease
-      - name: Verify permanent-key release APK matches Firebase certificate
-        if: ${{ env.HAS_RELEASE_SIGNING == 'true' }}
+      - name: Verify permanent-key release APK matches permanent keystore
+        if: ${{ secrets.ECHOS_KEY_ENCRYPTION_PASSWORD != '' }}
+        env:
+          KEY_PASSWORD: ${{ secrets.ECHOS_KEY_ENCRYPTION_PASSWORD }}
         run: |
+          set -euo pipefail
           APK="app/build/outputs/apk/release/app-release.apk"
+          keytool -list -v -keystore "$RUNNER_TEMP/echos-release.jks" -storepass "$KEY_PASSWORD" -alias echos-upload > expected-certificate.txt
           "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose --print-certs "$APK" | tee release-certificate.txt
           "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$APK" | grep "package: name='com.echos.app'"
-          grep -Fqi "SHA-1 digest: 07:35:50:11:38:59:f4:87:75:3a:7f:b8:52:5a:0c:a0:96:0e:59:89" release-certificate.txt || {
-            echo "ERROR: APK certificate does not match the historical Firebase OAuth SHA-1. Release blocked."
-            exit 1
-          }
+          EXPECTED=$(awk '/SHA1:/{print $2; exit}' expected-certificate.txt | tr -d ':' | tr '[:upper:]' '[:lower:]')
+          ACTUAL=$(sed -n 's/.*SHA-1 digest: //p' release-certificate.txt | head -n 1 | tr -d ':' | tr '[:upper:]' '[:lower:]')
+          test -n "$EXPECTED" && test "$EXPECTED" = "$ACTUAL" || { echo "ERROR: APK signature differs from permanent keystore."; exit 1; }
+          echo "Permanent SHA-1: $ACTUAL"
       - name: Upload permanent-key release APK
-        if: ${{ env.HAS_RELEASE_SIGNING == 'true' }}
+        if: ${{ secrets.ECHOS_KEY_ENCRYPTION_PASSWORD != '' }}
         uses: actions/upload-artifact@v4
         with:
           name: ECHOS-APK-RELEASE-SIGNED
