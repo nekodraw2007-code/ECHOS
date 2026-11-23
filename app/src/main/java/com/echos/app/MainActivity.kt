@@ -3,6 +3,8 @@ package com.echos.app
 import android.app.Activity
 import android.app.AlertDialog
 import android.content.Context
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.util.Log
 import android.graphics.Color
 import android.graphics.Typeface
@@ -1493,7 +1495,22 @@ class MainActivity : Activity(), SensorEventListener {
                 12501 -> "Sélection Google annulée par l'utilisateur."
                 else -> e.localizedMessage ?: "Erreur Google"
             }
-            toast("Échec Google [${e.statusCode}] : $detail")
+            if (e.statusCode == 10) {
+                val fingerprint = lastGoogleSignInSha1 ?: "indisponible"
+                val diagnostic = "Application : $packageName\nSHA-1 de cet APK : $fingerprint\n\nDans Firebase Console > Paramètres du projet > Vos applications Android, ajoute cette empreinte SHA-1 à l'application com.echos.app. Active aussi Google comme fournisseur dans Authentication > Sign-in method, puis télécharge le nouveau google-services.json et remplace app/google-services.json dans le dépôt GitHub. Une nouvelle compilation sera nécessaire."
+                AlertDialog.Builder(this)
+                    .setTitle("Configuration Google OAuth refusée (10)")
+                    .setMessage(diagnostic)
+                    .setPositiveButton("COPIER LE SHA-1") { _, _ ->
+                        val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                        clipboard.setPrimaryClip(ClipData.newPlainText("ECHOS SHA-1", fingerprint))
+                        toast("Empreinte SHA-1 copiée")
+                    }
+                    .setNegativeButton("FERMER", null)
+                    .show()
+            } else {
+                toast("Échec Google [${e.statusCode}] : $detail")
+            }
             refreshAccountUi()
         } catch (e: Exception) {
             Log.e("ECHOS_SYNC", "Erreur inattendue pendant la connexion Google", e)
