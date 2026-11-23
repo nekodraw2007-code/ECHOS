@@ -133,6 +133,7 @@ class MainActivity : Activity(), SensorEventListener {
     private lateinit var googleSignInButton: Button
     private lateinit var signOutButton: Button
 
+    private var lastGoogleSignInSha1: String? = null
     private var firebaseAuth: FirebaseAuth? = null
     private var firestore: FirebaseFirestore? = null
     private var customSyncListener: ListenerRegistration? = null
@@ -1428,8 +1429,8 @@ class MainActivity : Activity(), SensorEventListener {
             toast("Identifiant OAuth Web introuvable dans google-services.json.")
             return
         }
-        val installedSha1 = installedApkCertificateSha1()
-        Log.i("ECHOS_SYNC", "Démarrage OAuth package=$packageName, APK SHA-1=${installedSha1 ?: "indisponible"}")
+        lastGoogleSignInSha1 = installedApkCertificateSha1()
+        Log.i("ECHOS_SYNC", "Démarrage OAuth package=$packageName, APK SHA-1=${lastGoogleSignInSha1 ?: "indisponible"}")
         googleSignInButton.isEnabled = false
         googleSignInButton.text = "OUVERTURE DE GOOGLE…"
         val options = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -1487,7 +1488,7 @@ class MainActivity : Activity(), SensorEventListener {
         } catch (e: ApiException) {
             Log.e("ECHOS_SYNC", "Google Sign-In statusCode=${e.statusCode}, resultCode=$resultCode", e)
             val detail = when (e.statusCode) {
-                10 -> "OAuth refusé. Package=${packageName} · SHA-1=${installedSha1 ?: "indisponible"}. Ajoute cette empreinte au client Android Firebase puis récupère le nouveau google-services.json."
+                10 -> "OAuth refusé. Package=${packageName} · SHA-1=${lastGoogleSignInSha1 ?: "indisponible"}. Ajoute cette empreinte au client Android Firebase puis récupère le nouveau google-services.json."
                 16 -> "Réauthentification refusée par Google. Vérifie la signature SHA-1 de l'APK et Google Play Services."
                 12501 -> "Sélection Google annulée par l'utilisateur."
                 else -> e.localizedMessage ?: "Erreur Google"
