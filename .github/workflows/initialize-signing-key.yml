@@ -1,0 +1,58 @@
+name: Initialize permanent ECHOS signing key
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  initialize:
+    name: Generate permanent signing key (one time)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require encryption secret and prevent key replacement
+        env:
+          GH_TOKEN: ${{ github.token }}
+          KEY_PASSWORD: ${{ secrets.ECHOS_KEY_ENCRYPTION_PASSWORD }}
+        run: |
+          if [ -z "$KEY_PASSWORD" ]; then
+            echo "::error::Create the ECHOS_KEY_ENCRYPTION_PASSWORD repository secret before running this workflow."
+            exit 1
+          fi
+          if gh release view echos-signing-key-v1 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "::error::The permanent signing-key release already exists. Refusing to replace it."
+            exit 1
+          fi
+      - name: Generate permanent JKS and encrypted backup
+        env:
+          KEY_PASSWORD: ${{ secrets.ECHOS_KEY_ENCRYPTION_PASSWORD }}
+        run: |
+          set -euo pipefail
+          keytool -genkeypair -v \
+            -keystore echos-release.jks \
+            -storetype JKS \
+            -storepass "$KEY_PASSWORD" \
+            -keypass "$KEY_PASSWORD" \
+            -alias echos-upload \
+            -keyalg RSA -keysize 4096 -validity 10000 \
+            -dname "CN=ECHOS Android, OU=Mobile, O=ECHOS, L=France, ST=France, C=FR"
+          keytool -list -v -keystore echos-release.jks -storepass "$KEY_PASSWORD" -alias echos-upload > signing-certificate.txt
+          openssl enc -aes-256-cbc -salt -pbkdf2 -iter 600000 \
+            -in echos-release.jks -out echos-release.jks.enc \
+            -pass env:KEY_PASSWORD
+          grep -E 'SHA1:|SHA256:' signing-certificate.txt || true
+      - name: Publish encrypted key backup as permanent private-key vault
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create echos-signing-key-v1 echos-release.jks.enc signing-certificate.txt \
+            --repo "$GITHUB_REPOSITORY" \
+            --title "ECHOS permanent signing key (encrypted)" \
+            --notes "Encrypted JKS backup. Decryption requires the ECHOS_KEY_ENCRYPTION_PASSWORD Actions secret. Never remove or replace this release."
+      - name: Publish certificate fingerprint artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ECHOS-PERMANENT-SIGNING-CERTIFICATE
+          path: signing-certificate.txt
+          retention-days: 90
