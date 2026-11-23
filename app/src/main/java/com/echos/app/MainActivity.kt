@@ -79,6 +79,7 @@ class MainActivity : Activity(), SensorEventListener {
     private var magneticReference = Double.NaN
     private var magneticReferenceVector: DoubleArray? = null
     private val motionTriggerActive = mutableMapOf<String, Boolean>()
+    private val motionReferenceMagnitude = mutableMapOf<String, Double>()
     private var lastProximityNear: Boolean? = null
     private val registeredSensorTypes = mutableSetOf<Int>()
     private var speechEngine: TextToSpeech? = null
@@ -773,6 +774,7 @@ class MainActivity : Activity(), SensorEventListener {
         magneticReference = Double.NaN
         magneticReferenceVector = null
         motionTriggerActive.clear()
+        motionReferenceMagnitude.clear()
         lastProximityNear = null
         gravityInitialized = false
         motionSamples.clear()
@@ -792,8 +794,9 @@ class MainActivity : Activity(), SensorEventListener {
         addHistory("Session démarrée · mode $currentMode")
     }
 
-    // Reproduction indépendante des deux voies de sélection observées dans GhostTube 6.2.5.
-    // Aucun mot n'est généré si la signature ne satisfait pas les seuils du dictionnaire.
+    // ECHOS reprend le principe public de GhostTube : une signature numérique issue
+    // des capteurs sélectionne une entrée. L'algorithme propriétaire exact de GhostTube
+    // n'étant pas publié, cette implémentation est indépendante et ne prétend pas le copier.
     private fun sensorFraction(value: Double): String {
         if (!value.isFinite()) return ""
         val decimal = BigDecimal(abs(value).toString()).toPlainString()
@@ -883,24 +886,46 @@ class MainActivity : Activity(), SensorEventListener {
         val now = System.currentTimeMillis()
         val norm = sqrt(x * x + y * y + z * z)
         if (!norm.isFinite()) return
+
+        // Le mouvement est évalué par rapport au niveau de repos propre à chaque
+        // capteur, et non par sa valeur brute. Cela évite de traiter la gravité comme
+        // une anomalie et réduit les déclenchements dus aux petits mouvements continus.
+        val reference = motionReferenceMagnitude[source]
+        if (reference == null) {
+            motionReferenceMagnitude[source] = norm
+            return
+        }
+        val deviation = abs(norm - reference)
         val threshold = when (source) {
             "gyroscope" -> 0.12 + (1.0 - sensitivity.toDouble()) * 0.18
             "accéléromètre linéaire" -> 0.35 + (1.0 - sensitivity.toDouble()) * 0.45
             else -> 0.35 + (1.0 - sensitivity.toDouble()) * 0.45
         }
+        val effectiveThreshold = maxOf(threshold, if (calibrated) noiseFloor.toDouble() * 2.5 else 0.0)
         val wasActive = motionTriggerActive[source] == true
-        if (norm < threshold * 0.40) {
+
+        // Mise à jour lente de la référence uniquement lorsque le capteur est calme.
+        // Une variation brusque reste donc détectable sans que le mouvement normal
+        // fasse dériver immédiatement le seuil.
+        if (deviation < effectiveThreshold * 0.60) {
+            motionReferenceMagnitude[source] = reference * 0.97 + norm * 0.03
             motionTriggerActive[source] = false
             return
         }
-        if (wasActive || norm < threshold || now < nextWordAt) return
+        if (wasActive || deviation < effectiveThreshold || now < nextWordAt) return
+
         val pool = activeWordPool()
         if (pool.isEmpty()) return
-        val signature = signatureDigits(x, y, z, norm)
+        val signature = signatureDigits(x, y, z, norm, deviation)
         val entry = selectSignatureEntry(pool, signature) ?: return
+
         motionTriggerActive[source] = true
         nextWordAt = now + cooldownForSignature(signature)
-        emitWord(entry, "signature de mouvement · $source · %.3f".format(Locale.FRANCE, norm), signature)
+        emitWord(
+            entry,
+            "variation environnementale · $source · Δ %.3f".format(Locale.FRANCE, deviation),
+            signature
+        )
     }
 
     @Synchronized
