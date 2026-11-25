@@ -61,12 +61,16 @@ internal object FrenchNeuralVoices {
                 FileOutputStream(archiveFile).use { output ->
                     val buffer = ByteArray(64 * 1024)
                     var total = 0L
+                    var lastProgress = -1
                     while (true) {
                         val count = input.read(buffer)
                         if (count < 0) break
                         output.write(buffer, 0, count)
                         total += count
-                        if (expected > 0) progress((total * 45 / expected).toInt().coerceIn(0, 45))
+                        if (expected > 0) {
+                            val percent = (total * 45 / expected).toInt().coerceIn(0, 45)
+                            if (percent != lastProgress) { lastProgress = percent; progress(percent) }
+                        }
                     }
                 }
             }
@@ -158,7 +162,7 @@ internal class NeuralVoiceEngine(private val context: Context) {
         val track = AudioTrack(
             android.media.AudioManager.STREAM_MUSIC, playbackRate,
             AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT,
-            maxOf(minBuffer, sampleRate / 2), AudioTrack.MODE_STREAM
+            maxOf(minBuffer, playbackRate / 2), AudioTrack.MODE_STREAM
         )
         try {
             track.play()
