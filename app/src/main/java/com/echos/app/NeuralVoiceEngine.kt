@@ -143,13 +143,18 @@ internal class NeuralVoiceEngine(private val context: Context) {
 
     fun stop() { stopRequested.set(true) }
 
-    @Synchronized\n    fun speak(text: String, voice: FrenchNeuralVoice, speakerId: Int, speed: Float = 1.0f, whisper: Boolean = false) {
+    @Synchronized\n    fun speak(text: String, voice: FrenchNeuralVoice, speakerId: Int, speed: Float = 1.0f, style: Int = 4) {
         stopRequested.set(false)
         val engine = ensureLoaded(voice)
         val sampleRate = engine.sampleRate()
+        val playbackRate = when (style) {
+            1 -> (sampleRate * 0.88f).toInt()
+            2 -> (sampleRate * 1.12f).toInt()
+            else -> sampleRate
+        }
         val minBuffer = AudioTrack.getMinBufferSize(sampleRate, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT)
         val track = AudioTrack(
-            android.media.AudioManager.STREAM_MUSIC, sampleRate,
+            android.media.AudioManager.STREAM_MUSIC, playbackRate,
             AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT,
             maxOf(minBuffer, sampleRate / 2), AudioTrack.MODE_STREAM
         )
@@ -159,12 +164,20 @@ internal class NeuralVoiceEngine(private val context: Context) {
             engine.generateWithConfigAndCallback(text, generation) { samples ->
                 if (stopRequested.get()) return@generateWithConfigAndCallback 0
                 val shorts = ShortArray(samples.size)
+                var previous = 0f
                 for (i in samples.indices) {
                     var sample = samples[i]
-                    if (whisper) {
-                        // Whisper-style timbre processing: reduced harmonics, soft spectral-like shaping,
-                        // and compression. This changes the signal character, not only its loudness.
-                        sample = kotlin.math.tanh(sample * 1.45f) * 0.22f
+                    when (style) {
+                        0 -> { // whisper-like airy signal: HPF, light noise, soft compression
+                            val high = sample - previous * 0.90f
+                            previous = sample
+                            val air = ((i * 1103515245L + 12345L) and 0x7fffffffL).toFloat() / 2147483647f - 0.5f
+                            sample = kotlin.math.tanh(high * 1.55f) * 0.18f + air * 0.004f
+                        }
+                        1 -> sample *= 0.88f
+                        2 -> sample = (sample * 1.10f).coerceIn(-1f, 1f)
+                        3 -> sample *= 0.92f
+                        else -> sample *= 0.98f
                     }
                     shorts[i] = (sample.coerceIn(-1f, 1f) * 32767f).toInt().toShort()
                 }
