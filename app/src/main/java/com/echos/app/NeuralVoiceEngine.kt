@@ -143,15 +143,16 @@ internal class NeuralVoiceEngine(private val context: Context) {
 
     fun stop() { stopRequested.set(true) }
 
-    @Synchronized\n    @Synchronized\n    fun speak(text: String, voice: FrenchNeuralVoice, speakerId: Int, speed: Float = 1.0f, style: Int = 4) {
+    @Synchronized\n    @Synchronized\n    fun speak(text: String, voice: FrenchNeuralVoice, speakerId: Int, speed: Float = 1.0f, style: Int = 4, question: Boolean = false) {
         stopRequested.set(false)
         val engine = ensureLoaded(voice)
         val sampleRate = engine.sampleRate()
-        val playbackRate = when (style) {
-            1 -> (sampleRate * 0.88f).toInt()
-            2 -> (sampleRate * 1.12f).toInt()
-            else -> sampleRate
+        val stylePitch = when (style) {
+            1 -> 0.88f
+            2 -> 1.12f
+            else -> 1.0f
         }
+        val playbackRate = (sampleRate * stylePitch * if (question) 1.04f else 1.0f).toInt()
         val minBuffer = AudioTrack.getMinBufferSize(sampleRate, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT)
         val track = AudioTrack(
             android.media.AudioManager.STREAM_MUSIC, playbackRate,
