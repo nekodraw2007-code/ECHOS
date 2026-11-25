@@ -777,7 +777,8 @@ class MainActivity : Activity(), SensorEventListener {
                 } catch (e: Exception) {
                     Log.e("ECHOS_NEURAL", "Synthèse neuronale impossible", e)
                     // The previous Android TTS path remains a safe fallback if model/runtime fails.
-                    runOnUiThread { toast("La voix neuronale a échoué. Retour à la voix Android.") }
+                    val details = e.message?.take(140)?.let { " ($it)" } ?: ""
+                    runOnUiThread { toast("Voix neuronale échouée$details · secours Android") }
                     runOnUiThread { speakWithSensorVoiceAndroid(rawText, fingerprint) }
                 }
             }.also { it.start() }
