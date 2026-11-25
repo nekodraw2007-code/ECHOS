@@ -46,6 +46,7 @@ import java.util.Locale
 import java.security.MessageDigest
 import kotlin.math.abs
 import kotlin.math.sqrt
+import kotlin.math.pow
 import kotlin.random.Random
 
 private data class WordEntry(val category: String, val text: String, val weight: Int = 1, val custom: Boolean = false)
@@ -622,23 +623,23 @@ class MainActivity : Activity(), SensorEventListener {
                 engine.voice = dynamicVoices[voiceSeed % dynamicVoices.size]
                 when (styleSeed % 5) {
                     0 -> { // Chuchotement simulé
-                        engine.setPitch(0.88f + (pitchSeed / 15f) * 0.08f)
+                        engine.setPitch(0.88f + (pitchSeed / 15f) * 0.08f + if (question) 0.06f else 0f)
                         engine.setSpeechRate(0.78f + (rateSeed / 15f) * 0.08f)
                     }
                     1 -> { // Grave
-                        engine.setPitch(0.78f + (pitchSeed / 15f) * 0.10f)
+                        engine.setPitch(0.78f + (pitchSeed / 15f) * 0.10f + if (question) 0.06f else 0f)
                         engine.setSpeechRate(0.86f + (rateSeed / 15f) * 0.08f)
                     }
                     2 -> { // Aérien, plus aigu
-                        engine.setPitch(1.10f + (pitchSeed / 15f) * 0.16f)
+                        engine.setPitch(1.10f + (pitchSeed / 15f) * 0.16f + if (question) 0.06f else 0f)
                         engine.setSpeechRate(0.86f + (rateSeed / 15f) * 0.12f)
                     }
                     3 -> { // Ralenti / instable
-                        engine.setPitch(0.92f + (pitchSeed / 15f) * 0.18f)
+                        engine.setPitch(0.92f + (pitchSeed / 15f) * 0.18f + if (question) 0.06f else 0f)
                         engine.setSpeechRate(0.82f + (rateSeed / 15f) * 0.16f)
                     }
                     else -> {
-                        engine.setPitch(0.94f + (pitchSeed / 15f) * 0.12f)
+                        engine.setPitch(0.94f + (pitchSeed / 15f) * 0.12f + if (question) 0.06f else 0f)
                         engine.setSpeechRate(0.90f + (rateSeed / 15f) * 0.16f)
                     }
                 }
