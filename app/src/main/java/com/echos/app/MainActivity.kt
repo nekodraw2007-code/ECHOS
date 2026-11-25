@@ -607,7 +607,7 @@ class MainActivity : Activity(), SensorEventListener {
         voiceInfoView.text = if (installed.isEmpty()) {
             "Aucun pack neural installé. Installe une voix indépendante pour utiliser la synthèse hors Android. Les voix Android restent disponibles en secours."
         } else {
-            "Moteur neural hors ligne actif · ${installed.size} pack(s) installé(s) : ${installed.joinToString { it.label }}. Les signatures sélectionnent une voix stable."
+            "Moteur neural hors ligne disponible · ${installed.size} pack(s) installé(s) : ${installed.joinToString { it.label }}. Les signatures sélectionnent une voix stable."
         }
     }
 
@@ -656,7 +656,7 @@ class MainActivity : Activity(), SensorEventListener {
                         .setTitle("Installer ${voice.label}")
                         .setMessage("Le pack est téléchargé une seule fois puis conservé sur le téléphone.")
                         .setView(box)
-                        .setNegativeButton("Annuler", null)
+                        .setNegativeButton("Masquer", null)
                         .create()
                     dialog.show()
                     Thread {
