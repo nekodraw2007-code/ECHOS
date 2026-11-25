@@ -669,7 +669,9 @@ class MainActivity : Activity(), SensorEventListener {
                             }
                             runOnUiThread {
                                 dialog.dismiss()
-                                prefs.edit().putString("neural_voice_selected", voice.id).apply()
+                                prefs.edit().putString("neural_voice_selected", voice.id)
+                                    .putLong("preferences_updated_at", System.currentTimeMillis()).apply()
+                                syncPreferencesToCloud()
                                 toast("Pack vocal installé et sélectionné.")
                                 refreshNeuralVoiceStatus()
                                 manageNeuralVoicePacks()
