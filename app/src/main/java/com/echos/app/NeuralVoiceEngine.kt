@@ -81,10 +81,11 @@ internal object FrenchNeuralVoices {
                 TarArchiveInputStream(bz).use { tar ->
                     var entry = tar.nextTarEntry
                     while (entry != null) {
-                        val safeName = entry.name.replace('\\', '/').trimStart('/')
+                        val currentEntry = entry
+                        val safeName = currentEntry.name.replace('\\', '/').trimStart('/')
                         if (safeName.split('/').any { it == ".." }) throw SecurityException("Archive invalide")
                         val output = File(tempFolder, safeName)
-                        if (entry.isDirectory) output.mkdirs()
+                        if (currentEntry.isDirectory) output.mkdirs()
                         else {
                             output.parentFile?.mkdirs()
                             FileOutputStream(output).use { out ->
@@ -95,8 +96,8 @@ internal object FrenchNeuralVoices {
                                     if (n < 0) break
                                     out.write(buffer, 0, n)
                                     copied += n
-                                    if (entry.name.endsWith(voice.modelFile) && entry.size > 0) {
-                                        val pct = (46 + copied * 42 / entry.size).toInt().coerceIn(46, 88)
+                                    if (currentEntry.name.endsWith(voice.modelFile) && currentEntry.size > 0) {
+                                        val pct = (46 + copied * 42 / currentEntry.size).toInt().coerceIn(46, 88)
                                         progress(pct)
                                     }
                                 }
