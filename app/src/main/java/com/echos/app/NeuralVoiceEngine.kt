@@ -76,6 +76,7 @@ internal object FrenchNeuralVoices {
             }
             tempFolder.deleteRecursively()
             tempFolder.mkdirs()
+            progress(46)
             BZip2CompressorInputStream(FileInputStream(archiveFile)).use { bz ->
                 TarArchiveInputStream(bz).use { tar ->
                     var entry = tar.nextTarEntry
@@ -87,7 +88,18 @@ internal object FrenchNeuralVoices {
                         else {
                             output.parentFile?.mkdirs()
                             FileOutputStream(output).use { out ->
-                                tar.copyTo(out)
+                                val buffer = ByteArray(64 * 1024)
+                                var copied = 0L
+                                while (true) {
+                                    val n = tar.read(buffer)
+                                    if (n < 0) break
+                                    out.write(buffer, 0, n)
+                                    copied += n
+                                    if (entry.name.endsWith(voice.modelFile) && entry.size > 0) {
+                                        val pct = (46 + copied * 42 / entry.size).toInt().coerceIn(46, 88)
+                                        progress(pct)
+                                    }
+                                }
                             }
                         }
                         entry = tar.nextTarEntry
