@@ -582,13 +582,21 @@ class MainActivity : Activity(), SensorEventListener {
     }
 
     private fun prepareFrenchSpeech(rawText: String): String {
-        return rawText.trim()
+        var text = rawText.trim()
             .replace("&", " et ")
-            .replace("/", ", ")
+            .replace("/", " ")
             .replace(Regex("[_•…]+"), " ")
-            .replace(Regex("[–—-]+"), ", ")
+            // Les tirets de questions françaises ne doivent plus créer une pause longue.
+            .replace(Regex("[–—-]+"), " ")
             .replace(Regex("\\s+"), " ")
             .lowercase(Locale.FRANCE)
+            .trim()
+        val questionCue = Regex("^(est ce|es tu|êtes vous|qui|quoi|que|où|quand|comment|pourquoi|combien|avez vous|as tu|peux tu|veux tu|sais tu|y a t il)\\b", RegexOption.IGNORE_CASE)
+        if (questionCue.containsMatchIn(text) && !text.endsWith("?")) text = text.trimEnd('.', '!', '…') + " ?"
+        text = text.replace(Regex("\\s+([?!.,])"), "$1")
+            .replace(Regex("([?!.,])(?=\\S)"), "$1 ")
+            .replace(Regex("\\s+"), " ")
+        return text
     }
 
     private fun fingerprintHexValue(fingerprint: String, index: Int, fallback: Int): Int {
@@ -603,23 +611,45 @@ class MainActivity : Activity(), SensorEventListener {
         val spokenText = prepareFrenchSpeech(rawText)
         if (spokenText.isBlank()) return
         try {
+            val question = spokenText.endsWith("?")
+            val styleSeed = fingerprintHexValue(fingerprint, 8, 8)
             if (dynamicVoicesEnabled && dynamicVoices.isNotEmpty()) {
-                // Les chiffres hexadécimaux de la signature pilotent le profil vocal.
+                // Même empreinte = même voix et même profil vocal (dont chuchotement).
                 val voiceSeed = fingerprintHexValue(fingerprint, 4, 0) * 16 +
                     fingerprintHexValue(fingerprint, 5, 0)
                 val pitchSeed = fingerprintHexValue(fingerprint, 6, 8)
                 val rateSeed = fingerprintHexValue(fingerprint, 7, 8)
-                val chosenVoice = dynamicVoices[voiceSeed % dynamicVoices.size]
-                engine.voice = chosenVoice
-                // Variations modérées pour conserver une diction compréhensible.
-                engine.setPitch(0.94f + (pitchSeed / 15f) * 0.12f)
-                engine.setSpeechRate(0.90f + (rateSeed / 15f) * 0.16f)
+                engine.voice = dynamicVoices[voiceSeed % dynamicVoices.size]
+                when (styleSeed % 5) {
+                    0 -> { // Chuchotement simulé
+                        engine.setPitch(0.88f + (pitchSeed / 15f) * 0.08f)
+                        engine.setSpeechRate(0.78f + (rateSeed / 15f) * 0.08f)
+                    }
+                    1 -> { // Grave
+                        engine.setPitch(0.78f + (pitchSeed / 15f) * 0.10f)
+                        engine.setSpeechRate(0.86f + (rateSeed / 15f) * 0.08f)
+                    }
+                    2 -> { // Aérien, plus aigu
+                        engine.setPitch(1.10f + (pitchSeed / 15f) * 0.16f)
+                        engine.setSpeechRate(0.86f + (rateSeed / 15f) * 0.12f)
+                    }
+                    3 -> { // Ralenti / instable
+                        engine.setPitch(0.92f + (pitchSeed / 15f) * 0.18f)
+                        engine.setSpeechRate(0.82f + (rateSeed / 15f) * 0.16f)
+                    }
+                    else -> {
+                        engine.setPitch(0.94f + (pitchSeed / 15f) * 0.12f)
+                        engine.setSpeechRate(0.90f + (rateSeed / 15f) * 0.16f)
+                    }
+                }
             } else {
                 defaultFrenchVoice?.let { engine.voice = it }
-                engine.setPitch(1.0f)
-                engine.setSpeechRate(0.92f)
+                engine.setPitch(if (question) 1.04f else 1.0f)
+                engine.setSpeechRate(if (question) 0.88f else 0.92f)
             }
-            val params = Bundle().apply { putFloat("volume", 1.0f) }
+            // Android n'offre pas un vrai whisper universel : on simule avec volume bas.
+            val whisper = dynamicVoicesEnabled && styleSeed % 5 == 0
+            val params = Bundle().apply { putFloat("volume", if (whisper) 0.30f else 1.0f) }
             engine.speak(spokenText, TextToSpeech.QUEUE_FLUSH, params, "echos-${System.nanoTime()}")
         } catch (e: Exception) {
             Log.e("ECHOS_TTS", "Lecture du mot impossible : $rawText", e)
@@ -976,7 +1006,8 @@ class MainActivity : Activity(), SensorEventListener {
         )
         val magnitudeDelta = abs(magnitude - magneticReference)
         val calibratedNoise = if (calibrated) noiseFloor.toDouble() * 3.0 else 0.0
-        val threshold = maxOf(0.45, calibratedNoise, 1.45 - sensitivity.toDouble() * 1.0)
+        val sensitivityCurve = sensitivity.toDouble().pow(1.65)
+        val threshold = maxOf(0.18, calibratedNoise, 1.45 - sensitivityCurve * 1.27)
         magneticDelta = magnitudeDelta.toFloat()
 
         // Mise à jour très progressive de la référence en période calme; les
@@ -1000,7 +1031,9 @@ class MainActivity : Activity(), SensorEventListener {
         // confirmer la variation avant qu'un mot soit émis.
         if (magneticCandidateSamples == 0) magneticCandidateSince = now
         magneticCandidateSamples++
-        if (magneticCandidateSamples < 3 || now - magneticCandidateSince < 70L || now < nextWordAt) return
+        val requiredSamples = if (sensitivity >= 0.92f) 2 else 3
+        val requiredDuration = if (sensitivity >= 0.92f) 35L else 70L
+        if (magneticCandidateSamples < requiredSamples || now - magneticCandidateSince < requiredDuration || now < nextWordAt) return
         if (now - lastMagneticEventAt < 350L) return
 
         val pool = activeWordPool()
@@ -1048,10 +1081,11 @@ class MainActivity : Activity(), SensorEventListener {
             return
         }
         val deviation = abs(norm - reference)
+        val sensCurve = sensitivity.toDouble().pow(1.45)
         val threshold = when (source) {
-            "gyroscope" -> 0.12 + (1.0 - sensitivity.toDouble()) * 0.18
-            "accéléromètre linéaire" -> 0.35 + (1.0 - sensitivity.toDouble()) * 0.45
-            else -> 0.35 + (1.0 - sensitivity.toDouble()) * 0.45
+            "gyroscope" -> 0.055 + (1.0 - sensCurve) * 0.24
+            "accéléromètre linéaire" -> 0.12 + (1.0 - sensCurve) * 0.48
+            else -> 0.12 + (1.0 - sensCurve) * 0.48
         }
         val effectiveThreshold = maxOf(threshold, if (calibrated) noiseFloor.toDouble() * 2.5 else 0.0)
         val wasActive = motionTriggerActive[source] == true
