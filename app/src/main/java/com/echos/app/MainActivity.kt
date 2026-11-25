@@ -90,6 +90,7 @@ class MainActivity : Activity(), SensorEventListener {
     private var speechReady = false
     private var neuralVoiceEngine: NeuralVoiceEngine? = null
     private var neuralVoiceLoading = false
+    private var neuralSpeechThread: Thread? = null
     private var dynamicVoicesEnabled = true
     private var dynamicVoices: List<Voice> = emptyList()
     private var defaultFrenchVoice: Voice? = null
@@ -695,19 +696,26 @@ class MainActivity : Activity(), SensorEventListener {
                 installedNeural.firstOrNull { it.id == selectedId } ?: installedNeural.first()
             }
             val seed = fingerprintHexValue(fingerprint, 8, 8)
-            val rate = 0.86f + (fingerprintHexValue(fingerprint, 7, 8) / 15f) * 0.25f
-            val whisper = dynamicVoicesEnabled && seed % 5 == 0
+            val style = if (dynamicVoicesEnabled) seed % 5 else 4
+            val rate = when (style) {
+                0 -> 0.84f + (fingerprintHexValue(fingerprint, 7, 8) / 15f) * 0.12f
+                3 -> 0.78f + (fingerprintHexValue(fingerprint, 7, 8) / 15f) * 0.10f
+                else -> 0.88f + (fingerprintHexValue(fingerprint, 7, 8) / 15f) * 0.18f
+            }
             val neural = neuralVoiceEngine ?: NeuralVoiceEngine(this).also { neuralVoiceEngine = it }
-            Thread {
+            neural.stop()
+            speechEngine?.stop()
+            neuralSpeechThread?.interrupt()
+            neuralSpeechThread = Thread {
                 try {
-                    neural.speak(prepareFrenchSpeech(rawText), voice, 0, rate, whisper)
+                    neural.speak(prepareFrenchSpeech(rawText), voice, 0, rate, style)
                 } catch (e: Exception) {
                     Log.e("ECHOS_NEURAL", "Synthèse neuronale impossible", e)
                     // The previous Android TTS path remains a safe fallback if model/runtime fails.
                     runOnUiThread { toast("La voix neuronale a échoué. Retour à la voix Android.") }
                     runOnUiThread { speakWithSensorVoiceAndroid(rawText, fingerprint) }
                 }
-            }.start()
+            }.also { it.start() }
             return
         }
         if (!speechReady) return
@@ -1913,6 +1921,7 @@ class MainActivity : Activity(), SensorEventListener {
     }
 
     override fun onDestroy() {
+        neuralSpeechThread?.interrupt()
         neuralVoiceEngine?.stop()
         neuralVoiceEngine?.release()
         neuralVoiceEngine = null
