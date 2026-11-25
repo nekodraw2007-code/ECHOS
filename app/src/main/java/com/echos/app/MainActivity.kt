@@ -617,77 +617,135 @@ class MainActivity : Activity(), SensorEventListener {
     private fun manageNeuralVoicePacks() {
         val voices = FrenchNeuralVoices.catalog
         val prefs = getSharedPreferences("echos_preferences", MODE_PRIVATE)
-        val descriptions = voices.map { voice ->
-            val state = if (FrenchNeuralVoices.isInstalled(this, voice)) "INSTALLÉE" else "À TÉLÉCHARGER · ${voice.approximateSize}"
-            "${voice.label}\n${state}"
-        }.toTypedArray()
-        AlertDialog.Builder(this)
+
+        val content = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(dp(18), dp(8), dp(18), dp(12))
+        }
+        val explanation = text(
+            "Choisis une voix. Les packs non installés ont un bouton de téléchargement visible. " +
+                "Après installation, la voix fonctionne hors ligne.",
+            13, white
+        )
+        explanation.setPadding(0, 0, 0, dp(12))
+        content.addView(explanation)
+
+        val scroll = ScrollView(this).apply {
+            isFillViewport = false
+            addView(content)
+        }
+        val managerDialog = AlertDialog.Builder(this)
             .setTitle("Voix neuronales françaises")
-            .setMessage("Voix générées par un moteur indépendant d'Android, sur l'appareil. Les packs téléchargés fonctionnent ensuite sans réseau.")
-            .setItems(descriptions) { _, index ->
-                val voice = voices[index]
-                if (FrenchNeuralVoices.isInstalled(this, voice)) {
-                    prefs.edit().putString("neural_voice_selected", voice.id)
-                        .putLong("preferences_updated_at", System.currentTimeMillis()).apply()
-                    syncPreferencesToCloud()
-                    toast("Voix neuronale sélectionnée : ${voice.label}")
-                    Thread {
-                        try {
-                            val engine = neuralVoiceEngine ?: NeuralVoiceEngine(this).also { neuralVoiceEngine = it }
-                            engine.speak("Bonjour. Cette voix neuronale fonctionne hors ligne dans ECHOS.", voice, 0, 0.94f, 4)
-                        } catch (e: Exception) {
-                            Log.e("ECHOS_NEURAL", "Test neural impossible", e)
-                            runOnUiThread { toast("Erreur moteur neural : ${e.localizedMessage ?: "inconnue"}") }
-                        }
-                    }.start()
-                } else {
-                    val progress = ProgressBar(this, null, android.R.attr.progressBarStyleHorizontal).apply {
-                        max = 100
-                        progress = 0
-                    }
-                    val status = text("Téléchargement du pack vocal…", 12, white)
-                    val box = LinearLayout(this).apply {
-                        orientation = LinearLayout.VERTICAL
-                        setPadding(dp(20), dp(12), dp(20), dp(8))
-                        addView(status)
-                        addView(progress, LinearLayout.LayoutParams(-1, dp(10)))
-                    }
-                    val dialog = AlertDialog.Builder(this)
-                        .setTitle("Installer ${voice.label}")
-                        .setMessage("Le pack est téléchargé une seule fois puis conservé sur le téléphone.")
-                        .setView(box)
-                        .setNegativeButton("Masquer", null)
-                        .create()
-                    dialog.show()
-                    Thread {
-                        try {
-                            FrenchNeuralVoices.downloadAndInstall(this, voice) { value ->
-                                runOnUiThread {
-                                    progress.progress = value
-                                    status.text = if (value >= 90) "Extraction et vérification du pack…" else "Téléchargement : $value %"
-                                }
-                            }
-                            runOnUiThread {
-                                dialog.dismiss()
-                                prefs.edit().putString("neural_voice_selected", voice.id)
-                                    .putLong("preferences_updated_at", System.currentTimeMillis()).apply()
-                                syncPreferencesToCloud()
-                                toast("Pack vocal installé et sélectionné.")
-                                refreshNeuralVoiceStatus()
-                                manageNeuralVoicePacks()
-                            }
-                        } catch (e: Exception) {
-                            Log.e("ECHOS_NEURAL", "Installation pack vocal échouée", e)
-                            runOnUiThread {
-                                dialog.dismiss()
-                                toast("Installation échouée : ${e.localizedMessage ?: e.javaClass.simpleName}")
+            .setView(scroll)
+            .setNegativeButton("Fermer", null)
+            .create()
+
+        fun chooseAndPreview(voice: FrenchNeuralVoice) {
+            prefs.edit().putString("neural_voice_selected", voice.id)
+                .putLong("preferences_updated_at", System.currentTimeMillis()).apply()
+            syncPreferencesToCloud()
+            toast("Voix neuronale sélectionnée : ${voice.label}")
+            Thread {
+                try {
+                    val engine = neuralVoiceEngine ?: NeuralVoiceEngine(this).also { neuralVoiceEngine = it }
+                    engine.speak("Bonjour. Cette voix neuronale fonctionne hors ligne dans ECHOS.", voice, 0, 0.94f, 4)
+                } catch (e: Exception) {
+                    Log.e("ECHOS_NEURAL", "Test neural impossible", e)
+                    runOnUiThread { toast("Erreur moteur neural : ${e.localizedMessage ?: "inconnue"}") }
+                }
+            }.start()
+        }
+
+        fun startVoiceDownload(voice: FrenchNeuralVoice) {
+            managerDialog.dismiss()
+            val progress = ProgressBar(this, null, android.R.attr.progressBarStyleHorizontal).apply {
+                max = 100
+                progress = 0
+            }
+            val status = text("Connexion au serveur vocal…", 13, white)
+            val box = LinearLayout(this).apply {
+                orientation = LinearLayout.VERTICAL
+                setPadding(dp(20), dp(12), dp(20), dp(8))
+                addView(status)
+                addView(progress, LinearLayout.LayoutParams(-1, dp(12)))
+            }
+            val dialog = AlertDialog.Builder(this)
+                .setTitle("Téléchargement : ${voice.label}")
+                .setView(box)
+                .setNegativeButton("Masquer", null)
+                .create()
+            dialog.show()
+            Thread {
+                try {
+                    FrenchNeuralVoices.downloadAndInstall(this, voice) { value ->
+                        runOnUiThread {
+                            progress.progress = value
+                            status.text = when {
+                                value >= 90 -> "Extraction et vérification du pack…"
+                                value == 0 -> "Connexion au serveur vocal…"
+                                else -> "Téléchargement : $value %"
                             }
                         }
-                    }.start()
+                    }
+                    runOnUiThread {
+                        dialog.dismiss()
+                        prefs.edit().putString("neural_voice_selected", voice.id)
+                            .putLong("preferences_updated_at", System.currentTimeMillis()).apply()
+                        syncPreferencesToCloud()
+                        toast("Pack vocal installé et sélectionné.")
+                        refreshNeuralVoiceStatus()
+                        manageNeuralVoicePacks()
+                    }
+                } catch (e: Exception) {
+                    Log.e("ECHOS_NEURAL", "Installation pack vocal échouée", e)
+                    runOnUiThread {
+                        dialog.dismiss()
+                        toast("Téléchargement échoué : ${e.localizedMessage ?: e.javaClass.simpleName}")
+                        manageNeuralVoicePacks()
+                    }
+                }
+            }.start()
+        }
+
+        voices.forEach { voice ->
+            val installed = FrenchNeuralVoices.isInstalled(this, voice)
+            val selected = prefs.getString("neural_voice_selected", "") == voice.id
+            val row = LinearLayout(this).apply {
+                orientation = LinearLayout.VERTICAL
+                setPadding(0, dp(8), 0, dp(10))
+            }
+            val label = text(voice.label, 15, white)
+            row.addView(label)
+            val state = text(
+                if (installed) (if (selected) "Installée · sélectionnée" else "Installée · prête hors ligne")
+                else "Non installée · ${voice.approximateSize}",
+                12, white
+            )
+            state.setPadding(0, dp(3), 0, dp(6))
+            row.addView(state)
+            val action = Button(this).apply {
+                text = if (installed) (if (selected) "Tester cette voix" else "Sélectionner et tester")
+                    else "Télécharger le pack (${voice.approximateSize})"
+                isAllCaps = false
+                setOnClickListener {
+                    if (installed) {
+                        managerDialog.dismiss()
+                        chooseAndPreview(voice)
+                    } else {
+                        startVoiceDownload(voice)
+                    }
                 }
             }
-            .setNegativeButton("Fermer", null)
-            .show()
+            row.addView(action, LinearLayout.LayoutParams(-1, dp(48)))
+            content.addView(row)
+            if (voice != voices.last()) {
+                val separator = View(this).apply {
+                    setBackgroundColor(0x44FFFFFF)
+                }
+                content.addView(separator, LinearLayout.LayoutParams(-1, dp(1)))
+            }
+        }
+        managerDialog.show()
     }
 
     private fun speakWithSensorVoice(rawText: String, fingerprint: String) {
