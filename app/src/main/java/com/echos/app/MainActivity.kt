@@ -537,15 +537,7 @@ class MainActivity : Activity(), SensorEventListener {
                 engine.setPitch(1.0f)
                 engine.setSpeechRate(0.92f)
                 runOnUiThread {
-                    if (::voiceInfoView.isInitialized) {
-                        val localCount = dynamicVoices.count { !it.isNetworkConnectionRequired }
-                        val networkCount = dynamicVoices.size - localCount
-                        voiceInfoView.text = if (dynamicVoices.isEmpty()) {
-                            "Aucune voix française détectée. Installe une voix française dans les paramètres de synthèse vocale Android."
-                        } else {
-                            "${dynamicVoices.size} voix françaises détectées · $localCount hors ligne · $networkCount en ligne"
-                        }
-                    }
+                    refreshNeuralVoiceStatus()
                 }
             } catch (e: Exception) {
                 Log.e("ECHOS_TTS", "Initialisation des voix françaises impossible", e)
@@ -610,6 +602,16 @@ class MainActivity : Activity(), SensorEventListener {
             .takeIf { it >= 0 } ?: fallback
     }
 
+    private fun refreshNeuralVoiceStatus() {
+        if (!::voiceInfoView.isInitialized) return
+        val installed = installedNeuralVoices()
+        voiceInfoView.text = if (installed.isEmpty()) {
+            "Aucun pack neural installé. Installe une voix indépendante pour utiliser la synthèse hors Android. Les voix Android restent disponibles en secours."
+        } else {
+            "Moteur neural hors ligne actif · ${installed.size} pack(s) installé(s) : ${installed.joinToString { it.label }}. Les signatures sélectionnent une voix stable."
+        }
+    }
+
     private fun installedNeuralVoices(): List<FrenchNeuralVoice> =
         FrenchNeuralVoices.catalog.filter { FrenchNeuralVoices.isInstalled(this, it) }
 
@@ -669,6 +671,7 @@ class MainActivity : Activity(), SensorEventListener {
                                 dialog.dismiss()
                                 prefs.edit().putString("neural_voice_selected", voice.id).apply()
                                 toast("Pack vocal installé et sélectionné.")
+                                refreshNeuralVoiceStatus()
                                 manageNeuralVoicePacks()
                             }
                         } catch (e: Exception) {
@@ -703,12 +706,13 @@ class MainActivity : Activity(), SensorEventListener {
                 else -> 0.88f + (fingerprintHexValue(fingerprint, 7, 8) / 15f) * 0.18f
             }
             val neural = neuralVoiceEngine ?: NeuralVoiceEngine(this).also { neuralVoiceEngine = it }
+            val question = prepareFrenchSpeech(rawText).endsWith("?")
             neural.stop()
             speechEngine?.stop()
             neuralSpeechThread?.interrupt()
             neuralSpeechThread = Thread {
                 try {
-                    neural.speak(prepareFrenchSpeech(rawText), voice, 0, rate, style)
+                    neural.speak(prepareFrenchSpeech(rawText), voice, 0, rate, style, question)
                 } catch (e: Exception) {
                     Log.e("ECHOS_NEURAL", "Synthèse neuronale impossible", e)
                     // The previous Android TTS path remains a safe fallback if model/runtime fails.
