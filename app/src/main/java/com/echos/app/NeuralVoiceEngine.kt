@@ -148,7 +148,7 @@ internal class NeuralVoiceEngine(private val context: Context) {
     fun stop() { stopRequested.set(true) }
 
     @Synchronized
-        fun speak(text: String, voice: FrenchNeuralVoice, speakerId: Int, speed: Float = 1.0f, style: Int = 4, question: Boolean = false) {
+    fun speak(text: String, voice: FrenchNeuralVoice, speakerId: Int, speed: Float = 1.0f, style: Int = 4, question: Boolean = false) {
         stopRequested.set(false)
         val engine = ensureLoaded(voice)
         val sampleRate = engine.sampleRate()
