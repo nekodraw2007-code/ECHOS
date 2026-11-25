@@ -165,18 +165,16 @@ internal class NeuralVoiceEngine(private val context: Context) {
         stopRequested.set(false)
         val engine = ensureLoaded(voice)
         val sampleRate = engine.sampleRate()
-        val stylePitch = when (style) {
-            1 -> 0.88f
-            2 -> 1.12f
-            else -> 1.0f
-        }
-        val playbackRate = (sampleRate * stylePitch * if (question) 1.04f else 1.0f).toInt()
+        require(sampleRate in 8000..48000) { "Fréquence audio invalide: $sampleRate Hz" }
         val minBuffer = AudioTrack.getMinBufferSize(sampleRate, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT)
+        require(minBuffer > 0) { "AudioTrack buffer invalide: $minBuffer" }
         val track = AudioTrack(
-            android.media.AudioManager.STREAM_MUSIC, playbackRate,
+            android.media.AudioManager.STREAM_MUSIC, sampleRate,
             AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT,
-            maxOf(minBuffer, playbackRate / 2), AudioTrack.MODE_STREAM
+            maxOf(minBuffer, sampleRate / 2), AudioTrack.MODE_STREAM
         )
+        require(track.state == AudioTrack.STATE_INITIALIZED) { "AudioTrack non initialisé (sample rate=$sampleRate)" }
+        if (question) track.playbackRate = (sampleRate * 1.04f).toInt()
         try {
             track.play()
             val generation = GenerationConfig(sid = speakerId, speed = speed.coerceIn(0.75f, 1.25f), silenceScale = 0.2f)
