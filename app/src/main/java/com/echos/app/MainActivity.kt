@@ -681,9 +681,10 @@ class MainActivity : Activity(), SensorEventListener {
                         runOnUiThread {
                             progress.progress = value
                             status.text = when {
-                                value >= 90 -> "Extraction et vérification du pack…"
+                                value >= 90 -> "Finalisation et vérification du pack…"
+                                value in 46..89 -> "Extraction du modèle vocal : ${((value - 46) * 100 / 42).coerceIn(0, 100)} %"
                                 value == 0 -> "Connexion au serveur vocal…"
-                                else -> "Téléchargement : $value %"
+                                else -> "Téléchargement : ${value * 100 / 45} %"
                             }
                         }
                     }
