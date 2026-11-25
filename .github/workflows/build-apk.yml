@@ -12,8 +12,6 @@ jobs:
   build:
     name: Build and verify Android APK
     runs-on: ubuntu-latest
-    env:
-      HAS_RELEASE_SIGNING: ${{ secrets.ECHOS_KEYSTORE_BASE64 != '' && secrets.ECHOS_KEYSTORE_PASSWORD != '' && secrets.ECHOS_KEY_ALIAS != '' && secrets.ECHOS_KEY_PASSWORD != '' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -30,14 +28,34 @@ jobs:
         run: |
           yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses >/dev/null || true
           "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --install "platforms;android-35" "build-tools;35.0.0" "platform-tools"
-      - name: Compile installable debug APK
-        run: gradle --no-daemon clean :app:assembleDebug
+      - name: Restore permanent signing key from encrypted GitHub release vault
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ECHOS_KEY_ENCRYPTION_PASSWORD: ${{ secrets.ECHOS_KEY_ENCRYPTION_PASSWORD }}
+        run: |
+          set -euo pipefail
+          if [ -z "$ECHOS_KEY_ENCRYPTION_PASSWORD" ]; then
+            echo "::error::Missing repository secret ECHOS_KEY_ENCRYPTION_PASSWORD. The permanent signing key cannot be restored."
+            exit 1
+          fi
+          gh release download echos-signing-key-v1 --repo "$GITHUB_REPOSITORY" --pattern echos-release.jks.enc --output "$RUNNER_TEMP/echos-release.jks.enc"
+          openssl enc -d -aes-256-cbc -salt -pbkdf2 -iter 600000 \
+            -in "$RUNNER_TEMP/echos-release.jks.enc" \
+            -out "$RUNNER_TEMP/echos-release.jks" \
+            -pass env:ECHOS_KEY_ENCRYPTION_PASSWORD
+          keytool -list -keystore "$RUNNER_TEMP/echos-release.jks" -storepass "$ECHOS_KEY_ENCRYPTION_PASSWORD" -alias echos-upload
+          echo "ECHOS_KEYSTORE_PATH=$RUNNER_TEMP/echos-release.jks" >> "$GITHUB_ENV"
+          echo "ECHOS_KEYSTORE_PASSWORD=$ECHOS_KEY_ENCRYPTION_PASSWORD" >> "$GITHUB_ENV"
+          echo "ECHOS_KEY_ALIAS=echos-upload" >> "$GITHUB_ENV"
+          echo "ECHOS_KEY_PASSWORD=$ECHOS_KEY_ENCRYPTION_PASSWORD" >> "$GITHUB_ENV"
+      - name: Compile debug and permanently signed release APKs
+        run: gradle --no-daemon clean :app:assembleDebug :app:assembleRelease
       - name: Verify debug APK
         run: |
           APK="app/build/outputs/apk/debug/app-debug.apk"
           "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose --print-certs "$APK"
-          "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$APK" | tee apk-metadata.txt
-          grep -q "package: name='com.echos.app'" apk-metadata.txt
+          "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$APK" | tee debug-metadata.txt
+          grep -q "package: name='com.echos.app'" debug-metadata.txt
           unzip -t "$APK" | tail -n 2
       - name: Upload verified debug APK
         uses: actions/upload-artifact@v4
@@ -46,40 +64,17 @@ jobs:
           path: app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 14
-      - name: Package official Android signing tools
-        run: tar -czf "$RUNNER_TEMP/android-build-tools-35.0.0.tar.gz" -C "$ANDROID_HOME/build-tools" 35.0.0
-      - name: Upload official Android signing tools
-        uses: actions/upload-artifact@v4
-        with:
-          name: ECHOS-ANDROID-BUILD-TOOLS
-          path: ${{ runner.temp }}/android-build-tools-35.0.0.tar.gz
-          if-no-files-found: error
-          retention-days: 7
-      - name: Prepare permanent release signing key
-        if: ${{ env.HAS_RELEASE_SIGNING == 'true' }}
-        env:
-          ECHOS_KEYSTORE_BASE64: ${{ secrets.ECHOS_KEYSTORE_BASE64 }}
-        run: |
-          echo "$ECHOS_KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/echos-release.jks"
-          echo "ECHOS_KEYSTORE_PATH=$RUNNER_TEMP/echos-release.jks" >> "$GITHUB_ENV"
-      - name: Build permanent-key release APK
-        if: ${{ env.HAS_RELEASE_SIGNING == 'true' }}
-        env:
-          ECHOS_KEYSTORE_PASSWORD: ${{ secrets.ECHOS_KEYSTORE_PASSWORD }}
-          ECHOS_KEY_ALIAS: ${{ secrets.ECHOS_KEY_ALIAS }}
-          ECHOS_KEY_PASSWORD: ${{ secrets.ECHOS_KEY_PASSWORD }}
-        run: gradle --no-daemon :app:assembleRelease
-      - name: Verify permanent-key release APK
-        if: ${{ env.HAS_RELEASE_SIGNING == 'true' }}
+      - name: Verify APK signed with permanent ECHOS key
         run: |
           APK="app/build/outputs/apk/release/app-release.apk"
           "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose --print-certs "$APK"
-          "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$APK" | grep "package: name='com.echos.app'"
-      - name: Upload permanent-key release APK
-        if: ${{ env.HAS_RELEASE_SIGNING == 'true' }}
+          "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$APK" | tee release-metadata.txt
+          grep -q "package: name='com.echos.app'" release-metadata.txt
+          unzip -t "$APK" | tail -n 2
+      - name: Upload permanently signed release APK
         uses: actions/upload-artifact@v4
         with:
-          name: ECHOS-APK-RELEASE-SIGNED
+          name: ECHOS-APK-RELEASE-PERMANENT-KEY
           path: app/build/outputs/apk/release/app-release.apk
           if-no-files-found: error
-          retention-days: 14
+          retention-days: 30
