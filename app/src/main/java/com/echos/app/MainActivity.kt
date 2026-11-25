@@ -689,8 +689,11 @@ class MainActivity : Activity(), SensorEventListener {
         if (installedNeural.isNotEmpty()) {
             val prefs = getSharedPreferences("echos_preferences", MODE_PRIVATE)
             val selectedId = prefs.getString("neural_voice_selected", null)
-            val voice = installedNeural.firstOrNull { it.id == selectedId }
-                ?: installedNeural[fingerprintHexValue(fingerprint, 4, 0) % installedNeural.size]
+            val voice = if (dynamicVoicesEnabled && installedNeural.size > 1) {
+                installedNeural[fingerprintHexValue(fingerprint, 4, 0) % installedNeural.size]
+            } else {
+                installedNeural.firstOrNull { it.id == selectedId } ?: installedNeural.first()
+            }
             val seed = fingerprintHexValue(fingerprint, 8, 8)
             val rate = 0.86f + (fingerprintHexValue(fingerprint, 7, 8) / 15f) * 0.25f
             val whisper = dynamicVoicesEnabled && seed % 5 == 0
