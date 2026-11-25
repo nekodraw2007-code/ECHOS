@@ -78,6 +78,9 @@ class MainActivity : Activity(), SensorEventListener {
     private var gravityInitialized = false
     private var magneticReference = Double.NaN
     private var magneticReferenceVector: DoubleArray? = null
+    private var magneticCandidateSamples = 0
+    private var magneticCandidateSince = 0L
+    private var lastMagneticEventAt = 0L
     private val motionTriggerActive = mutableMapOf<String, Boolean>()
     private val motionReferenceMagnitude = mutableMapOf<String, Double>()
     private var lastProximityNear: Boolean? = null
@@ -872,6 +875,9 @@ class MainActivity : Activity(), SensorEventListener {
         nextWordAt = 0L
         magneticReference = Double.NaN
         magneticReferenceVector = null
+        magneticCandidateSamples = 0
+        magneticCandidateSince = 0L
+        lastMagneticEventAt = 0L
         motionTriggerActive.clear()
         motionReferenceMagnitude.clear()
         lastProximityNear = null
@@ -949,35 +955,82 @@ class MainActivity : Activity(), SensorEventListener {
 
     @Synchronized
     private fun processMagneticSignature(x: Double, y: Double, z: Double, magnitude: Double) {
-        if (!magnitude.isFinite() || magnitude <= 0.0) return
+        if (!magnitude.isFinite() || magnitude <= 0.0 || !x.isFinite() || !y.isFinite() || !z.isFinite()) return
         val now = System.currentTimeMillis()
-        if (!magneticReference.isFinite()) {
-            magneticReferenceVector = doubleArrayOf(x, y, z)
+        val current = doubleArrayOf(x, y, z)
+        val referenceVector = magneticReferenceVector
+        if (!magneticReference.isFinite() || referenceVector == null) {
+            magneticReferenceVector = current
             magneticReference = magnitude
+            magneticCandidateSamples = 0
             return
         }
 
-        // La norme magnétique est indépendante de l'orientation du téléphone :
-        // tourner l'appareil ne doit donc pas suffire à déclencher un mot.
+        // Compare le vecteur complet pour mesurer les changements de champ dans
+        // les trois axes, tout en conservant la norme comme indicateur moins
+        // sensible aux rotations du téléphone.
+        val vectorDelta = sqrt(
+            (x - referenceVector[0]) * (x - referenceVector[0]) +
+            (y - referenceVector[1]) * (y - referenceVector[1]) +
+            (z - referenceVector[2]) * (z - referenceVector[2])
+        )
         val magnitudeDelta = abs(magnitude - magneticReference)
         val calibratedNoise = if (calibrated) noiseFloor.toDouble() * 3.0 else 0.0
         val threshold = maxOf(0.45, calibratedNoise, 1.45 - sensitivity.toDouble() * 1.0)
         magneticDelta = magnitudeDelta.toFloat()
-        if (magnitudeDelta < threshold || now < nextWordAt) return
+
+        // Mise à jour très progressive de la référence en période calme; les
+        // petits changements ne s'accumulent pas en fausses alertes.
+        if (vectorDelta < threshold * 0.55 && magnitudeDelta < threshold * 0.55) {
+            for (i in 0..2) referenceVector[i] = referenceVector[i] * 0.985 + current[i] * 0.015
+            magneticReference = magneticReference * 0.985 + magnitude * 0.015
+            magneticCandidateSamples = 0
+            magneticCandidateSince = 0L
+            return
+        }
+
+        val eventThreshold = maxOf(threshold, if (calibrated) noiseFloor.toDouble() * 2.0 else 0.0)
+        if (vectorDelta < eventThreshold && magnitudeDelta < eventThreshold) {
+            magneticCandidateSamples = 0
+            magneticCandidateSince = 0L
+            return
+        }
+
+        // Validation temporelle : plusieurs lectures consécutives doivent
+        // confirmer la variation avant qu'un mot soit émis.
+        if (magneticCandidateSamples == 0) magneticCandidateSince = now
+        magneticCandidateSamples++
+        if (magneticCandidateSamples < 3 || now - magneticCandidateSince < 70L || now < nextWordAt) return
+        if (now - lastMagneticEventAt < 350L) return
 
         val pool = activeWordPool()
         if (pool.isEmpty()) return
-        // GhostTube construit sa signature magnétique à partir de la norme du champ.
-        // On reprend ce principe : chiffres décimaux de |B|, étendus à 20 chiffres.
-        val signature = repeatDigitsTo20(sensorFraction(magnitude), inclusive = false)
-        if (signature.length < 20) return
+
+        // Empreinte sensorielle reproductible et quantifiée : axes, norme,
+        // écart vectoriel et variation de norme. Ce n'est pas une preuve
+        // d'origine paranormale ni une reproduction du code propriétaire.
+        val signature = signatureDigits(
+            (x * 10.0).toLong().toDouble(),
+            (y * 10.0).toLong().toDouble(),
+            (z * 10.0).toLong().toDouble(),
+            (magnitude * 10.0).toLong().toDouble(),
+            (vectorDelta * 10.0).toLong().toDouble(),
+            (magnitudeDelta * 100.0).toLong().toDouble()
+        )
         val entry = selectSignatureEntry(pool, signature) ?: return
 
+        magneticReferenceVector = current
         magneticReference = magnitude
-        magneticReferenceVector = doubleArrayOf(x, y, z)
+        magneticCandidateSamples = 0
+        magneticCandidateSince = 0L
+        lastMagneticEventAt = now
         lastMagneticSignature = signature
         nextWordAt = now + cooldownForSignature(signature)
-        emitWord(entry, "signature magnétique · Δ %.2f µT".format(Locale.FRANCE, magnitudeDelta), signature)
+        emitWord(
+            entry,
+            "empreinte magnétique · vecteur Δ %.2f µT · norme Δ %.2f µT".format(Locale.FRANCE, vectorDelta, magnitudeDelta),
+            signature
+        )
     }
 
     @Synchronized
