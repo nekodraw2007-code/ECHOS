@@ -89,7 +89,6 @@ class MainActivity : Activity(), SensorEventListener {
     private var speechEngine: TextToSpeech? = null
     private var speechReady = false
     private var neuralVoiceEngine: NeuralVoiceEngine? = null
-    private var neuralVoiceLoading = false
     private var neuralSpeechThread: Thread? = null
     private var dynamicVoicesEnabled = true
     private var dynamicVoices: List<Voice> = emptyList()
@@ -618,7 +617,6 @@ class MainActivity : Activity(), SensorEventListener {
     private fun manageNeuralVoicePacks() {
         val voices = FrenchNeuralVoices.catalog
         val prefs = getSharedPreferences("echos_preferences", MODE_PRIVATE)
-        val selected = prefs.getString("neural_voice_selected", "siwis") ?: "siwis"
         val descriptions = voices.map { voice ->
             val state = if (FrenchNeuralVoices.isInstalled(this, voice)) "INSTALLÉE" else "À TÉLÉCHARGER · ${voice.approximateSize}"
             "${voice.label}\n${state}"
