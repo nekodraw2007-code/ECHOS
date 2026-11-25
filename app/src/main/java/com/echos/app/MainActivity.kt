@@ -629,7 +629,9 @@ class MainActivity : Activity(), SensorEventListener {
             .setItems(descriptions) { _, index ->
                 val voice = voices[index]
                 if (FrenchNeuralVoices.isInstalled(this, voice)) {
-                    prefs.edit().putString("neural_voice_selected", voice.id).apply()
+                    prefs.edit().putString("neural_voice_selected", voice.id)
+                        .putLong("preferences_updated_at", System.currentTimeMillis()).apply()
+                    syncPreferencesToCloud()
                     toast("Voix neuronale sélectionnée : ${voice.label}")
                     Thread {
                         try {
@@ -1733,6 +1735,11 @@ class MainActivity : Activity(), SensorEventListener {
                 noiseFloor = snapshot.getDouble("noiseFloor")?.toFloat() ?: noiseFloor
                 calibrated = snapshot.getBoolean("calibrated") ?: calibrated
                 dynamicVoicesEnabled = snapshot.getBoolean("dynamicVoicesEnabled") ?: dynamicVoicesEnabled
+                val neuralVoiceSelected = snapshot.getString("neuralVoiceSelected")
+                if (!neuralVoiceSelected.isNullOrBlank()) {
+                    getSharedPreferences("echos_preferences", MODE_PRIVATE).edit()
+                        .putString("neural_voice_selected", neuralVoiceSelected).apply()
+                }
                 val remoteCategories = (snapshot.get("activeCategories") as? List<*>)?.filterIsInstance<String>()
                 if (remoteCategories != null) {
                     activeCategories.clear()
@@ -1744,6 +1751,7 @@ class MainActivity : Activity(), SensorEventListener {
                     .putFloat("noise_floor", noiseFloor)
                     .putBoolean("calibrated", calibrated)
                     .putBoolean("dynamic_voices_enabled", dynamicVoicesEnabled)
+                    .putString("neural_voice_selected", neuralVoiceSelected ?: getSharedPreferences("echos_preferences", MODE_PRIVATE).getString("neural_voice_selected", "siwis"))
                     .putString("active_categories", activeCategories.joinToString("\n"))
                     .putLong("preferences_updated_at", remoteUpdatedAt)
                     .apply()
@@ -1850,6 +1858,7 @@ class MainActivity : Activity(), SensorEventListener {
             "noiseFloor" to noiseFloor.toDouble(),
             "calibrated" to calibrated,
             "dynamicVoicesEnabled" to dynamicVoicesEnabled,
+            "neuralVoiceSelected" to getSharedPreferences("echos_preferences", MODE_PRIVATE).getString("neural_voice_selected", "siwis"),
             "activeCategories" to activeCategories.toList(),
             "updatedAt" to getSharedPreferences("echos_preferences", MODE_PRIVATE).getLong("preferences_updated_at", System.currentTimeMillis())
         )
