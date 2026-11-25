@@ -634,7 +634,7 @@ class MainActivity : Activity(), SensorEventListener {
                     Thread {
                         try {
                             val engine = neuralVoiceEngine ?: NeuralVoiceEngine(this).also { neuralVoiceEngine = it }
-                            engine.speak("Bonjour. Cette voix neuronale fonctionne hors ligne dans ECHOS.", voice, 0, 0.94f, false)
+                            engine.speak("Bonjour. Cette voix neuronale fonctionne hors ligne dans ECHOS.", voice, 0, 0.94f, 4)
                         } catch (e: Exception) {
                             Log.e("ECHOS_NEURAL", "Test neural impossible", e)
                             runOnUiThread { toast("Erreur moteur neural : ${e.localizedMessage ?: "inconnue"}") }
