@@ -3,20 +3,20 @@ package com.echos.app;
 import android.media.AudioTrack;
 
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
 
 import kotlin.jvm.functions.Function1;
 
 /**
  * Explicit JVM callback for sherpa-onnx JNI.
- *
- * The native binding resolves invoke([F)Ljava/lang/Integer; by name and
- * descriptor. A Kotlin lambda may be emitted as an ART synthetic lambda
- * without this exact method on some Android/R8 combinations.
+ * Keeps track of every PCM frame queued so the caller can wait for playback
+ * to finish instead of stopping/flushing AudioTrack as soon as TTS generation ends.
  */
 final class SherpaAudioCallback implements Function1<float[], Integer> {
     private final AudioTrack track;
     private final AtomicBoolean stopRequested;
     private final int style;
+    private final AtomicLong framesQueued = new AtomicLong(0L);
 
     SherpaAudioCallback(AudioTrack track, AtomicBoolean stopRequested, int style) {
         this.track = track;
@@ -33,7 +33,7 @@ final class SherpaAudioCallback implements Function1<float[], Integer> {
         for (int i = 0; i < samples.length; i++) {
             float sample = samples[i];
             switch (style) {
-                case 0: // Whisper-like airy signal: high-pass, light noise, soft compression.
+                case 0:
                     float high = sample - previous * 0.90f;
                     previous = sample;
                     float air = ((i * 1103515245L + 12345L) & 0x7fffffffL)
@@ -63,7 +63,29 @@ final class SherpaAudioCallback implements Function1<float[], Integer> {
                     AudioTrack.WRITE_BLOCKING);
             if (written <= 0) break;
             offset += written;
+            framesQueued.addAndGet(written); // mono: one short is one PCM frame
         }
         return Integer.valueOf(stopRequested.get() ? 0 : 1);
+    }
+
+    /** Wait until AudioTrack has actually played all frames accepted by write(). */
+    void awaitPlaybackComplete() {
+        long targetFrames = framesQueued.get();
+        if (targetFrames <= 0L || stopRequested.get()) return;
+
+        long sampleRate = Math.max(1, track.getSampleRate());
+        long timeoutMs = Math.max(5000L, (targetFrames * 1000L / sampleRate) + 5000L);
+        long deadline = android.os.SystemClock.elapsedRealtime() + timeoutMs;
+
+        while (!stopRequested.get() && android.os.SystemClock.elapsedRealtime() < deadline) {
+            long playedFrames = Integer.toUnsignedLong(track.getPlaybackHeadPosition());
+            if (playedFrames >= targetFrames) return;
+            try {
+                Thread.sleep(10L);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                return;
+            }
+        }
     }
 }
