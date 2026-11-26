@@ -126,7 +126,7 @@ class MainActivity : Activity(), SensorEventListener {
     private lateinit var sessionButton: Button
     private lateinit var sensitivityLabel: TextView
     private lateinit var sensorLabel: TextView
-    private lateinit var historyView: TextView
+    private lateinit var historyContainer: LinearLayout
     private lateinit var categoriesButton: Button
     private lateinit var recentWordsView: TextView
     private lateinit var customWordsContainer: LinearLayout
@@ -366,11 +366,10 @@ class MainActivity : Activity(), SensorEventListener {
 
         val historyPage = makePage()
         historyPage.addView(heading("Historique", "Tous les mots prononcés, du plus récent au plus ancien"))
-        historyView = text("Aucun mot détecté.", 13, white)
-        historyView.setLineSpacing(dp(6).toFloat(), 1f)
-        val historyCard = card()
-        historyCard.addView(historyView)
-        historyPage.addView(historyCard)
+        historyContainer = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+        }
+        historyPage.addView(historyContainer)
         historyPage.addView(button("EFFACER L'HISTORIQUE") {
             AlertDialog.Builder(this).setTitle("Effacer l'historique ?")
                 .setMessage("Tous les mots enregistrés seront supprimés.")
@@ -1980,10 +1979,48 @@ class MainActivity : Activity(), SensorEventListener {
     }
 
     private fun refreshHistory() {
-        if (::historyView.isInitialized) {
-            val grouped = history.groupBy { it.substringBefore(",") }
-            historyView.text = if (history.isEmpty()) "Aucun mot détecté." else grouped.entries.joinToString("\n\n") { (date, entries) ->
-                "▰  $date\n" + entries.joinToString("\n") { "• " + it.substringAfter(" · ") }
+        if (::historyContainer.isInitialized) {
+            historyContainer.removeAllViews()
+            if (history.isEmpty()) {
+                val emptyCard = card()
+                emptyCard.addView(text("Aucun mot détecté.", 15, muted))
+                historyContainer.addView(emptyCard)
+            } else {
+                val grouped = history.groupBy { it.substringBefore(",") }
+                grouped.forEach { (date, entries) ->
+                    val dateHeader = text("▰  $date", 12, accent, true).apply {
+                        setPadding(dp(3), dp(12), 0, dp(7))
+                    }
+                    historyContainer.addView(dateHeader)
+                    entries.forEach { entry ->
+                        val stamp = entry.substringBefore(" · ")
+                        val details = entry.substringAfter(" · ", entry)
+                        val isWord = details.startsWith("Mot : ")
+                        val word = if (isWord) details.substringAfter("Mot : ").substringBefore(" · ") else details
+                        val metadata = if (isWord) details.substringAfter(" · ", "") else ""
+                        val item = LinearLayout(this).apply {
+                            orientation = LinearLayout.VERTICAL
+                            setPadding(dp(14), dp(11), dp(14), dp(11))
+                            background = rounded(Color.rgb(13, 29, 51), 13)
+                        }
+                        if (isWord) {
+                            item.addView(text(word, 21, white, true).apply {
+                                maxLines = 3
+                                setLineSpacing(dp(1).toFloat(), 1f)
+                            })
+                            if (metadata.isNotBlank()) {
+                                item.addView(text(metadata, 10, muted))
+                            }
+                        } else {
+                            item.addView(text(details, 14, white, true))
+                        }
+                        item.addView(text(stamp.substringAfter(", ", stamp), 10, muted))
+                        val params = LinearLayout.LayoutParams(-1, -2).apply {
+                            bottomMargin = dp(7)
+                        }
+                        historyContainer.addView(item, params)
+                    }
+                }
             }
         }
         if (::recentWordsView.isInitialized) {
