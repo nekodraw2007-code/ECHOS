@@ -266,7 +266,7 @@ internal class NeuralVoiceEngine(private val context: Context) {
                 val timeoutMs = maxOf(5000L, (pcm.size * 1000L / audio.sampleRate) + 5000L)
                 val deadline = android.os.SystemClock.elapsedRealtime() + timeoutMs
                 while (!stopRequested.get() &&
-                    Integer.toUnsignedLong(track.playbackHeadPosition) < pcm.size.toLong() &&
+                    (track.playbackHeadPosition.toLong() and 0xffffffffL) < pcm.size.toLong() &&
                     android.os.SystemClock.elapsedRealtime() < deadline
                 ) {
                     Thread.sleep(10L)
