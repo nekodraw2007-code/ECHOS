@@ -257,7 +257,13 @@ internal class NeuralVoiceEngine(private val context: Context) {
                 val written = track.write(pcm, offset, pcm.size - offset, AudioTrack.WRITE_BLOCKING)
                 if (written < 0) throw IllegalStateException("AudioTrack.write a échoué : " + written)
                 if (written == 0) {
-                    Thread.sleep(5L)
+                    try {
+                        Thread.sleep(5L)
+                    } catch (_: InterruptedException) {
+                        stopRequested.set(true)
+                        Thread.currentThread().interrupt()
+                        return
+                    }
                 } else {
                     offset += written
                 }
@@ -269,7 +275,13 @@ internal class NeuralVoiceEngine(private val context: Context) {
                     (track.playbackHeadPosition.toLong() and 0xffffffffL) < pcm.size.toLong() &&
                     android.os.SystemClock.elapsedRealtime() < deadline
                 ) {
-                    Thread.sleep(10L)
+                    try {
+                        Thread.sleep(10L)
+                    } catch (_: InterruptedException) {
+                        stopRequested.set(true)
+                        Thread.currentThread().interrupt()
+                        return
+                    }
                 }
                 if (!stopRequested.get() &&
                     (track.playbackHeadPosition.toLong() and 0xffffffffL) < pcm.size.toLong()
