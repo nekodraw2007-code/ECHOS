@@ -168,7 +168,7 @@ internal object FrenchNeuralVoices {
                     val estimatedExtractBytes = 220L * 1024L * 1024L
                     while (entry != null) {
                         val currentEntry = entry
-                        val safeName = currentEntry.name.replace('\\\\', '/').trimStart('/')
+                        val safeName = currentEntry.name.replace('\\', '/').trimStart('/')
                         if (safeName.split('/').any { it == ".." }) throw SecurityException("Archive invalide")
                         val output = File(tempFolder, safeName)
                         if (currentEntry.isDirectory) output.mkdirs()
