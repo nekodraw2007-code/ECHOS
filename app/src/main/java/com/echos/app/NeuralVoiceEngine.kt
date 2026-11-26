@@ -8,7 +8,7 @@ import com.k2fsa.sherpa.onnx.GenerationConfig
 import com.k2fsa.sherpa.onnx.OfflineTts
 import com.k2fsa.sherpa.onnx.OfflineTtsConfig
 import com.k2fsa.sherpa.onnx.OfflineTtsModelConfig
-import com.k2fsa.sherpa.onnx.OfflineTtsVitsModelConfig
+import com.k2fsa.sherpa.onnx.OfflineTtsSupertonicModelConfig
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream
 import java.io.File
@@ -21,41 +21,56 @@ import java.util.concurrent.atomic.AtomicBoolean
 internal data class FrenchNeuralVoice(
     val id: String,
     val label: String,
-    val archive: String,
-    val modelFile: String,
-    val approximateSize: String
+    val speakerId: Int,
+    val archive: String = "sherpa-onnx-supertonic-3-tts-int8-2026-05-11.tar.bz2",
+    val modelFile: String = "duration_predictor.int8.onnx",
+    val approximateSize: String = "~100 Mo"
 )
 
 internal object FrenchNeuralVoices {
-    val catalog = listOf(
-        FrenchNeuralVoice("siwis", "Siwis · voix féminine", "vits-piper-fr_FR-siwis-medium.tar.bz2", "fr_FR-siwis-medium.onnx", "~64 Mo"),
-        FrenchNeuralVoice("tom", "Tom · voix masculine", "vits-piper-fr_FR-tom-medium.tar.bz2", "fr_FR-tom-medium.onnx", "~64 Mo"),
-        FrenchNeuralVoice("upmc", "UPMC · voix française", "vits-piper-fr_FR-upmc-medium.tar.bz2", "fr_FR-upmc-medium.onnx", "~64 Mo")
-    )
+    // Supertonic 3 provides ten speaker identities and supports French (lang=fr).
+    // All entries share one model directory and one downloaded archive.
+    val catalog = (0..9).map { sid ->
+        FrenchNeuralVoice(
+            id = "supertonic_fr_$sid",
+            label = "Voix française \${sid + 1}",
+            speakerId = sid
+        )
+    }
+
     private const val BASE = "https://github.com/k2-fsa/sherpa-onnx/releases/download/tts-models/"
+    private const val MODEL_DIR = "supertonic-fr"
 
     fun directory(context: Context, voice: FrenchNeuralVoice) =
-        File(context.filesDir, "neural-voices/${voice.id}")
+        File(context.filesDir, "neural-voices/$MODEL_DIR")
 
-    fun isInstalled(context: Context, voice: FrenchNeuralVoice) =
-        File(directory(context, voice), voice.modelFile).exists() &&
-            File(directory(context, voice), "tokens.txt").exists() &&
-            File(directory(context, voice), "espeak-ng-data").isDirectory
+    fun isInstalled(context: Context, voice: FrenchNeuralVoice): Boolean {
+        val dir = directory(context, voice)
+        return listOf(
+            "duration_predictor.int8.onnx",
+            "text_encoder.int8.onnx",
+            "vector_estimator.int8.onnx",
+            "vocoder.int8.onnx",
+            "tts.json",
+            "unicode_indexer.bin",
+            "voice.bin"
+        ).all { File(dir, it).isFile && File(dir, it).length() > 0L }
+    }
 
     fun downloadAndInstall(context: Context, voice: FrenchNeuralVoice, progress: (Int) -> Unit) {
         val base = File(context.filesDir, "neural-voices")
         base.mkdirs()
         val archiveFile = File(base, voice.archive)
-        val tempFolder = File(base, "install-${voice.id}-tmp")
+        val tempFolder = File(base, "install-supertonic-fr-tmp")
         val finalFolder = directory(context, voice)
         var connection: HttpURLConnection? = null
         try {
             connection = URL(BASE + voice.archive).openConnection() as HttpURLConnection
             connection.connectTimeout = 20000
-            connection.readTimeout = 45000
+            connection.readTimeout = 60000
             connection.setRequestProperty("User-Agent", "ECHOS-Android")
             connection.connect()
-            if (connection.responseCode !in 200..299) throw IllegalStateException("Téléchargement HTTP ${connection.responseCode}")
+            if (connection.responseCode !in 200..299) throw IllegalStateException("Téléchargement HTTP " + connection.responseCode)
             val expected = connection.contentLengthLong
             connection.inputStream.use { input ->
                 FileOutputStream(archiveFile).use { output ->
@@ -80,6 +95,8 @@ internal object FrenchNeuralVoices {
             BZip2CompressorInputStream(FileInputStream(archiveFile)).use { bz ->
                 TarArchiveInputStream(bz).use { tar ->
                     var entry = tar.nextTarEntry
+                    var extractedBytes = 0L
+                    val estimatedExtractBytes = 220L * 1024L * 1024L
                     while (entry != null) {
                         val currentEntry = entry
                         val safeName = currentEntry.name.replace('\\', '/').trimStart('/')
@@ -90,16 +107,13 @@ internal object FrenchNeuralVoices {
                             output.parentFile?.mkdirs()
                             FileOutputStream(output).use { out ->
                                 val buffer = ByteArray(64 * 1024)
-                                var copied = 0L
                                 while (true) {
                                     val n = tar.read(buffer)
                                     if (n < 0) break
                                     out.write(buffer, 0, n)
-                                    copied += n
-                                    if (currentEntry.name.endsWith(voice.modelFile) && currentEntry.size > 0) {
-                                        val pct = (46 + copied * 42 / currentEntry.size).toInt().coerceIn(46, 88)
-                                        progress(pct)
-                                    }
+                                    extractedBytes += n
+                                    val pct = (46 + extractedBytes * 42 / estimatedExtractBytes).toInt().coerceIn(46, 88)
+                                    progress(pct)
                                 }
                             }
                         }
@@ -108,12 +122,18 @@ internal object FrenchNeuralVoices {
                 }
             }
             progress(90)
-            // Archive has one root folder. Flatten its contents into the pack directory.
             val root = tempFolder.listFiles()?.singleOrNull()?.takeIf { it.isDirectory } ?: tempFolder
-            if (!File(root, voice.modelFile).exists() || !File(root, "tokens.txt").exists() ||
-                !File(root, "espeak-ng-data").isDirectory) {
-                throw IllegalStateException("Le pack vocal téléchargé est incomplet.")
-            }
+            val required = listOf(
+                "duration_predictor.int8.onnx",
+                "text_encoder.int8.onnx",
+                "vector_estimator.int8.onnx",
+                "vocoder.int8.onnx",
+                "tts.json",
+                "unicode_indexer.bin",
+                "voice.bin"
+            )
+            val missing = required.filter { !File(root, it).isFile || File(root, it).length() <= 0L }
+            if (missing.isNotEmpty()) throw IllegalStateException("Pack Supertonic incomplet : " + missing.joinToString())
             finalFolder.deleteRecursively()
             finalFolder.mkdirs()
             root.listFiles()?.forEach { item ->
@@ -134,72 +154,134 @@ internal class NeuralVoiceEngine(private val context: Context) {
     private var loadedId: String? = null
     private var tts: OfflineTts? = null
     private val stopRequested = AtomicBoolean(false)
+    @Volatile private var activeTrack: AudioTrack? = null
 
     @Synchronized
     private fun ensureLoaded(voice: FrenchNeuralVoice): OfflineTts {
-        if (loadedId == voice.id && tts != null) return tts!!
-        tts?.release()
+        if (loadedId == "supertonic-fr" && tts != null) return tts!!
+        try { tts?.release() } catch (_: Exception) {}
         val dir = FrenchNeuralVoices.directory(context, voice)
         val config = OfflineTtsConfig(
             model = OfflineTtsModelConfig(
-                vits = OfflineTtsVitsModelConfig(
-                    model = File(dir, voice.modelFile).absolutePath,
-                    tokens = File(dir, "tokens.txt").absolutePath,
-                    dataDir = File(dir, "espeak-ng-data").absolutePath
+                supertonic = OfflineTtsSupertonicModelConfig(
+                    durationPredictor = File(dir, "duration_predictor.int8.onnx").absolutePath,
+                    textEncoder = File(dir, "text_encoder.int8.onnx").absolutePath,
+                    vectorEstimator = File(dir, "vector_estimator.int8.onnx").absolutePath,
+                    vocoder = File(dir, "vocoder.int8.onnx").absolutePath,
+                    ttsJson = File(dir, "tts.json").absolutePath,
+                    unicodeIndexer = File(dir, "unicode_indexer.bin").absolutePath,
+                    voiceStyle = File(dir, "voice.bin").absolutePath
                 ),
                 numThreads = 2,
-                debug = false
+                debug = false,
+                provider = "cpu"
             ),
             maxNumSentences = 1
         )
         val engine = OfflineTts(config = config)
         tts = engine
-        loadedId = voice.id
+        loadedId = "supertonic-fr"
         return engine
     }
 
-    fun stop() { stopRequested.set(true) }
+    fun stop() {
+        stopRequested.set(true)
+        try {
+            activeTrack?.pause()
+            activeTrack?.flush()
+        } catch (_: Exception) {
+            // Track may already be stopping or released.
+        }
+    }
 
     @Synchronized
-    fun speak(text: String, voice: FrenchNeuralVoice, speakerId: Int, speed: Float = 1.0f, style: Int = 4, question: Boolean = false) {
+    fun speak(
+        text: String,
+        voice: FrenchNeuralVoice,
+        speakerId: Int,
+        speed: Float = 1.0f,
+        style: Int = 4,
+        question: Boolean = false
+    ) {
         stopRequested.set(false)
+        require(FrenchNeuralVoices.isInstalled(context, voice)) { "Le pack Supertonic français n'est pas installé." }
         val engine = ensureLoaded(voice)
-        val sampleRate = engine.sampleRate()
-        require(sampleRate in 8000..48000) { "Fréquence audio invalide: $sampleRate Hz" }
-        val minBuffer = AudioTrack.getMinBufferSize(sampleRate, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT)
-        require(minBuffer > 0) { "AudioTrack.getMinBufferSize a échoué: $minBuffer (sample rate=$sampleRate)" }
-        // AudioTrack expects a buffer size expressed in whole PCM frames.
-        // For mono PCM16, one frame is 2 bytes. sampleRate / 2 can be odd
-        // (for example 11025 bytes at 22050 Hz), which Android rejects as
-        // "Invalid audio buffer size".
-        val frameSizeBytes = 2
-        val targetBufferBytes = maxOf(minBuffer.toLong(), sampleRate.toLong()) // about 500 ms
-        val bufferSizeBytes = (((targetBufferBytes + frameSizeBytes - 1) / frameSizeBytes) * frameSizeBytes)
+        val generation = GenerationConfig(
+            sid = speakerId.coerceIn(0, 9),
+            speed = speed.coerceIn(0.88f, 1.12f),
+            numSteps = 8,
+            silenceScale = 0.2f,
+            extra = mapOf("lang" to "fr")
+        )
+
+        // Generate without a JNI streaming callback. This avoids the native callback
+        // crash seen on ART and gives us the complete audio before playback starts.
+        val audio = engine.generateWithConfig(text, generation)
+        if (stopRequested.get()) return
+        require(audio.sampleRate in 8000..48000) { "Fréquence audio invalide : " + audio.sampleRate + " Hz" }
+        require(audio.samples.isNotEmpty()) { "Le moteur Supertonic n'a généré aucun échantillon audio." }
+
+        val minBuffer = AudioTrack.getMinBufferSize(
+            audio.sampleRate,
+            AudioFormat.CHANNEL_OUT_MONO,
+            AudioFormat.ENCODING_PCM_16BIT
+        )
+        require(minBuffer > 0) { "AudioTrack.getMinBufferSize a échoué : " + minBuffer }
+        val targetBytes = maxOf(minBuffer.toLong(), audio.sampleRate.toLong())
+        val bufferSizeBytes = (((targetBytes + 1L) / 2L) * 2L)
             .coerceAtMost(Int.MAX_VALUE.toLong()).toInt()
         val track = AudioTrack(
-            android.media.AudioManager.STREAM_MUSIC, sampleRate,
-            AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT,
-            bufferSizeBytes, AudioTrack.MODE_STREAM
+            android.media.AudioManager.STREAM_MUSIC,
+            audio.sampleRate,
+            AudioFormat.CHANNEL_OUT_MONO,
+            AudioFormat.ENCODING_PCM_16BIT,
+            bufferSizeBytes,
+            AudioTrack.MODE_STREAM
         )
-        require(track.state == AudioTrack.STATE_INITIALIZED) { "AudioTrack non initialisé (sample rate=$sampleRate)" }
-        if (question) track.playbackRate = (sampleRate * 1.04f).toInt()
+        require(track.state == AudioTrack.STATE_INITIALIZED) {
+            "AudioTrack non initialisé (sample rate=" + audio.sampleRate + ")"
+        }
+        activeTrack = track
         try {
-            track.play()
-            val generation = GenerationConfig(sid = speakerId, speed = speed.coerceIn(0.75f, 1.25f), silenceScale = 0.2f)
-            // Use a concrete Java Function1 implementation. sherpa-onnx JNI looks up
-            // invoke(float[]) with a boxed Integer return; Kotlin's synthetic lambda
-            // on some ART/R8 combinations does not expose that exact JNI signature.
-            val audioCallback = SherpaAudioCallback(track, stopRequested, style)
-            engine.generateWithConfigAndCallback(text, generation, audioCallback)
+            if (question) track.playbackRate = (audio.sampleRate * 1.02f).toInt()
+            val pcm = ShortArray(audio.samples.size)
+            for (i in audio.samples.indices) {
+                // Keep the generated voice intact; only leave a little headroom.
+                val sample = (audio.samples[i] * 0.96f).coerceIn(-1.0f, 1.0f)
+                pcm[i] = (sample * 32767.0f).toInt().toShort()
+            }
 
-            // TTS generation only queues PCM into AudioTrack. Do not stop or flush
-            // here: that discards audio still waiting in the hardware playback queue.
-            if (!stopRequested.get()) {
-                audioCallback.awaitPlaybackComplete()
+            track.play()
+            var offset = 0
+            while (offset < pcm.size && !stopRequested.get()) {
+                val written = track.write(pcm, offset, pcm.size - offset, AudioTrack.WRITE_BLOCKING)
+                if (written < 0) throw IllegalStateException("AudioTrack.write a échoué : " + written)
+                if (written == 0) {
+                    Thread.sleep(5L)
+                } else {
+                    offset += written
+                }
+            }
+            if (!stopRequested.get() && offset == pcm.size) {
+                val timeoutMs = maxOf(5000L, (pcm.size * 1000L / audio.sampleRate) + 5000L)
+                val deadline = android.os.SystemClock.elapsedRealtime() + timeoutMs
+                while (!stopRequested.get() &&
+                    Integer.toUnsignedLong(track.playbackHeadPosition) < pcm.size.toLong() &&
+                    android.os.SystemClock.elapsedRealtime() < deadline
+                ) {
+                    Thread.sleep(10L)
+                }
+                if (!stopRequested.get() &&
+                    Integer.toUnsignedLong(track.playbackHeadPosition) < pcm.size.toLong()
+                ) {
+                    throw IllegalStateException(
+                        "Lecture audio incomplète : " + track.playbackHeadPosition + "/" + pcm.size + " trames."
+                    )
+                }
                 if (!stopRequested.get()) track.stop()
             }
         } finally {
-            // Flush only on cancellation; on normal completion the queue has drained.
+            activeTrack = null
             if (stopRequested.get()) {
                 try { track.pause(); track.flush() } catch (_: Exception) {}
             }
