@@ -272,7 +272,7 @@ internal class NeuralVoiceEngine(private val context: Context) {
                     Thread.sleep(10L)
                 }
                 if (!stopRequested.get() &&
-                    Integer.toUnsignedLong(track.playbackHeadPosition) < pcm.size.toLong()
+                    (track.playbackHeadPosition.toLong() and 0xffffffffL) < pcm.size.toLong()
                 ) {
                     throw IllegalStateException(
                         "Lecture audio incomplète : " + track.playbackHeadPosition + "/" + pcm.size + " trames."
