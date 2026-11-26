@@ -86,7 +86,7 @@ internal object FrenchNeuralVoices {
                 }
                 connection.connect()
                 val code = connection.responseCode
-                if (code == HttpURLConnection.HTTP_REQUESTED_RANGE_NOT_SATISFIABLE) {
+                if (code == 416) {
                     // A stale/complete partial file cannot be resumed: restart cleanly.
                     archiveFile.delete()
                     expectedTotal = -1L
