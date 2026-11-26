@@ -167,11 +167,19 @@ internal class NeuralVoiceEngine(private val context: Context) {
         val sampleRate = engine.sampleRate()
         require(sampleRate in 8000..48000) { "Fréquence audio invalide: $sampleRate Hz" }
         val minBuffer = AudioTrack.getMinBufferSize(sampleRate, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT)
-        require(minBuffer > 0) { "AudioTrack buffer invalide: $minBuffer" }
+        require(minBuffer > 0) { "AudioTrack.getMinBufferSize a échoué: $minBuffer (sample rate=$sampleRate)" }
+        // AudioTrack expects a buffer size expressed in whole PCM frames.
+        // For mono PCM16, one frame is 2 bytes. sampleRate / 2 can be odd
+        // (for example 11025 bytes at 22050 Hz), which Android rejects as
+        // "Invalid audio buffer size".
+        val frameSizeBytes = 2
+        val targetBufferBytes = maxOf(minBuffer.toLong(), sampleRate.toLong()) // about 500 ms
+        val bufferSizeBytes = (((targetBufferBytes + frameSizeBytes - 1) / frameSizeBytes) * frameSizeBytes)
+            .coerceAtMost(Int.MAX_VALUE.toLong()).toInt()
         val track = AudioTrack(
             android.media.AudioManager.STREAM_MUSIC, sampleRate,
             AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT,
-            maxOf(minBuffer, sampleRate / 2), AudioTrack.MODE_STREAM
+            bufferSizeBytes, AudioTrack.MODE_STREAM
         )
         require(track.state == AudioTrack.STATE_INITIALIZED) { "AudioTrack non initialisé (sample rate=$sampleRate)" }
         if (question) track.playbackRate = (sampleRate * 1.04f).toInt()
