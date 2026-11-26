@@ -59,38 +59,107 @@ internal object FrenchNeuralVoices {
 
     fun downloadAndInstall(context: Context, voice: FrenchNeuralVoice, progress: (Int) -> Unit) {
         val base = File(context.filesDir, "neural-voices")
-        base.mkdirs()
+        if (!base.exists() && !base.mkdirs()) throw IllegalStateException("Impossible de créer le dossier des voix.")
         val archiveFile = File(base, voice.archive)
         val tempFolder = File(base, "install-supertonic-fr-tmp")
         val finalFolder = directory(context, voice)
-        var connection: HttpURLConnection? = null
-        try {
-            connection = URL(BASE + voice.archive).openConnection() as HttpURLConnection
-            connection.connectTimeout = 20000
-            connection.readTimeout = 60000
-            connection.setRequestProperty("User-Agent", "ECHOS-Android")
-            connection.connect()
-            if (connection.responseCode !in 200..299) throw IllegalStateException("Téléchargement HTTP " + connection.responseCode)
-            val expected = connection.contentLengthLong
-            connection.inputStream.use { input ->
-                FileOutputStream(archiveFile).use { output ->
-                    val buffer = ByteArray(64 * 1024)
-                    var total = 0L
-                    var lastProgress = -1
-                    while (true) {
-                        val count = input.read(buffer)
-                        if (count < 0) break
-                        output.write(buffer, 0, count)
-                        total += count
-                        if (expected > 0) {
-                            val percent = (total * 45 / expected).toInt().coerceIn(0, 45)
-                            if (percent != lastProgress) { lastProgress = percent; progress(percent) }
+        var expectedTotal = -1L
+
+        // GitHub release assets support HTTP Range. Keep a partial archive so an
+        // interrupted mobile connection can resume instead of restarting at 0%.
+        var completed = false
+        var attempt = 0
+        var lastError: Exception? = null
+        progress(0)
+        while (!completed && attempt < 7) {
+            attempt++
+            var connection: HttpURLConnection? = null
+            try {
+                val offset = archiveFile.takeIf { it.isFile }?.length() ?: 0L
+                connection = (URL(BASE + voice.archive).openConnection() as HttpURLConnection).apply {
+                    connectTimeout = 30000
+                    readTimeout = 120000
+                    instanceFollowRedirects = true
+                    setRequestProperty("User-Agent", "ECHOS-Android")
+                    setRequestProperty("Accept-Encoding", "identity")
+                    if (offset > 0L) setRequestProperty("Range", "bytes=$offset-")
+                }
+                connection.connect()
+                val code = connection.responseCode
+                if (code == HttpURLConnection.HTTP_REQUESTED_RANGE_NOT_SATISFIABLE) {
+                    // A stale/complete partial file cannot be resumed: restart cleanly.
+                    archiveFile.delete()
+                    expectedTotal = -1L
+                    throw java.io.IOException("Reprise HTTP 416, nouveau téléchargement nécessaire")
+                }
+                if (code != HttpURLConnection.HTTP_OK && code != HttpURLConnection.HTTP_PARTIAL) {
+                    throw java.io.IOException("Serveur vocal HTTP $code")
+                }
+
+                var startOffset = offset
+                if (code == HttpURLConnection.HTTP_OK) {
+                    // Server ignored Range: overwrite rather than append duplicate bytes.
+                    startOffset = 0L
+                    expectedTotal = connection.contentLengthLong
+                } else {
+                    val range = connection.getHeaderField("Content-Range")
+                        ?: throw java.io.IOException("Réponse de reprise sans Content-Range")
+                    val match = Regex("bytes (\\d+)-(\\d+)/(\\d+)").matchEntire(range.trim())
+                        ?: throw java.io.IOException("En-tête Content-Range invalide : $range")
+                    val rangeStart = match.groupValues[1].toLong()
+                    if (rangeStart != offset) throw java.io.IOException("Reprise incohérente : $range")
+                    expectedTotal = match.groupValues[3].toLongOrNull() ?: -1L
+                }
+
+                val totalBefore = startOffset
+                connection.inputStream.use { input ->
+                    FileOutputStream(archiveFile, startOffset > 0L).use { output ->
+                        val buffer = ByteArray(128 * 1024)
+                        var total = totalBefore
+                        while (true) {
+                            val count = input.read(buffer)
+                            if (count < 0) break
+                            if (count == 0) continue
+                            output.write(buffer, 0, count)
+                            total += count
+                            if (expectedTotal > 0L) {
+                                val percent = (total * 45L / expectedTotal).toInt().coerceIn(0, 45)
+                                progress(percent)
+                            }
                         }
+                        output.fd.sync()
                     }
                 }
+                val actual = archiveFile.length()
+                if (expectedTotal > 0L && actual != expectedTotal) {
+                    throw java.io.IOException("Téléchargement incomplet : $actual / $expectedTotal octets")
+                }
+                if (actual <= 0L) throw java.io.IOException("Le serveur a envoyé un fichier vide")
+                completed = true
+            } catch (e: Exception) {
+                lastError = e
+                if (attempt >= 7) break
+                // Keep the partial file for the next Range request.
+                try { Thread.sleep((1000L * attempt).coerceAtMost(6000L)) }
+                catch (_: InterruptedException) {
+                    Thread.currentThread().interrupt()
+                    throw java.io.IOException("Téléchargement interrompu")
+                }
+            } finally {
+                connection?.disconnect()
             }
+        }
+        if (!completed) {
+            throw java.io.IOException(
+                "Téléchargement interrompu après $attempt tentatives. " +
+                    "Les données déjà reçues sont conservées pour reprendre. " +
+                    (lastError?.localizedMessage ?: "Vérifie la connexion Internet.")
+            )
+        }
+
+        try {
             tempFolder.deleteRecursively()
-            tempFolder.mkdirs()
+            if (!tempFolder.mkdirs()) throw IllegalStateException("Impossible de préparer l'extraction du pack.")
             progress(46)
             BZip2CompressorInputStream(FileInputStream(archiveFile)).use { bz ->
                 TarArchiveInputStream(bz).use { tar ->
@@ -99,7 +168,7 @@ internal object FrenchNeuralVoices {
                     val estimatedExtractBytes = 220L * 1024L * 1024L
                     while (entry != null) {
                         val currentEntry = entry
-                        val safeName = currentEntry.name.replace('\\', '/').trimStart('/')
+                        val safeName = currentEntry.name.replace('\\\\', '/').trimStart('/')
                         if (safeName.split('/').any { it == ".." }) throw SecurityException("Archive invalide")
                         val output = File(tempFolder, safeName)
                         if (currentEntry.isDirectory) output.mkdirs()
@@ -134,17 +203,25 @@ internal object FrenchNeuralVoices {
             )
             val missing = required.filter { !File(root, it).isFile || File(root, it).length() <= 0L }
             if (missing.isNotEmpty()) throw IllegalStateException("Pack Supertonic incomplet : " + missing.joinToString())
-            finalFolder.deleteRecursively()
-            finalFolder.mkdirs()
+
+            val installStage = File(base, "supertonic-fr-install-stage")
+            installStage.deleteRecursively()
+            if (!installStage.mkdirs()) throw IllegalStateException("Impossible de préparer l'installation du pack.")
             root.listFiles()?.forEach { item ->
-                val target = File(finalFolder, item.name)
+                val target = File(installStage, item.name)
                 if (item.isDirectory) item.copyRecursively(target, overwrite = true)
                 else item.copyTo(target, overwrite = true)
             }
+            finalFolder.deleteRecursively()
+            if (!installStage.renameTo(finalFolder)) {
+                installStage.copyRecursively(finalFolder, overwrite = true)
+                installStage.deleteRecursively()
+            }
+            if (!isInstalled(context, voice)) throw IllegalStateException("La validation finale du pack Supertonic a échoué.")
             progress(100)
-        } finally {
-            connection?.disconnect()
+            // Only delete the archive after successful extraction and validation.
             archiveFile.delete()
+        } finally {
             tempFolder.deleteRecursively()
         }
     }
