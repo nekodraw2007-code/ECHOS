@@ -186,34 +186,14 @@ internal class NeuralVoiceEngine(private val context: Context) {
         try {
             track.play()
             val generation = GenerationConfig(sid = speakerId, speed = speed.coerceIn(0.75f, 1.25f), silenceScale = 0.2f)
-            engine.generateWithConfigAndCallback(text, generation) { samples ->
-                if (stopRequested.get()) return@generateWithConfigAndCallback 0
-                val shorts = ShortArray(samples.size)
-                var previous = 0f
-                for (i in samples.indices) {
-                    var sample = samples[i]
-                    when (style) {
-                        0 -> { // whisper-like airy signal: HPF, light noise, soft compression
-                            val high = sample - previous * 0.90f
-                            previous = sample
-                            val air = ((i * 1103515245L + 12345L) and 0x7fffffffL).toFloat() / 2147483647f - 0.5f
-                            sample = kotlin.math.tanh(high * 1.55f) * 0.18f + air * 0.004f
-                        }
-                        1 -> sample *= 0.88f
-                        2 -> sample = (sample * 1.10f).coerceIn(-1f, 1f)
-                        3 -> sample *= 0.92f
-                        else -> sample *= 0.98f
-                    }
-                    shorts[i] = (sample.coerceIn(-1f, 1f) * 32767f).toInt().toShort()
-                }
-                var offset = 0
-                while (offset < shorts.size && !stopRequested.get()) {
-                    val written = track.write(shorts, offset, shorts.size - offset, AudioTrack.WRITE_BLOCKING)
-                    if (written <= 0) break
-                    offset += written
-                }
-                if (stopRequested.get()) 0 else 1
-            }
+            // Use a concrete Java Function1 implementation. sherpa-onnx JNI looks up
+            // invoke(float[]) with a boxed Integer return; Kotlin's synthetic lambda
+            // on some ART/R8 combinations does not expose that exact JNI signature.
+            engine.generateWithConfigAndCallback(
+                text,
+                generation,
+                SherpaAudioCallback(track, stopRequested, style)
+            )
             if (!stopRequested.get()) track.stop()
         } finally {
             try { track.flush() } catch (_: Exception) {}
