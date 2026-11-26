@@ -189,14 +189,20 @@ internal class NeuralVoiceEngine(private val context: Context) {
             // Use a concrete Java Function1 implementation. sherpa-onnx JNI looks up
             // invoke(float[]) with a boxed Integer return; Kotlin's synthetic lambda
             // on some ART/R8 combinations does not expose that exact JNI signature.
-            engine.generateWithConfigAndCallback(
-                text,
-                generation,
-                SherpaAudioCallback(track, stopRequested, style)
-            )
-            if (!stopRequested.get()) track.stop()
+            val audioCallback = SherpaAudioCallback(track, stopRequested, style)
+            engine.generateWithConfigAndCallback(text, generation, audioCallback)
+
+            // TTS generation only queues PCM into AudioTrack. Do not stop or flush
+            // here: that discards audio still waiting in the hardware playback queue.
+            if (!stopRequested.get()) {
+                audioCallback.awaitPlaybackComplete()
+                if (!stopRequested.get()) track.stop()
+            }
         } finally {
-            try { track.flush() } catch (_: Exception) {}
+            // Flush only on cancellation; on normal completion the queue has drained.
+            if (stopRequested.get()) {
+                try { track.pause(); track.flush() } catch (_: Exception) {}
+            }
             track.release()
         }
     }
