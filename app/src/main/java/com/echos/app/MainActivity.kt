@@ -1810,7 +1810,7 @@ class MainActivity : Activity(), SensorEventListener {
                     .putFloat("noise_floor", noiseFloor)
                     .putBoolean("calibrated", calibrated)
                     .putBoolean("dynamic_voices_enabled", dynamicVoicesEnabled)
-                    .putString("neural_voice_selected", neuralVoiceSelected ?: getSharedPreferences("echos_preferences", MODE_PRIVATE).getString("neural_voice_selected", "siwis"))
+                    .putString("neural_voice_selected", neuralVoiceSelected ?: getSharedPreferences("echos_preferences", MODE_PRIVATE).getString("neural_voice_selected", "supertonic_fr_0"))
                     .putString("active_categories", activeCategories.joinToString("\n"))
                     .putLong("preferences_updated_at", remoteUpdatedAt)
                     .apply()
@@ -1917,7 +1917,7 @@ class MainActivity : Activity(), SensorEventListener {
             "noiseFloor" to noiseFloor.toDouble(),
             "calibrated" to calibrated,
             "dynamicVoicesEnabled" to dynamicVoicesEnabled,
-            "neuralVoiceSelected" to getSharedPreferences("echos_preferences", MODE_PRIVATE).getString("neural_voice_selected", "siwis"),
+            "neuralVoiceSelected" to getSharedPreferences("echos_preferences", MODE_PRIVATE).getString("neural_voice_selected", "supertonic_fr_0"),
             "activeCategories" to activeCategories.toList(),
             "updatedAt" to getSharedPreferences("echos_preferences", MODE_PRIVATE).getLong("preferences_updated_at", System.currentTimeMillis())
         )
