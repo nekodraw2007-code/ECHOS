@@ -607,7 +607,7 @@ class MainActivity : Activity(), SensorEventListener {
         voiceInfoView.text = if (installed.isEmpty()) {
             "Aucun pack neural installé. Installe une voix indépendante pour utiliser la synthèse hors Android. Les voix Android restent disponibles en secours."
         } else {
-            "Moteur neural hors ligne disponible · ${installed.size} pack(s) installé(s) : ${installed.joinToString { it.label }}. Les signatures sélectionnent une voix stable."
+            "Moteur IA Supertonic 3 hors ligne disponible · ${installed.size} voix française(s) : ${installed.joinToString { it.label }}."
         }
     }
 
@@ -623,8 +623,7 @@ class MainActivity : Activity(), SensorEventListener {
             setPadding(dp(18), dp(8), dp(18), dp(12))
         }
         val explanation = text(
-            "Choisis une voix. Les packs non installés ont un bouton de téléchargement visible. " +
-                "Après installation, la voix fonctionne hors ligne.",
+            "Choisis parmi 10 personnalités vocales françaises. Le pack IA est téléchargé une seule fois, puis toutes les voix fonctionnent hors ligne.",
             13, white
         )
         explanation.setPadding(0, 0, 0, dp(12))
@@ -635,7 +634,7 @@ class MainActivity : Activity(), SensorEventListener {
             addView(content)
         }
         val managerDialog = AlertDialog.Builder(this)
-            .setTitle("Voix neuronales françaises")
+            .setTitle("Voix IA françaises · Supertonic 3")
             .setView(scroll)
             .setNegativeButton("Fermer", null)
             .create()
@@ -648,7 +647,7 @@ class MainActivity : Activity(), SensorEventListener {
             Thread {
                 try {
                     val engine = neuralVoiceEngine ?: NeuralVoiceEngine(this).also { neuralVoiceEngine = it }
-                    engine.speak("Bonjour. Cette voix neuronale fonctionne hors ligne dans ECHOS.", voice, 0, 0.94f, 4)
+                    engine.speak("Bonjour. Cette voix IA française fonctionne hors ligne dans ECHOS.", voice, voice.speakerId, 1.0f, 4)
                 } catch (e: Exception) {
                     Log.e("ECHOS_NEURAL", "Test neural impossible", e)
                     runOnUiThread { toast("Erreur moteur neural : ${e.localizedMessage ?: "inconnue"}") }
@@ -773,7 +772,7 @@ class MainActivity : Activity(), SensorEventListener {
             neuralSpeechThread?.interrupt()
             neuralSpeechThread = Thread {
                 try {
-                    neural.speak(prepareFrenchSpeech(rawText), voice, 0, rate, style, question)
+                    neural.speak(prepareFrenchSpeech(rawText), voice, voice.speakerId, rate, style, question)
                 } catch (e: Exception) {
                     Log.e("ECHOS_NEURAL", "Synthèse neuronale impossible", e)
                     // The previous Android TTS path remains a safe fallback if model/runtime fails.
