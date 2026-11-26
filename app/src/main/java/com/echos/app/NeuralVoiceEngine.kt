@@ -33,7 +33,7 @@ internal object FrenchNeuralVoices {
     val catalog = (0..9).map { sid ->
         FrenchNeuralVoice(
             id = "supertonic_fr_$sid",
-            label = "Voix française \${sid + 1}",
+            label = "Voix française ${sid + 1}",
             speakerId = sid
         )
     }
